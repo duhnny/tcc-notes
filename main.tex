@@ -595,7 +595,25 @@ Chame $\Graph = [\Gamma, \Set]$.
 \end{theorem}
 
 \begin{proof}
-    ($\implies$) 
+    ($\implies$) Seja $f \colon A \to B$ um encoding total. Primeiramente,
+    provarenos que $\Free f$ é uma fibacao.
+
+    Seja, então, $p \colon \Free y_0 \to \Free f (b)$ um caminho em $\Free(B)$. Sabemos que
+    $p$ é uma palavra formada pela composicao de arestas de $B$ da seguinte 
+    forma:
+
+    \begin{equation*}
+        y_0 \to y_1 \to y_2 \to \cdots \to y_{n-1} \to f(b)
+    \end{equation*}
+
+    Do fato de que $f$ é encoding, tira-se que existe $x_{n-1} \in A$ tal
+    que existe aresta $x_{n-1} \to b$ que é levada em $y_{n-1} \to f(b)$.
+    Seguindo indutivamente, obtemos um caminho em $A$
+
+    \begin{equation*}
+        p' \colon x_0 \to x_1 \to \cdots \to x_{n-1} \to b
+    \end{equation*}
+    que é mapeado por $\Free f$ para $p$.
 \end{proof}
 
 \chapter*{TODOs}
