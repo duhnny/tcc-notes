@@ -1,0 +1,45 @@
+% aesthetics
+\def\smallsetminus{
+    \,\parbox{4pt}{%
+        \begin{tikzpicture}%
+            \draw[line width=.7pt] (.2ex, .8ex) -- (.8ex, .2ex);%
+            \node[scale=0.0] at (0,0) {$\setminus$};
+        \end{tikzpicture}%
+    }\,%
+}
+\def\encodes{
+    \,\parbox{13pt}{%
+        \begin{tikzpicture}[scale=1.1]%
+            \draw[line width=.55pt] plot [smooth, tension=1] coordinates {
+                (.2ex, .5ex)
+                (1.5ex, .5ex)
+                (1.3ex, .9ex)
+                (1ex, .5ex)
+                (1.33ex, .07ex)
+                (2.05ex, .5ex)
+                (2.6ex, .5ex)
+            };%
+            \draw[line width=.55pt] (2.2ex, .9ex)  -- (2.62ex, .48ex);%
+            \draw[line width=.55pt] (2.2ex, .14ex) -- (2.62ex, .56ex);%
+        \end{tikzpicture}%
+    }\,%
+}
+
+% general conventions
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\encodes}{\rightarrow}
+\newcommand{\Graph}{\operatorname{Graph}}
+\newcommand{\Enc}{\operatorname{Enc}}
+\newcommand{\Hom}[2]{\operatorname{Hom}(#1, #2)}
+\newcommand{\Ver}[1]{\operatorname{V}\left(#1\right)}
+\newcommand{\Edg}[1]{\operatorname{E}\left(#1\right)}
+\newcommand{\defeq}{:=}
+\newcommand{\card}[1]{\left|#1\right|}
+\newcommand{\Set}{\operatorname{Set}}
+\newcommand{\Kayley}[2]{\left\langle #1, #2 \right\rangle}
+\DeclareMathOperator*{\bigBoxProduct}{\text{\raisebox{-0.25ex}{\scalebox{1.25}{$\square$}}}}
+\newcommand\boxProduct{\mathbin{\text{\scalebox{.84}{$\square$}}}}
+\newcommand\Free{\operatorname{Free}}

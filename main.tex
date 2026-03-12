@@ -1,0 +1,616 @@
+% !Mode:: "TeX:UTF-8"
+\documentclass{book}
+
+% Pacotes que uso ---------------------------------------------------
+
+\usepackage[a4paper, total={16cm, 24cm}]{geometry}
+\usepackage[unicode,hidelinks]{hyperref}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{stix2}
+% \usepackage{unicode-math}
+\usepackage{cancel}
+\usepackage{mathtools}
+% \setmainfont{STIX Two Text}
+% \setmathfont{STIX Two Math}[bold-style=ISO]
+% \setmathfont[
+%     range=bb,
+%     Scale = MatchLowercase
+% ]{TeX Gyre DejaVu Math}
+%\setmathfont{cambria}[
+	%Path = {C:/Windows/Fonts/},
+	%Extension = .ttc,
+	%range = {`i-`j,"1D456-"1D457},
+	%Scale = 1.2
+%]
+% \setmathfont[
+%     range={"02216}
+% ]{XITS Math}
+\usepackage{multirow}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{quiver}
+\usepackage{graphicx}
+\usepackage{xparse}
+\usepackage{expl3}
+\usepackage{csquotes}
+\usepackage[brazilian,provide=*]{babel}
+\usepackage[style=authoryear, backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+
+% Fim dos pacotes ---------------------------------------------------
+
+% Para acessar o current directory (by https://tex.stackexchange.com/users/3094/paulo-cereda)]
+
+% \directlua{
+% 
+% 	require 'lfs'
+% 
+% 	function getPath()
+% 		tex.print(-2, lfs.currentdir())
+% 	end
+% 
+% }
+
+% Fim do código -----------------------------------------------------
+
+% Para o \(mathmode\) -----------------------------------------------
+
+\newcommand{\e}{ \ \ \text{e} \ \ }
+\newcommand{\bm}[1]{\symbf{#1}}
+\newcommand{\partiald}[2]{\frac{\partial #1}{\partial #2}}
+\let\oldImplies=\implies
+\RenewDocumentCommand{\implies}{!o}{%
+	\IfNoValueTF{#1}{\oldImplies}{\xRightarrow{#1}}%
+}%
+\newcommand{\meq}[1]{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\tiny #1}}}{=}}}
+\newcommand{\toInfty}[1]{\parbox[b][0.25cm]{0.9cm}{\centering\scriptsize$#1 \to \infty$}}
+\newcommand{\sq}[3][]{
+    \ifx&#1&%
+        (#2_#3)_{#3 \geqslant 1}
+    \else
+        (#2_#3)_{#3 \geqslant #1}
+    \fi
+}
+\newcommand{\esconder}[1]{}
+
+% \usepackage{justRedefiningScales}
+
+\newcommand{\sub}[1]{\bgroup \color{black!60} ( #1 ) \egroup}
+
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{corollary}[theorem]{Corolário}
+
+\theoremstyle{definition}
+\newtheorem{example}[theorem]{Exemplo}
+\newtheorem{exercise}{Exercício}[section]
+
+% \end{math} --------------------------------------------------------
+
+% Para o tikz (produção de imagens) ---------------------------------
+
+\newcommand{\SetCoordinate}{\coordinate (O) at (0,0)}
+\newcommand{\Node}[4][black]{\node[#1, shift = {(#2 cm,#3 cm)}] at (O){#4}}
+\newcommand{\Line}[5][black]{
+	\draw[#1] ([xshift= #2 cm,yshift= #3 cm]O) -- ([xshift= #4 cm,yshift= #5 cm]O)
+}
+\newcommand{\Coo}[2]{([xshift= #1 cm, yshift = #2 cm]O)}
+\newcommand{\Arc}[6][]{
+	\coordinate (C) at ([xshift= #2 cm, yshift= #3 cm]O);
+	\draw[#1] ([shift=(#5:#4)]C) arc (#5:#6:#4)
+}
+
+% \end{tikzpicture} -------------------------------------------------
+
+% Para os exercícios ------------------------------------------------
+
+% \label{exc}
+
+\title{
+	{\huge \textit{Notas de Aula}}
+}
+
+\author{}
+
+\ExplSyntaxOn
+\date{
+	\seq_const_from_clist:Nn \c_db_meses_seq {Janeiro, Fevereiro, Março, Abril, Maio, Junho, Julho, Agosto, Setembro, Outubro, Novembro, Dezembro}
+    \small \textit{\seq_item:Nn \c_db_meses_seq \c_sys_month_int,~\int_use:N \c_sys_year_int}
+}
+\ExplSyntaxOff
+
+\input{src/math.tex}
+
+\ExplSyntaxOn
+
+\prop_new:N \g_db_todo_prop
+
+\NewDocumentCommand{\TODO}{m}{
+    \ClassWarning{TODO}{#1}
+    \fcolorbox{red}{white}{\hypertarget{TODO_ \msg_line_number:}{\color{red}{#1}}}
+    \prop_gput:Nen \g_db_todo_prop {\msg_line_number:} {#1}
+}
+
+\cs_new:Npn \printItem:nn #1#2 {\item[\hyperlink{TODO_ #1}{\textbf{#1 .}}] #2}
+\NewDocumentCommand{\PrintTODOs} {} {
+    \begin{itemize}
+        \prop_map_function:NN \g_db_todo_prop \printItem:nn
+    \end{itemize}
+}
+
+\ExplSyntaxOff
+
+\newcommand{\mylabel}[1]{\label{#1}\hypertarget{#1}}
+\NewDocumentCommand{\myref}{om}{%
+    \hyperlink{#2}{\textbf{#1 \ref{#2}}}%
+}%
+
+% \newtheorem{theorem}{Teorema}[section]
+% \newtheorem{corollary}{Corolário}[theorem]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem{proposition}[theorem]{Proposição}
+\newtheorem{definition}[theorem]{Definição}
+
+\title{Notas de Métodos da Física Teórica}
+\author{Daniel Betoret}
+\date{July 2021}
+
+\begin{document}
+
+\input{titlepage}
+
+\tableofcontents
+
+\chapter{Introdução}
+    \TODO{Contextualizar introdução}
+
+    Para isso, trataremos aqui da categoria dos grafos $\Graph$, em que os morfismos serão os
+    encodings.
+
+    Bom, o primeiro passo para isso é mostrar que, de fato, está é uma categoria.
+
+    \begin{theorem}\mylabel{graph_is_a_category}
+        $(\Graph, \Enc)$ é uma categoria
+    \end{theorem}
+    \begin{proof}
+        (Associatividade) Sejam $A, B, C \in \Graph$ e seja $f \in \Hom{A}{B}$ e $g \in \Hom{B}{C}$,
+        então $g \circ f \in \Hom{A}{C}$.
+
+        De fato, seja $c_1 c_2$ uma aresta em $C$. Então, pela definição de encoding, existem
+        $b_1 \in g^{-1}(\{c_1\})$ e $b_2 \in g^{-1}(\{c_2\})$ tais que $b_1 b_2 \in \Edg{C}$.
+
+        Repetindo o argumento para $A$, encontramos dois vértices $a_1, a_2 \in \Ver{A}$ tais que
+        $f(a_1) = b_1$, $f(a_2) = b_2$ e $a_1 a_2 \in \Edg{A}$. Logo, $a_1 a_2$ é uma aresta em
+        $A$ tal que
+
+        \[(g \circ f) (a_1) = g(f(a_1)) = g(b_1) = c_1\]
+
+        e analogamente para $C$.
+    \end{proof}
+
+    Munidos do conhecimento de que o nosso objeto de estudo é uma categoria, podemos também definir
+    um produto, que nos será muito útil mais afrente.
+
+    \begin{definition}\mylabel{product}
+        Sejam $A, B \in \Graph$ grafos. Definimos então o grafo produto $A \times B$ como sendo o
+        grafo com vértices $\Ver{A} \times \Ver{B}$ e em que, se $(a, b)$ e $(a', b')$ são
+        dois vértices de $A \times B$, há uma aresta entre os dois se, e somente se,
+        $a = a' \wedge b b' \in \Edg{B}$ ou $a a' \in \Edg{A} \wedge b = b'$.
+
+        De forma mais geral, sejam $A_1, A_2, \cdots A_n \in \Graph$, então o grafo produto
+        $\prod_{i} A_i$ é o grafo no conjunto de vértices $\prod_i A_i$ definido da seguinte forma:
+
+        \begin{equation*}
+            (a_1, a_2, \cdots a_n) (a_1', a_2', \cdots a_n') \in \Edg{\prod_i A_i} \iff
+            \exists i \in \{1, \cdots n\}
+            \left( a_i a_i' \in \Edg{A_i} \wedge a_j = a_j', \forall j \neq i \right)
+        \end{equation*}
+        ou seja, se os vértices diferem em no máximo uma coordenada, e, nessa coordenada, há uma
+        aresta entre os dois vértices.
+    \end{definition}
+
+    Basta mostrar que esse produto realmente é um produto de categorias.
+
+    Lembre que, em uma categoria $(C, Hom)$, um produto $X \defeq \prod_i X_i$ é definido como um
+    elemento de $C$, munido de morfismos $\pi_i: X \to X_i$ tais que, dada uma família de
+    morfismos $f_i: Y \to X_i$, há um único morfismo $f: Y \to X$ tal que o seguinte diagrama
+    comuta:
+
+    \[
+        \begin{tikzcd}
+            Y \\
+            \\
+            \\
+            {\prod_i X_i} && {X_i}
+            \arrow["f"', dashed, from=1-1, to=4-1]
+            \arrow["{f_i}", from=1-1, to=4-3]
+            \arrow["{\pi_i}"', from=4-1, to=4-3]
+        \end{tikzcd}
+    \]
+
+    \begin{lemma}\mylabel{prod_is_prod}
+        A operação definida na \myref[Definição]{product} é de fato um produto na categoria
+        $(\Graph, \Enc)$.
+    \end{lemma}
+    \begin{proof}
+        Sejam $A_i \in \Graph$ uma família de grafos e $B$ um outro grafo tal que $B \encodes A_i$
+        por $f_i, \forall i$. Tome, então, a função $f: B \to \prod_i A_i$ dada por:
+
+        \begin{equation*}
+            f(b) = (f_1(b), f_2(b), \cdots) \in \prod_i A_i
+        \end{equation*}
+
+        Provaremos que $f$ é o único encoding tal que o diagrama acima comuta.
+
+        De fato, escreva $A \defeq \prod_i A_i$ seja
+        $(a_1, \cdots a_n)(a_1', \cdots a_n') \in \Edg{A}$. Então existe $i$ tal que
+        $a_i a_i' \in \Edg{A_i}$ e $a_j = a_j', \forall j \neq i$. Como $f_i$ é encoding,
+        existem $b_i, b_i' \in B$ tais que $b_i b_i' \in \Edg{B}$,
+        $f_i(b_i) = a_i$ e $f_i(b_i') = a_i'$. Logo,
+    \end{proof}
+
+\chapter{Notas sobre a tese}
+
+\section{9 de setembro de 2025}
+
+Vamos do fim para o começo. Onde queremos chegar é o seguinte teorema:
+
+\begin{theorem}[Teorema 2.11]
+    $\mu_1(n) \sim n$
+\end{theorem}
+
+\begin{proof}
+    Já sabemos que $\mu_1(n) \geq n - 1$.
+
+    Essa prova usa o lema para os primos a seguir:
+
+    Tomando $0 < \epsilon < 1$ sabemos que há $p, q \in \N$ primos e $s, t \in \N$ tais que
+    $p < 2^s$, $q < 2^t$ e
+
+    \begin{center}
+        \setlength{\tabcolsep}{13pt}
+        \begin{table}[ht!]
+            \begin{tabular}{c c c c}
+                $\displaystyle\frac{2^{s}}{p} < 1 + \frac{\epsilon}{27}$, &
+                $\displaystyle\frac{2^t}{q} < 1 + \frac{\epsilon}{27}$, &
+                $\displaystyle\frac{p}{p-1} < 1 + \frac{\epsilon}{27}$ &
+                $\displaystyle\frac{q}{q-1} < 1+ \frac{\epsilon}{27}$
+            \end{tabular}
+        \end{table}
+    \end{center}
+
+    Dados esses dois primos, sabemos que existe um $n_0 \in \N$ tal que, se $n \geq n_0$, existe
+    $m \in \N$, $m \geq n$ tal que $m = p^a q^b$ para um par $a, b \in \N$ tal que 
+
+    \begin{equation}
+        \frac{m}{n} < 1 + \frac{\epsilon}{3}
+    \end{equation}
+
+    Assim sendo, pelo \textbf{Teorema 2.10} (da tese) temos que
+
+    \begin{equation}
+        \mu_1(n) \leq \mu_1(p^a q^b) \leq_{\text{Teorema 2.10}}
+        \frac{p^a q^b \mu_1(pq)}{(p-1)(q-1)} \leq
+        \frac{\mu_1(2^s 2^t)}{(p-1)(q-1)} p^a q^b
+    \end{equation}
+    \begin{equation}
+        =    \frac{2^{s+t}}{(p-1)(q-1)} p^a q^b
+        \leq \frac{2^s}{p} \frac{p}{p-1} \frac{2^t}{q} \frac{q}{q-1} p^a q^b
+        \leq \Big(1 + \frac{\epsilon}{27}\Big)^4 p^a q^b
+        \leq \Big(1 + \frac{\epsilon}{3}\Big) p^a q^b
+    \end{equation}
+\end{proof}
+
+\begin{proposition}
+    $\mu_1(n) \geq n - 1$
+\end{proposition}
+
+\begin{proof}
+    A prova é uma conclusão do Lema 1.4 e do fato de que $K_n$ é regular de grau $n-1$.
+\end{proof}
+
+\begin{lemma}[Lema 1.4]
+    Se $f: G \to H$ é um encoding, e se $f(x) = u$, então $\deg_{f^{-1}(H)}(x) \geq \deg(u)$.
+\end{lemma}
+
+\begin{proof}
+    Prova é trivial pela definição de encoding.
+\end{proof}
+
+\begin{definition}
+    Um grafo é \textbf{regular} quando todos os seus vértices têm o mesmo grau.
+\end{definition}
+
+\begin{lemma}
+    Para todo $\epsilon > 0$, existe um número $n_0 \in \N$ tal que, se $n > n_0$, existe um inteiro $m = p^a q^b$ com $\frac{m}{n} < 1 + \epsilon$
+\end{lemma}
+
+\begin{proof}
+    Sem prova
+\end{proof}
+
+\begin{theorem}[Teorema dos Números Primos?]
+    Seja $0 < \epsilon < 1$. Então existem primos $p, q \in \N$ e $s, t \in \N$ tais que $p < 2^s$, $q < 2^t$ e
+
+    \begin{center}
+        \setlength{\tabcolsep}{13pt}
+        \begin{table}[ht!]
+            \begin{tabular}{c c c c}
+                $\displaystyle\frac{2^{s}}{p} < 1 + \frac{\epsilon}{27}$, & $\displaystyle\frac{2^t}{q} < 1 + \frac{\epsilon}{27}$, & $\displaystyle\frac{p}{p-1} < 1 + \frac{\epsilon}{27}$ & $\displaystyle\frac{q}{q-1} < 1+ \frac{\epsilon}{27}$
+            \end{tabular}
+        \end{table}
+    \end{center}
+\end{theorem}
+
+\begin{theorem}[Teorema 2.10]
+    Seja $n = p_1^{r_1} \cdots p_k^{r_k}$ e suponha que $s_1, \cdots, s_k \in \N$ sejam tais que $s_i | r_i, \forall i$. Então, tomando $m = p_1^{s_1} \cdots p_k^{s_k}$, temos que
+
+    \begin{equation}
+        \mu_1(n) \leq
+            \Big(\prod_{i = 1}^k \frac{p^{s_i}}{p^{s_i} - 1}\Big) \cdot \frac{\mu_1(m)}{m} \cdot n
+    \end{equation}
+\end{theorem}
+\begin{proof}
+    Repare que $\card{\prod_i GF(p_i^{r_i})} = n$. Logo,
+    $\left\langle \prod_i GF(p_i^{r_i}), * \right\rangle \encodes K_n$. Mas, segundo o lema
+    \TODO{inserir lema}, para cada $i$ existe $S_i \subseteq GF(p_i^{r_i})$ tal que :
+\end{proof}
+
+\begin{lemma}\mylabel{leminhas}
+    A seguinte propriedade 
+\end{lemma}
+
+\section{29 de janeiro de 2026}
+
+Considere a categoria formal $\Gamma$, com dois objetos e duas flechas seguinte:
+
+% https://q.uiver.app/#q=WzAsMixbMCwwLCJFIl0sWzAsMiwiViJdLFswLDEsInQiLDAseyJvZmZzZXQiOi0zfV0sWzAsMSwicyIsMix7Im9mZnNldCI6M31dXQ==
+\[\begin{tikzcd}
+	E \\
+	\\
+	V
+	\arrow["t", shift left=3, from=1-1, to=3-1]
+	\arrow["s"', shift right=3, from=1-1, to=3-1]
+\end{tikzcd}\]
+
+Nesse caso, $E$ é mapeado no conjunto das arestas de um grafo e $V$ nos vértices, sendo $Fs$ a
+função que mapeia cada aresta na sua fonte, e $Ft$ o seu destino.
+
+Podemos então considerar a categoria $[\Gamma, \Set]$ dos funtores $F \colon \Gamma \to \Set$ em
+que as setas são as transformações naturais:
+
+% https://q.uiver.app/#q=WzAsMixbMCwwLCJcXEdhbW1hIl0sWzQsMCwiU2V0Il0sWzAsMSwiRiIsMCx7ImN1cnZlIjotNH1dLFswLDEsIkciLDIseyJjdXJ2ZSI6NH1dLFsyLDMsIlxcZXRhIiwyLHsic2hvcnRlbiI6eyJzb3VyY2UiOjIwLCJ0YXJnZXQiOjIwfX1dXQ==
+\[\begin{tikzcd}
+	\Gamma &&&& \Set
+	\arrow[""{name=0, anchor=center, inner sep=0}, "F", curve={height=-24pt}, from=1-1, to=1-5]
+	\arrow[""{name=1, anchor=center, inner sep=0}, "G"', curve={height=24pt}, from=1-1, to=1-5]
+	\arrow["\eta"', between={0.2}{0.8}, Rightarrow, from=0, to=1]
+\end{tikzcd}\]
+
+Chame $\Graph = [\Gamma, \Set]$.
+
+\begin{theorem}
+    Seja $G$ um grupo, $N_i$ uma família de subgrupos normais de $G$ tais que $G = \prod_i N_i$ e
+    $S \subseteq G$ um subconjunto de $G$ qualquer tal que para todo $s \in S$, existe $i$ tal que
+    $s \in N_i$. Seja ainda $K$ um clique. Então
+
+    \begin{equation*}
+        \bigBoxProduct_i \Kayley{N_i}{*} \encodes_{K} \Kayley{G}{S}
+    \end{equation*}
+\end{theorem}
+
+\begin{proof}
+    
+\end{proof}
+
+\begin{theorem}
+    Sejam $A, B, C, D \in \Graph$ tais que $A \encodes B$ e $C \encodes D$. Então teremos:
+
+    \begin{equation*}
+        A \boxProduct C \encodes B \boxProduct D
+    \end{equation*}
+\end{theorem}
+\begin{proof}
+    
+\end{proof}
+
+\begin{theorem}[Teorema 2.10]
+    Seja $n = p_1^{r_1} \cdots p_k^{r_k}$ e suponha que $s_1, \cdots, s_k \in \N$ sejam tais que
+    $s_i | r_i, \forall i$. Então, tomando $m = p_1^{s_1} \cdots p_k^{s_k}$, temos que
+
+    \begin{equation}
+        \mu_1(n) \leq
+            \Big(\prod_{i = 1}^k \frac{p^{s_i}}{p^{s_i} - 1}\Big) \cdot \frac{\mu_1(m)}{m} \cdot n
+    \end{equation}
+\end{theorem}
+
+
+
+\begin{proof}
+    Seja $G \defeq \prod_i GF(p_i^{r_i})$. Repare que $\card{G} = n$. Logo,
+    $\Kayley{G}{*} \cong K_n$. Mas, segundo o lema \TODO{inserir lema}, para cada $i$ existe
+    $S_i \subseteq GF(p_i^{r_i})$, um conjunto de vetores linearmente independentes sobre
+    $GF(p_i^{s_i})$ que geram $GF(p_i^{r_i})$ pela ação de $GF(p_i^{s_i})$ em $S_i$.
+    
+    Sejam então
+
+    \begin{equation}
+        G' \defeq \prod_i GF(p_i^{s_i})
+    \end{equation}
+    e
+
+    \begin{equation}
+        S \defeq \prod_i S_i \subseteq G' 
+    \end{equation}
+
+    Então cada elemento de $G$ pode ser escrito como $s g'$, em que $s \in S$ e $g' \in G'$.
+
+    Considere, agora, $G$ como um grupo aditivo e as órbitas $sG' \subseteq G$ como subgrupos.
+    Então é claro que os subgrupos $sG'$ são normais e, além disso, temos que
+
+    \begin{equation*}
+        G \subseteq \sum_{s \in S} sG'
+    \end{equation*}
+
+    Logo, pelo \myref[Teorema]{normal_enc_kayley}, temos que
+
+    \begin{equation*}
+        \bigBoxProduct_{s \in S} \Kayley{s G'}{*} \encodes \Kayley{G}{*} \cong K_n
+    \end{equation*}
+    
+    Mas sabemos também que cada $s G'$ contém $m$ elementos. Sendo assim, temos
+    $\Kayley{s G'}{*} \cong K_{m}$ para todo $s \in S$. Mas isso significa que
+
+    \begin{equation*}
+        Q_{\mu(m)} \encodes K_m
+    \end{equation*}
+    por definição de $\mu$.
+
+    Logo, pelo \myref[Teorema]{prod_enc_prod}, nós temos que
+
+    \begin{equation*}
+        \bigBoxProduct_{s \in S} Q_{\mu(m)} \cong Q_{\card{S} \mu(m)} \encodes
+        \bigBoxProduct_{s \in S} K_m \cong \bigBoxProduct_{s \in S} \Kayley{s G'}{*} \cong K_n
+    \end{equation*}
+    donde, pela definição de $\mu$, tiramos imediatamente que
+
+    \begin{align*}
+        \mu(n) &\leq \card{S} \mu(m) \\
+               &=    \left( \prod_i \frac{p^{r_i} - 1}{p^{s_i} - 1} \right) \mu(m) \\
+               &\leq \left( \prod_i \frac{p^{r_i}}{p^{s_i} - 1} \right) \mu(m) \\
+               &=    n \left( \prod_i \frac{1}{p^{s_i} - 1} \right) \mu(m) \\
+               &=    \frac{n}{m} \left( \prod_i \frac{p^{s_i}}{p^{s_i} - 1} \right) \mu(m)
+    \end{align*}
+
+    Isto é,
+    \begin{equation*}
+        \mu(n) \leq \left( \prod_i \frac{p^{s_i}}{p^{s_i} - 1} \right) \frac{\mu(m)}{m} n
+    \end{equation*}
+\end{proof}
+
+\chapter{Resultados na Teoria de Grafos}
+
+\begin{theorem}\mylabel{normal_enc_kayley}
+    Seja $G$ um grupo, $N_i$ uma família de subgrupos normais de $G$ tais que $G = \prod_i N_i$ e
+    $S \subseteq G$ um subconjunto de $G$ qualquer tal que para todo $s \in S$, existe $i$ tal que
+    $s \in N_i$.
+
+    \begin{equation*}
+        \bigBoxProduct_i \Kayley{N_i}{*} \encodes \Kayley{G}{S}
+    \end{equation*}
+\end{theorem}
+
+\begin{proof}
+    Defina $f \colon \bigBoxProduct_i \Kayley{N_i}{*} \to \Kayley{G}{S}$ parcialmente levando cada
+    vértice $(n_i)_{i \in I}$ no produto $\prod_i n_i \in G$. Além disso, para cada aresta, que é
+    da forma
+
+    \begin{equation*}
+        (n_0, n_1, \cdots, n_i, \cdots, n_k) \to (n_0', n_1', \cdots, n_i', \cdots, n_k')
+    \end{equation*}
+    em que $n_j = n_j', \forall j \neq i$, se houver $s \in S$ tal que
+    $n_0' \cdots n_k' = s n_0 \cdots n_k$, então a aresta acima é mapeada na aresta
+
+    \begin{equation*}
+        n_0 n_1 \cdots n_k \to s n_0 n_1 \cdots n_k = n_0' n_1' \cdots n_k'
+    \end{equation*}
+    e, se não houver, não é definida.
+
+    Provaremos que $f$ assim dada é um encoding. Nesse caso, basta mostrar que, para toda aresta de
+    $\Kayley{G}{S}$, há um levantamento da aresta dado por $f$.
+
+    De fato, seja, sem perda de generalidade, $g \to s g$ uma aresta de $\Kayley{G}{S}$, com
+    $s \in S$ e $g \in G$. Sabemos, então, que, dado que $G = \prod_i N_i$, podemos escrever
+
+    \begin{equation*}
+        g = n_0 n_1 \cdots n_k
+    \end{equation*}
+    com cada $n_i \in N_i, \forall i$.
+
+    Além disso, sabemos que existe um $i$ tal que $s \in N_i$. Fixe tal $i$.
+
+    Temos, então, que
+
+    \begin{align*}
+        s n_0 n_1 \cdots n_i \cdots n_k &= ( n_0 n_1 \cdots n_{i-1} )
+                                           ( n_0 n_1 \cdots n_{i-1} )^{-1}
+                                           \cdot ( s n_0 n_1 \cdots n_i \cdots n_k ) \\
+                                        &= ( n_0 n_1 \cdots n_{i-1} )
+                                           \left( ( n_0 n_1 \cdots n_{i-1} )^{-1}
+                                           s ( n_0 n_1 \cdots n_{i-1} ) \right)
+                                           \cdot n_i \cdots n_k \\
+    \end{align*}
+
+    Como $N_i$ é normal, temos que
+
+    \begin{equation*}
+        \left( n_0 n_1 \cdots n_{i-1} \right)^{-1}
+            \cdot s
+            \cdot \left( n_0 n_1 \cdots n_{i-1} \right) \in N_i
+    \end{equation*}
+    \begin{equation*}
+         \implies \left( n_0 n_1 \cdots n_{i-1} \right)^{-1}
+                    \cdot s
+                    \cdot \left( n_0 n_1 \cdots n_{i-1} \right)
+                    \cdot n_i
+                    =: n_i' \in N_i
+    \end{equation*}
+
+    Logo,
+
+    \begin{equation*}
+        s n_0 n_1 \cdots n_i \cdots n_k = n_0 n_1 \cdots n_i' \cdots n_k
+    \end{equation*}
+    ou seja, a aresta
+
+    \begin{equation*}
+        (n_0, n_1, \cdots, n_i, \cdots n_k) \to (n_0, n_1, \cdots, n_i', \cdots n_k)
+    \end{equation*}
+    é mapeada por $f$ para a aresta
+
+    \begin{equation*}
+        g \to s g
+    \end{equation*}
+\end{proof}
+
+
+\chapter{Rumo a uma categorização de encodings}
+
+\begin{theorem}
+    Sejam $A, B \in \Graph$, e $f \colon A \to B$ um encoding de grafos. Então
+
+    \begin{equation*}
+        \Free f \colon \Free(A) \to \Free(B)
+    \end{equation*}
+    é uma fibração de Conduché.
+
+    Por outro lado, se $F \colon \Free(A) \to \Free(B)$ é uma fibração de Conduché, existe
+    $f \colon A \to B$ encoding tal que
+
+    \begin{equation*}
+        F = \Free f
+    \end{equation*}
+\end{theorem}
+
+\begin{proof}
+    ($\implies$) 
+\end{proof}
+
+\chapter*{TODOs}
+    \PrintTODOs
+
+\chapter*{Bibliografia}
+    \printbibliography
+    \begin{itemize}
+    \item VIANA, M.; OLIVEIRA, K. \textit{Fundamentos da teoria ergódica}. Rio de Janeiro: SBM, 2014. v. 90. 
+    \item MAQUERA, H. \textit{Teorema de Furstenberg sobre o produto aleatório de matrizes}. São Carlos: USP, Dissertação de Mestrado do Programa de Pós-Graduação em Matemática, 2018.
+    \end{itemize}
+
+
+
+
+
+
+\end{document}
