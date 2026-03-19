@@ -312,7 +312,7 @@ Vamos do fim para o começo. Onde queremos chegar é o seguinte teorema:
 \end{proof}
 
 \begin{lemma}[Lema 1.4]
-    Se $f: G \to H$ é um encoding, e se $f(x) = u$, então $\deg_{f^{-1}(H)}(x) \geq \deg(u)$.
+    Se $f: G \encodes H$ é um encoding, e se $f(x) = u$, então $\deg_{f^{-1}(H)}(x) \geq \deg(u)$.
 \end{lemma}
 
 \begin{proof}
@@ -492,6 +492,14 @@ Chame $\Graph = [\Gamma, \Set]$.
 
 \chapter{Resultados na Teoria de Grafos}
 
+\begin{lemma}[Lema 1.4]
+    Se $f: G \encodes H$ é um encoding, e se $f(x) = u$, então $\deg_{f^{-1}(H)}(x) \geq \deg(u)$.
+\end{lemma}
+
+\begin{proof}
+    Prova é trivial pela definição de encoding.
+\end{proof}
+
 \begin{theorem}\mylabel{normal_enc_kayley}
     Seja $G$ um grupo, $N_i$ uma família de subgrupos normais de $G$ tais que $G = \prod_i N_i$ e
     $S \subseteq G$ um subconjunto de $G$ qualquer tal que para todo $s \in S$, existe $i$ tal que
@@ -575,8 +583,113 @@ Chame $\Graph = [\Gamma, \Set]$.
     \end{equation*}
 \end{proof}
 
+\begin{lemma}\mylabel{li_finite_field}
+    Seja $p$ um primo. Se $t$ é um elemento primitivo do corpo finito $GF(p^r)$, então $t^a$ e
+    $t^b$ são linearmente independentes em um subcorpo $GF(p^s)$ sse.
+
+    \begin{equation*}
+        a \cong b \\ \left( \operatorname{mod} \frac{p^r -1}{p^s - 1} \right)
+    \end{equation*}
+\end{lemma}
+
+\begin{theorem}\mylabel{prod_enc_prod}
+    Sejam $A, B, C, D \in \Graph$ grafos tais que $A \encodes B$ e $C \encodes D$. Então
+
+    \begin{equation*}
+        A \boxProduct C \encodes B \boxProduct D
+    \end{equation*}
+\end{theorem}
+
+\begin{proof}
+    Sejam $f \colon A \to B$ e $g \colon C \to D$ encodings. Além disso, seja
+
+    \begin{equation*}
+        (b_1, d_1) \to (b_2, d_2)
+    \end{equation*}
+
+    Uma aresta de $B \boxProduct D$.
+\end{proof}
+
+\begin{theorem}[Teorema 2.10]
+    Seja $n = p_1^{r_1} \cdots p_k^{r_k}$ e suponha que $s_1, \cdots, s_k \in \N$ sejam tais que
+    $s_i | r_i, \forall i$. Então, tomando $m = p_1^{s_1} \cdots p_k^{s_k}$, temos que
+
+    \begin{equation}
+        \mu_1(n) \leq
+            \Big(\prod_{i = 1}^k \frac{p^{s_i}}{p^{s_i} - 1}\Big) \cdot \frac{\mu_1(m)}{m} \cdot n
+    \end{equation}
+\end{theorem}
+
+\begin{proof}
+    Seja $G \defeq \prod_i GF(p_i^{r_i})$. Repare que $\card{G} = n$. Logo,
+    $\Kayley{G}{*} \cong K_n$. Mas, segundo o \myref[Lema]{li_finite_field}, para cada $i$ existe
+    $S_i \subseteq GF(p_i^{r_i})$, um conjunto de vetores linearmente independentes sobre
+    $GF(p_i^{s_i})$ que geram $GF(p_i^{r_i})$ pela ação de $GF(p_i^{s_i})$ em $S_i$.
+    
+    Sejam então
+
+    \begin{equation}
+        G' \defeq \prod_i GF(p_i^{s_i})
+    \end{equation}
+    e
+
+    \begin{equation}
+        S \defeq \prod_i S_i \subseteq G' 
+    \end{equation}
+
+    Então cada elemento de $G$ pode ser escrito como $s g'$, em que $s \in S$ e $g' \in G'$.
+
+    Considere, agora, $G$ como um grupo aditivo e as órbitas $sG' \subseteq G$ como subgrupos.
+    Então é claro que os subgrupos $sG'$ são normais e, além disso, temos que
+
+    \begin{equation*}
+        G \subseteq \sum_{s \in S} sG'
+    \end{equation*}
+
+    Logo, pelo \myref[Teorema]{normal_enc_kayley}, temos que
+
+    \begin{equation*}
+        \bigBoxProduct_{s \in S} \Kayley{s G'}{*} \encodes \Kayley{G}{*} \cong K_n
+    \end{equation*}
+    
+    Mas sabemos também que cada $s G'$ contém $m$ elementos. Sendo assim, temos
+    $\Kayley{s G'}{*} \cong K_{m}$ para todo $s \in S$. Mas isso significa que
+
+    \begin{equation*}
+        Q_{\mu(m)} \encodes K_m
+    \end{equation*}
+    por definição de $\mu$.
+
+    Logo, pelo \myref[Teorema]{prod_enc_prod}, nós temos que
+
+    \begin{equation*}
+        \bigBoxProduct_{s \in S} Q_{\mu(m)} \cong Q_{\card{S} \mu(m)} \encodes
+        \bigBoxProduct_{s \in S} K_m \cong \bigBoxProduct_{s \in S} \Kayley{s G'}{*} \cong K_n
+    \end{equation*}
+    donde, pela definição de $\mu$, tiramos imediatamente que
+
+    \begin{align*}
+        \mu(n) &\leq \card{S} \mu(m) \\
+               &=    \left( \prod_i \frac{p^{r_i} - 1}{p^{s_i} - 1} \right) \mu(m) \\
+               &\leq \left( \prod_i \frac{p^{r_i}}{p^{s_i} - 1} \right) \mu(m) \\
+               &=    n \left( \prod_i \frac{1}{p^{s_i} - 1} \right) \mu(m) \\
+               &=    \frac{n}{m} \left( \prod_i \frac{p^{s_i}}{p^{s_i} - 1} \right) \mu(m)
+    \end{align*}
+
+    Isto é,
+    \begin{equation*}
+        \mu(n) \leq \left( \prod_i \frac{p^{s_i}}{p^{s_i} - 1} \right) \frac{\mu(m)}{m} n
+    \end{equation*}
+\end{proof}
+
 
 \chapter{Rumo a uma categorização de encodings}
+
+\begin{definition}\mylabel{functor_fibration}
+    Seja $F \colon A \to B$ um funtor entre duas categorias $A, B$. Diremos, então, que $F$ é uma
+    \textbf{fibração} se, e somente se, para todo $y \in A$ e toda seta $f \colon x \to F(y)$ em
+    $B$, existe uma seta $f' \colon x' \to y$ em $A$ tal que $F f' = f$.
+\end{definition}
 
 \begin{theorem}
     Sejam $A, B \in \Graph$, e $f \colon A \to B$ um encoding de grafos. Então
@@ -584,10 +697,15 @@ Chame $\Graph = [\Gamma, \Set]$.
     \begin{equation*}
         \Free f \colon \Free(A) \to \Free(B)
     \end{equation*}
-    é uma fibração de Conduché.
+    é uma fibração.
 
-    Por outro lado, se $F \colon \Free(A) \to \Free(B)$ é uma fibração de Conduché, existe
+    Por outro lado, se $F \colon C \to \Free(B)$ é uma fibração, existe
     $f \colon A \to B$ encoding tal que
+
+    \begin{equation*}
+        A = \Free(C)
+    \end{equation*}
+    e
 
     \begin{equation*}
         F = \Free f
@@ -595,25 +713,33 @@ Chame $\Graph = [\Gamma, \Set]$.
 \end{theorem}
 
 \begin{proof}
-    ($\implies$) Seja $f \colon A \to B$ um encoding total. Primeiramente,
-    provarenos que $\Free f$ é uma fibacao.
+    ($\implies$) Seja $f \colon A \to B$ um encoding total. Primeiramente, provarenos que $\Free f$
+    é uma fibração.
 
-    Seja, então, $p \colon \Free y_0 \to \Free f (b)$ um caminho em $\Free(B)$. Sabemos que
-    $p$ é uma palavra formada pela composicao de arestas de $B$ da seguinte 
-    forma:
+    Seja, então, $p \colon \Free (y_0) \to \Free \left( f (b) \right)$ um caminho em $\Free(B)$.
+    Sabemos que $p$ é uma palavra formada pela composição de arestas de $B$ da seguinte forma:
 
     \begin{equation*}
         y_0 \to y_1 \to y_2 \to \cdots \to y_{n-1} \to f(b)
     \end{equation*}
 
-    Do fato de que $f$ é encoding, tira-se que existe $x_{n-1} \in A$ tal
-    que existe aresta $x_{n-1} \to b$ que é levada em $y_{n-1} \to f(b)$.
-    Seguindo indutivamente, obtemos um caminho em $A$
+    Do fato de que $f$ é encoding, tira-se que existe $x_{n-1} \in A$ tal que existe aresta
+    $x_{n-1} \to b$ que é levada em $y_{n-1} \to f(b)$. Seguindo indutivamente, obtemos um caminho
+    em $A$
 
     \begin{equation*}
         p' \colon x_0 \to x_1 \to \cdots \to x_{n-1} \to b
     \end{equation*}
     que é mapeado por $\Free f$ para $p$.
+
+    ($\Longleftarrow$) Seja $F \colon C \to \Free(B)$ uma fibração. Além disso, seja $a \to b$ um
+    gerador em $\Free(B)$. Então, como $F$ é sobrejetor, sabemos que existe $b' \in C$ tal que
+    $b = F(b')$. Assim sendo, dado que $F$ é fibração, existe $a' \in C$ e flecha $a' \to b'$ que
+    é mapeada por $F$ em $a \to b$. Provaremos que $a' \to b'$ não é decomponível.
+
+    Seja $a' \to c \to b'$ uma decomposição de $a' \to b'$. Então, como $F$ é funtor,
+    $a \to F(c) \to b$ seria decomposição de $a \to b$, o que não pode acontecer porque $a \to b$
+    é gerador.
 \end{proof}
 
 \chapter*{TODOs}
