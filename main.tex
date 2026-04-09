@@ -80,7 +80,7 @@
 
 \newcommand{\sub}[1]{\bgroup \color{black!60} ( #1 ) \egroup}
 
-\newtheorem{theorem}{Teorema}[section]
+\newtheorem{theorem}{Teorema}[chapter]
 \newtheorem{corollary}[theorem]{Corolário}
 
 \theoremstyle{definition}
@@ -144,7 +144,11 @@
 
 \newcommand{\mylabel}[1]{\label{#1}\hypertarget{#1}}
 \NewDocumentCommand{\myref}{om}{%
-    \hyperlink{#2}{\textbf{#1 \ref{#2}}}%
+    \IfNoValueTF{#1}{%
+        \hyperlink{#2}{\textbf{\ref{#2}}}%
+    }{%
+        \hyperlink{#2}{\textbf{#1 \ref{#2}}}%%
+    }%
 }%
 
 % \newtheorem{theorem}{Teorema}[section]
@@ -492,12 +496,103 @@ Chame $\Graph = [\Gamma, \Set]$.
 
 \chapter{Resultados na Teoria de Grafos}
 
-\begin{lemma}[Lema 1.4]
+\begin{lemma}[Lema 1.4]\mylabel{degree_geq}
     Se $f: G \encodes H$ é um encoding, e se $f(x) = u$, então $\deg_{f^{-1}(H)}(x) \geq \deg(u)$.
 \end{lemma}
 
 \begin{proof}
     Prova é trivial pela definição de encoding.
+\end{proof}
+
+\begin{lemma}\mylabel{prod_kayley}
+    Sejam $G, H$ grupoides e $S \subseteq G$, $T \subseteq H$ subconjuntos desses. Então
+
+    \begin{equation*}
+        \Kayley{G}{S} \boxProduct \Kayley{H}{T}
+            \cong \Kayley{G \oplus H}{(S \times \{e_H\}) \cup (\{e_G\} \times T)}
+    \end{equation*}
+\end{lemma}
+
+\begin{proof}
+    $(a, b) \to (a', b')$ é uma aresta de
+    $\Kayley{G \oplus H}{(S \times \{e_H\}) \cup (\{e_G\} \times T)}$ se, e somente se, existe
+    $c \in S \times \{e_H\} \cup \{e_G\} \times T$ tal que $(a',b') = (a, b) \cdot c$. Mas isso
+    implica que $a = a'$ ou $b = b'$.
+
+    Suponha, sem perda de generalidade, que $a = a'$. Então existe $t \in T$ tal que
+    $b' = b \cdot t$. Logo, $b \to b'$ é aresta de $\Kayley{H}{T}$, e, portanto,
+    $(a, b) \to (a', b')$ é aresta de $\Kayley{G}{S} \boxProduct \Kayley{H}{T}$.
+
+    Voltando o argumento, temos o outro lado do isomorfismo.
+\end{proof}
+
+\begin{corollary}
+    $Q_n \cong \Kayley{(\Z_2)^n}{\{(1, 0, 0, \cdots, 0), (0, 1, \cdots, 0), \cdots (0, 0, \cdots, 1)\}}$
+\end{corollary}
+
+\begin{proof}
+    Como $Q_1 \cong \Kayley{\Z_2}{\{1\}}$, a prova segue do \myref[lema]{prod_kayley}.
+\end{proof}
+
+\begin{lemma}\mylabel{kayley_enc_kayley}
+    Sejam $G, H$ grupoides, $S \subseteq G$ e $T \subseteq H$ subconjuntos desses, e
+    $f \colon G \to H$ um homomorfismo sobrejetor de grupoides tal que $f(S) \supseteq T$. Então
+
+    \begin{equation*}
+        \Kayley{G}{S} \encodes \Kayley{H}{T}
+    \end{equation*}
+\end{lemma}
+
+\begin{proof}
+    Dadas essas condições, construa, parcialmente, o seguinte homomorfismo $\bar{f}$ de grafos:
+
+    \begin{equation*}
+        \bar{f}(a) = f(a),\hspace{5pt} \forall a \in \Ver{\Kayley{G}{S}} = G
+    \end{equation*}
+    e, para toda aresta $a \to b$ de $\Kayley{G}{S}$, sabemos que existe $s \in S$ tal que
+    $a \cdot s$. Nesse caso, se $f(s) \in T$, definimos
+
+    \begin{equation*}
+        f(a \to b) = f(a) \to f(b) = f(a \cdot s) = f(a) \cdot f(s)
+    \end{equation*}
+    que está em $\Edg{\Kayley{H}{T}}$ porque $f(s) \in T$. Caso contrário, não definimos $\bar{f}$
+    sobre a aresta.
+
+    Agora, para mostrar que $\bar{f}$ é encoding, tome $b \in G$ e uma aresta
+    $a \to \bar{f}(b) = f(b)$. Então, sabemos que $f(b) = a \cdot t$ para algum $t \in T$. Mas
+    $f(S) \supseteq T$. Logo, existe um $s \in S$ tal que $f(s) = t$.
+
+    Tome, então, $b \cdot s^{-1}$. Temos, pois, 
+    
+    \begin{align*}
+        f(b \cdot s^{-1}) &= f(b) \cdot s^{-1} \\
+                          &= a \cdot s \cdot s^{-1} \\
+                          &= a
+    \end{align*}
+    e $b \cdot s^{-1} \to b$ é mapeada para $a \to f(b)$ por $\bar{f}$.
+\end{proof}
+
+\section{Para r = 1}
+
+\begin{proposition}\mylabel{mu_1_n_geq_n_minus_1}
+    $\mu_1(n) \geq n - 1$
+\end{proposition}
+
+\begin{proof}
+    A prova é uma conclusão do \myref[lema]{degree_geq} e do fato de que $K_n$ é regular de grau
+    $n-1$.
+\end{proof}
+
+\begin{theorem}\mylabel{mu_1_2_k_n_minus_1}
+    $\mu_1(2^k) = 2^k - 1$
+\end{theorem}
+
+\begin{proof}
+    Podemos representar $K_{2^k}$ como $\Kayley{(\Z_2)^k}{*}$, isto é,
+    $K_{2^k} \cong \Kayley{(\Z_2)^k}{*}$, porque $(\Z_2)^k$, como um grupo aditivo, tem $2^k$
+    elementos.
+
+    \TODO{terminar essa prova}
 \end{proof}
 
 \begin{theorem}\mylabel{normal_enc_kayley}
@@ -526,11 +621,14 @@ Chame $\Graph = [\Gamma, \Set]$.
     \end{equation*}
     e, se não houver, não é definida.
 
-    Provaremos que $f$ assim dada é um encoding. Nesse caso, basta mostrar que, para toda aresta de
-    $\Kayley{G}{S}$, há um levantamento da aresta dado por $f$.
+    Provaremos que $f$ assim dada é um encoding. Nesse caso, dado que $f$ é sobrejetora nos
+    vértices porque $\prod_i N_i = G$, basta mostrar que, para todo ponto
+    $n \in \bigBoxProduct_i N_i$ e para toda aresta $g \to f(n)$ de $\Kayley{G}{S}$, há um
+    levantamento da aresta dado por $f$.
 
-    De fato, seja, sem perda de generalidade, $g \to s g$ uma aresta de $\Kayley{G}{S}$, com
-    $s \in S$ e $g \in G$. Sabemos, então, que, dado que $G = \prod_i N_i$, podemos escrever
+    De fato, podemos escrever a aresta acima como $g \to sg$, para algum $s \in S$, por construção
+    de $\Kayley{G}{S}$. Ou seja, $f(n) = sg$ para algum $s \in S$. Sabemos, então, que, dado que
+    $G = \prod_i N_i$, podemos escrever
 
     \begin{equation*}
         g = n_0 n_1 \cdots n_k
@@ -579,7 +677,7 @@ Chame $\Graph = [\Gamma, \Set]$.
     é mapeada por $f$ para a aresta
 
     \begin{equation*}
-        g \to s g
+        g \to s g = f(n)
     \end{equation*}
 \end{proof}
 
@@ -601,16 +699,30 @@ Chame $\Graph = [\Gamma, \Set]$.
 \end{theorem}
 
 \begin{proof}
-    Sejam $f \colon A \to B$ e $g \colon C \to D$ encodings. Além disso, seja
+    Sejam $f \colon A \to B$ e $g \colon C \to D$ encodings. Além disso, seja tome
+    $(a_2, c_2) \in \Obj{A \boxProduct C}$.
+
+    Seja, além disso, $(b_2, d_2) \defeq (f(a_2), g(c_2))$.
+
+    Suponha, então que
 
     \begin{equation*}
         (b_1, d_1) \to (b_2, d_2)
     \end{equation*}
+    seja umama aresta de $B \boxProduct D$. Então $b_1 = b_2$ ou $d_1 = d_2$. Escolha, sem perda de
+    generalidade, $b_1 = b_2$. Então, pela construção de $B \boxProduct D$, existe uma aresta
+    $d_1 \to d_2 = g(d_1)$ em $D$. Logo, pela definição de encoding, existe um $c_1 \in \Obj{C}$
+    e uma aresta $c_1 \to c_2$ em $C$ levada em $d_1 \to d_2$ em $D$.
 
-    Uma aresta de $B \boxProduct D$.
+    Além disso, como $f$ é sobrejetora, temos que existe $a_1 \in f^{-1}(\{b_1\})$. Logo,
+
+    \begin{equation*}
+        (a_1, c_1) \to (a_1, c_2)
+    \end{equation*}
+    é uma aresta em $A \boxProduct C$ que é levada em $(b_1, d_1) \to (b_2, d_2)$.
 \end{proof}
 
-\begin{theorem}[Teorema 2.10]
+\begin{theorem}[Teorema 2.10]\mylabel{factor_mu_1}
     Seja $n = p_1^{r_1} \cdots p_k^{r_k}$ e suponha que $s_1, \cdots, s_k \in \N$ sejam tais que
     $s_i | r_i, \forall i$. Então, tomando $m = p_1^{s_1} \cdots p_k^{s_k}$, temos que
 
@@ -682,8 +794,693 @@ Chame $\Graph = [\Gamma, \Set]$.
     \end{equation*}
 \end{proof}
 
+\begin{lemma}\mylabel{m_prox_n}
+    Seja $\epsilon > 0$ e $p, q \in \N$ primos. Então existe um $n_0 \in \N$ tal que, para todo
+    $n \in \N$, $n \geq n_0$, existem $a, b \in \N$ tais que $p^a q^b \geq n$ e
+
+    \begin{equation}
+        \frac{m}{n} < 1 + \epsilon
+    \end{equation}
+\end{lemma}
+
+\begin{proof}
+    \TODO{Inserir prova do lema sobre densidade dos primos}.
+\end{proof}
+
+\begin{lemma}\mylabel{dist_primos}
+    Seja $0 < \epsilon < 1$. Então existem $p, q \in \N$ primos e $s, t \in \N$ tais que
+    $p < 2^s$, $q < 2^t$ e
+
+    \begin{center}
+        \setlength{\tabcolsep}{13pt}
+        \begin{table}[ht!]
+            \begin{tabular}{c c c c}
+                $\displaystyle\frac{2^{s}}{p} < 1 + \frac{\epsilon}{27}$, &
+                $\displaystyle\frac{2^t}{q} < 1 + \frac{\epsilon}{27}$, &
+                $\displaystyle\frac{p}{p-1} < 1 + \frac{\epsilon}{27}$ &
+                $\displaystyle\frac{q}{q-1} < 1+ \frac{\epsilon}{27}$
+            \end{tabular}
+        \end{table}
+    \end{center}
+\end{lemma}
+
+\begin{proof}
+    \TODO{Inserir prova do lema com o Teorema dos Números Primos?}
+\end{proof}
+
+\begin{theorem}\mylabel{lim_assintotico_mu_1}
+    $\mu_1(n) \sim n$
+\end{theorem}
+
+\begin{proof}
+    Fixe um $0 < \epsilon < 1$. Pelo \myref[lema]{dist_primos}, sabemos que existem $p, q \in \N$
+    primos e $s, t \in \N$ inteiros tais que $p < 2^s$, $q < 2^t$ e
+
+    \begin{center}
+        \begin{minipage}{.2\linewidth}
+            \begin{equation*}
+                \frac{2^{s}}{p} < 1 + \frac{\epsilon}{27},
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.2\linewidth}
+            \begin{equation*}
+                \frac{2^t}{q} < 1 + \frac{\epsilon}{27},
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.2\linewidth}
+            \begin{equation*}
+                \frac{p}{p-1} < 1 + \frac{\epsilon}{27}
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.05\linewidth}
+            \begin{center}
+                e
+            \end{center}
+        \end{minipage}
+        \begin{minipage}{.2\linewidth}
+            \begin{equation*}
+                \frac{q}{q-1} < 1+ \frac{\epsilon}{27}
+            \end{equation*}
+        \end{minipage}
+    \end{center}
+
+    Como nos preocupamos somente com o comportamento assintótico de $\mu_1$, podemos considerar
+    somente valores de $n$ grandes o suficiente. Assim sendo, pelo \myref[lema]{m_prox_n}, sabemos
+    que existe $n_0 \in \N$ tal que, para todo $n > n_0$, existe $m \defeq p^a q^b \geq n$ tal que
+
+    \begin{equation*}
+        \frac{m}{n} < 1 + \frac{\epsilon}{3}
+    \end{equation*}
+
+    Logo, pelo \myref[teorema]{factor_mu_1}, temos
+    \begin{align*}
+        \mu_1(n) &\leq \mu_1(p^a p^b) \\
+                 &\leq \frac{p^a q^b \mu_1(pq)}{(p-1)(q-1)} \\
+                 &\leq \frac{\mu_1(2^s 2^t)}{(p-1)(q-1)} p^a q^b \\
+                 &=    \frac{2^{s+t}}{(p-1)(q-1)} p^a q^b \\
+                 &=    \frac{2^s}{p} \frac{p}{p-1} \frac{2^t}{q} \frac{q}{q-1} p^a q^b \\
+                 &\leq \Big(1 + \frac{\epsilon}{27}\Big)^4 p^a q^b \\
+                 &\leq \Big(1 + \frac{\epsilon}{3}\Big) p^a q^b \\
+                 &\leq \Big(1 + \frac{\epsilon}{3}\Big)^2 n \\
+                 &\leq (1 + \epsilon) n
+    \end{align*}
+
+    Como isso vale para todo $\epsilon$ entre $0$ e $1$, e, além disso, como provado em
+    \myref{mu_1_n_geq_n_minus_1} que $\mu_1(n) \geq n-1$, segue o resultado.
+\end{proof}
+
+\section{Para um r fixo}
+
+\begin{lemma}\mylabel{prod_construction}
+    Seja $r = r_1 + r_2$ e $n = n_1 + n_2$. Então
+
+    \begin{equation}
+        \mu_r(n) \leq \mu_{r_1}(n_1) + \mu_{r_2}(n_2)
+    \end{equation}
+\end{lemma}
+
+\begin{proof}
+    Sejam $m_1 \defeq \mu_{r_1}(n_1)$ e $m_2 \defeq \mu_{r_2}(n_2)$ e sejam
+
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                f_1 \colon Q_{m_1}^{(r_1)} \to K_{n_1}
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                f_2 \colon Q_{m_2}^{(r_2)} \to K_{n_2}
+            \end{equation*}
+        \end{minipage}
+    \end{center}
+    encodings.
+
+    Defina, então, a função $f \colon (Q_{m_1} \boxProduct Q_{m_2})^{(r)} \to K_{n_1} \times K_{n_2}$
+    da seguinte forma: seja $(q_1', q_2')$ um vértice de $Q_{m_1} \boxProduct Q_{m_2}$. Definimos
+
+    \begin{equation*}
+        f((q_1', q_2')) \defeq (f_1(q_1'), f_2(q_2'))
+    \end{equation*}
+    que é sobrejetora nos vértices porque $f_1$ e $f_2$ o são.
+
+    Além disso, para cada aresta de $(Q_{m_1} \boxProduct Q_{m_2})^{(r)}$, escolha a (única) aresta
+    de $K_{n_1} \times K_{n_2}$ que liga os pontos aos quais são mapeados o ponto inicial e final
+    da aresta em questão.
+
+    Isso define um homomorfismo de grafos. Provaremos que $f$ é encoding.
+
+    Com efeito, se $f((q_1', q_2')) = (k_1', k_2')$ e existe uma aresta
+    $(k_1, k_2) \to (k_1', k_2')$, então existe uma aresta $k_1 \to k_1'$ em $K_{n_1}$ e uma aresta
+    $k_2 \to k_2'$ em $K_{n_2}$. Mas, dado que $f_1$ é encoding, significa que existe um vértice
+    $q_1 \in \Obj{Q_{m_1}}^{(r_1)}$ e uma aresta $q_1 \to q_1'$ no mesmo grafo que mapeia para
+    $k_1 \to k_1'$. Ou, equivalentemente, existe um caminho $q_1 \leadsto q_1'$ de comprimento
+    menor ou igual a $r_1$ em $Q_{m_1}$ que é mapeado para $k_1 \to k_1'$.
+
+    Escreva
+
+    \begin{equation*}
+        q_1 \to s_1 \to s_2 \to \cdots \to s_j \to q_1'
+    \end{equation*}
+    tal caminho em $Q_{m_1}$.
+
+    Podemos traçar um caminho análogo em $Q_{m_1} \boxProduct Q_{m_2}$ mantendo a segunda
+    coordenada e seguindo o caminho na primeira:
+
+    \begin{equation*}
+        (q_1, q_2') \to (s_1, q_2') \to (s_2, q_2') \to \cdots \to (s_j, q_2') \to (q_1', q_2')
+    \end{equation*}
+    que existe pela construção do produto caixa. Por construção, esse caminho tem comprimento menor
+    ou igual a $r_1$.
+
+    Seguindo, agora, os mesmos passos na segunda coordenada, podemos traçar o caminho
+
+    \begin{equation*}
+        (q_1, q_2) \to (q_1, t_1) \to \cdots \to (q_1, t_k) \to (q_1, q_2')
+    \end{equation*}
+    de comprimento menor ou igual a $r_2$.
+
+    Concatenando os caminhos, temos um caminho $(q_1, q_2) \leadsto (q_1', q_2')$ de comprimento
+    menor ou igual a $r_1 + r_2 = r$, ou, equivalentemente, uma aresta em
+    $(Q_{m_1} \boxProduct Q_{m_2})^{(r)}$ que mapeia para $(k_1, k_2) \to (k_1', k_2')$.
+
+    Logo, $f$ é encoding. Compondo $f$ com os isomorfismos
+
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                \left( Q_{m_1} \boxProduct Q_{m_2} \right)^{(r)} \cong Q_{m}^{(r)}
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                K_{n_1} \times K_{n_2} \cong K_n
+            \end{equation*}
+        \end{minipage}
+    \end{center}
+    garante o resultado.
+\end{proof}
+
+\begin{lemma}[Um limite exponencial]\mylabel{r_exp_limit}
+    Sejam $n, r \geq 1$ inteiros. Então
+
+    \begin{equation}
+        \mu_r(n) \leq \alpha n^{\frac{1}{r}}
+    \end{equation}
+    em que
+
+    \begin{equation*}
+        \alpha \defeq 2^{1 + \frac{1}{r}} \cdot \frac{r}{e \cdot \ln 2}
+    \end{equation*}
+\end{lemma}
+
+\begin{proof}
+    Tome $n = 2^k$. Seja $k_1$ o resto da divisão de $k$ por $r$. Então $k = rs + k_2$, com
+    $0 \leq k_2 \leq r - 1$. Escreva $k_1 \defeq r - k_2$. Então
+
+    \begin{align*}
+        k &= rs + k_2 \\
+          &= (k_1 + k_2)s + k_2 \\
+          &= k_1 s + k_2 s + k_2 \\
+          &= k_1 s + k_2 (s + 1)
+    \end{align*}
+
+    Usando então o \myref[lema]{prod_construction}, podemos escrever:
+
+    \begin{align*}
+        \mu_r(n) &=    \mu_r(2^k) \\
+                 &=    \mu_{k_1 + k_2}\left( 2^{k_1 s + k_2 (s + 1)} \right) \\
+                 &\leq \mu_{k_1}(2^{k_1 s}) + \mu_{k_2}(2^{k_2 (s+1)}) \\
+                 &\leq k_1 \mu_1(2^s) + k_2 \mu_1(2^{s+1})
+    \end{align*}
+
+    Agora, sabemos que $\mu_1(2^l) = 2^l - 1$. Logo,
+
+    \begin{align*}
+        \mu_r(n) &\leq k_1 \mu_1(2^s) + k_2 \mu_1(2^{s+1}) \\
+                 &\leq k_1 2^s + k_2 2^{s+1} \\
+                 &\leq (k_1 + 2k_2) 2^s \\
+                 &=    (k_1 + 2k_2) (2^{rs})^{\frac{1}{r}} \\
+                 &=    (k_1 + 2k_2) \left( \frac{2^{rs + k_2}}{2^{k_2}} \right)^{\frac{1}{r}} \\
+                 &=    (k_1 + 2k_2) \left( \frac{2^k}{2^{k_2}} \right)^{\frac{1}{r}} \\
+                 &=    (k_1 + 2k_2) \left( \frac{n}{2^{k_2}} \right)^{\frac{1}{r}} \\
+                 &=    \left( \frac{k_1 + 2k_2}{2^{\frac{k_2}{r}}} \right) n^{\frac{1}{r}}
+    \end{align*}
+
+    Olhemos para o primeiro termo nessa desigualdade, como uma função de $k_2$. Como $k_1 + k_2 = r$
+    fixado, teremos a seguinte função:
+
+    \begin{equation*}
+        \lambda(k_2) = \frac{r + k_2}{2^{\frac{k_2}{r}}}
+    \end{equation*}
+
+    Derivando essa função em $k_2$, temos:
+
+    \begin{align*}
+        \frac{\mathrm{d} \lambda}{\mathrm{d} k_2}(k_2) &=
+            2^{-\frac{k_2}{r}} - \frac{\ln 2}{r} \cdot \frac{r + k_2}{2^{\frac{k_2}{r}}} \\
+        &=  2^{-\frac{k_2}{r}} \left( 1 - \frac{\ln 2 (r + k_2)}{r} \right)
+    \end{align*}
+    que é igual a zero se, e somente se:
+
+    \begin{align*}
+        k_2 &=      -r + \frac{r}{\ln 2} \\
+            &=      r \left( \frac{1}{\ln 2} - 1 \right) \\
+            &\qefed k_0
+    \end{align*}
+
+    Além disso, se $0 \leq k_2 \leq k_0$, a derivada de $\lambda$ é positiva, e, se
+    $k_0 \leq k_2 \leq r-1$, a derivada de $\lambda$ é negativa. Logo, $k_0$ é um ponto máximo de
+    $\lambda$.
+
+    Agora, mesmo que o fator acima na inequação com $\mu_r(n)$ seja somente válido para valores
+    inteiros de $k_2$, é claro que será menor ou igual ao máximo da função real $\lambda$ no
+    intervalo em questão. Logo, podemos dizer que
+
+    \begin{align*}
+        \mu_r(n) &\leq \left( \frac{r + k_0}{2^{\frac{k_0}{r}}} \right) n^{\frac{1}{r}} \\
+                 &\leq \left( \frac{r - r + \frac{r}{\ln 2}}{2^{\frac{1}{\ln 2} - 1}} \right) n^{\frac{1}{r}} \\
+                 &=    2^{1 - \frac{1}{\ln 2}} \cdot \frac{r}{\ln 2} \cdot n^{\frac{1}{r}} \\
+                 &=    2^{1 - \frac{\log_2 e}{\log_2 2}} \cdot \frac{r}{\ln 2} \cdot n^{\frac{1}{r}} \\
+                 &=    \frac{2r}{e \cdot \ln 2} \cdot n^{\frac{1}{r}}
+    \end{align*}
+
+    Mas isso vale para $n = 2^k$. Agora, para qualquer $n \in \N$ existe um $k \in \N$ tal que
+    $n \leq 2^k \leq 2n$ \TODO{adicionar prova disso?}. Mas isso significa que:
+
+    \begin{align*}
+        \mu_r(n) &\leq \mu_r(2^k) \\
+                 &\leq \frac{2r}{e \cdot \ln 2} \cdot (2^k)^{\frac{1}{r}} \\
+                 &\leq \frac{2r}{e \cdot \ln 2} \cdot (2n)^{\frac{1}{r}} \\
+                 &=    2^{1 + \frac{1}{r}} \cdot \frac{r}{e \cdot \ln 2} \cdot n^{\frac{1}{r}}
+    \end{align*}
+    que nos dá o resultado.
+\end{proof}
+
+\begin{theorem}
+    Para todos $\epsilon > 0$ e $r \in \N$, $r \geq 1$, existe um número $N \in \N$ tal que
+
+    \begin{equation*}
+        \mu_r(n) \leq (1 + \epsilon) r n^{\frac{1}{r}}
+    \end{equation*}
+\end{theorem}
+
+\begin{proof}
+    Fixe $\epsilon > 0$. Considere a diferença $\Delta(n, r) \defeq (n+1)^r - n^r$ entre a
+    $n$-ésima $r$ potência e a sua sucessora. Pelo Teorema do Valor Médio aplicado à função
+    $f(x) = x^r$, sabemos que a diferença
+
+    \begin{align*}
+        \Delta(n, r) &= (n+1)^r - n^r \\
+                     &= \frac{(n+1)^r - n^r}{1} \\
+                     &= f'(x_0)
+    \end{align*}
+    em que $x_0$ é algum ponto entre $n$ e $n+1$.
+
+    Mas
+
+    \begin{align*}
+        f'(x_0) &=    r x^{r-1} \\
+                &\leq r (n+1)^{r-1} \\
+                &=    r (n^{r-1} + (r-1)n^{r-2} + \cdots + 1) \\
+                &=    r n^{r-1} + r((r-1)n^{r-2} + \cdots + 1) \\
+                &\leq r n^{r-1} + n^{r-1} \\
+                &=    (r + 1) n^{r-1}
+    \end{align*}
+    para $n$ suficientemente grande.
+
+    Seja, então, $N_1 \in \N$ tal que, para todo $n \geq N_1$, o que está acima valha. Então
+
+    \begin{equation*}
+        \Delta(n, r) \leq (r + 1) n^{r-1}, \hspace{10pt} \forall n \geq N_1
+    \end{equation*}
+
+    Mas isso implica que
+
+    \begin{align*}
+        \frac{\Delta(n, r)}{n^r} &\leq \frac{(r + 1) n^{r-1}}{n^r} \\
+                                 &=    \frac{(r + 1)}{n} \\
+                                 &<    \frac{\epsilon}{3}
+    \end{align*}
+    para $n$ suficientemente grande. Seja $N_2 \in \N$, $N_2 \geq N_1$ tal que a desigualdade acima
+    com $\epsilon$ valha. Então, reescrevendo a desigualdade acima, temos:
+
+    \begin{alignat*}{3}
+        0   &< \quad \frac{\Delta(n, r)}{n^r} &&< \frac{\epsilon}{3} \\
+        0   &< \frac{(n+1)^r - n^r}{n^r}      &&< \frac{\epsilon}{3} \\
+        0   &< (n+1)^r - n^r                  &&< \frac{\epsilon}{3} n^r \\
+        n^r &< \quad (n+1)^r                  &&< \left( 1 + \frac{\epsilon}{3} \right) n^r
+    \end{alignat*}
+    ou seja, para um $n$ grande o suficiente, existe uma $r$-potência entre $n^r$ e
+    $(1 + \epsilon/3)n^r$.
+
+    Tome $N_3 = N_2^r \geq N_2$. Agora tome um $n$ qualquer, $n \geq N_3$, e seja $m = k^r$ a
+    última $r$-potência menor ou igual a $n$. Então $k \geq N_2$, porque $n \geq N_3 = N_2^r$.
+    Sabemos, pelo exposto acima, que
+
+    \begin{align*}
+        k^r < (k+1)^r &<    \left( 1 + \frac{\epsilon}{3} \right) k^r \\
+                      &\leq \left( 1 + \frac{\epsilon}{3} \right) n
+    \end{align*}
+    isto é, $(k+1)^r < (1 + \epsilon/3)n$. Mas, por hipótese, $k^r$ é a última $r$-potência menor
+    ou igual a $n$. Logo, para todo $n \geq N_3$, existe uma $r$-potência entre $n$ e
+    $(1 + \epsilon/3) n$.
+
+    Agora, escolha, pelo \myref[Teorema]{lim_assintotico_mu_1} $N_4 \geq N_3$ tal que para todo
+    $n \geq N_4^{1/r}$, tenhamos
+
+    \begin{equation*}
+        \mu_1(n) \leq \left( 1 + \frac{\epsilon}{3} \right) n
+    \end{equation*}
+
+    Por fim, se $n \geq N_4$, então existe uma $r$-potência $k^r$ entre $n$ e $(1 + \epsilon/3)n$.
+    Então sabemos que
+
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                \mu_1(k) \leq \left( 1 + \frac{\epsilon}{3} \right) k
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.3\linewidth}
+            \begin{align*}
+                         & k^r < \left( 1 + \frac{\epsilon}{3} \right) n \\
+                \implies & k < \left( 1 + \frac{\epsilon}{3} \right)^{1/r} n^{1/r} \\
+                \implies & k < \left( 1 + \frac{\epsilon}{3} \right) n^{1/r}
+            \end{align*}
+        \end{minipage}
+    \end{center}
+
+    Assim sendo,
+
+    \begin{align*}
+        \mu_r(n) &\leq \mu_r(k^r) \\
+                 &\leq r \mu_1(k) \\
+                 &\leq r \left( 1 + \frac{\epsilon}{3} \right) k \\
+                 &<    r \left( 1 + \frac{\epsilon}{3} \right)^2 n^{1/r} \\
+                 &\leq r \left( 1 + \epsilon \right) n^{1/r} \\
+    \end{align*}
+
+    Escolhendo $N = N_4$, temos, portanto, o resultado.
+\end{proof}
 
 \chapter{Rumo a uma categorização de encodings}
+
+Neste capítulo, procuraremos uma forma de desenvolver a teoria que a aproxime melhor da Teoria das
+Categorias, procurando generalizar alguns resultados usando ferramentas já conhecidas das
+categorias.
+
+\section{Em busca de uma definição coerente}
+
+Antes de tudo, precisamos entender a diferença entre um contexto da Teoria das Categorias e a
+Teoria dos Grafos: afinal, se ambos são formados por "pontos e setas", qual é a grande diferença
+entre elas?
+
+Em se tratando da Teoria de Grafos, poderíamos nos deparar com um objeto desse tipo:
+
+\TODO{inserir grafo direcionado com duas arestas e três vértices}
+
+enquanto na Teoria de Categorias, sempre que tivéssemos uma situação desse tipo, teríamos uma
+uma identidade para cada objeto e uma composta das duas flechas:
+
+\TODO{inserir mesmo grafo que o anterior, mas agora com loops e uma composta}
+
+Daqui tiramos que existe uma diferença essencial entre essas duas teorias: a operação de composição.
+
+Nesse contexto, a identidade faz o elemento neutro da operação de composição, e as composições de
+diferentes flechas, bem como a relações de quando diferentes composições resultam na mesma coisa
+nos dão uma descrição de uma categoria.
+
+Sabendo disso, olhemos de novo para a definição de encoding:
+
+\begin{definition}\mylabel{encoding}
+    Sejam $A, B \in \Graph$ grafos e $f \colon A \to B$ uma flecha, isto é, um homomorfismo entre
+    eles. Então dizemos que $f$ é um \textbf{encoding} se, e somente se, $f$ é um epimorfismo e,
+    para todo $b \in \Ver{A}$, e toda aresta $a \to_\alpha f(b)$ em $B$, existe um levantamento
+    $a' \to_{\alpha'} b$ de $\alpha$, isto é, $\alpha' \in \Edg{A}$ e $f(\alpha') = \alpha$.
+\end{definition}
+
+Tomemos um momento para apreciar essa definição.
+
+A princípio, parece que esta definição trata da mesma coisa duas vezes: a primeira dizendo que $f$
+é um epimorfismo. No contexto de um topos, como a categoria que estamos lidando, isto é, $\Graph$,
+dizer que temos um epimorfismo é equivalente a dizer que existe uma sobrejeção sobre os conjuntos
+correspondentes -- no caso, $\Ver{A} \to \Ver{B}$ e $\Edg{A} \to \Edg{B}$ --, que respeita as
+devidas relações.
+
+Ora, se a segunda condição diz que há um levantamento para qualquer aresta do codomínio, isso não é
+o mesmo que reafirmar o caráter de epimorfismo de $f$? Não, e justamente porque a segunda condição
+não diz isso. A segunda condição da definição acima nos diz que dado um vértice $v$ de $A$ e uma
+aresta terminando na imagem por $f$ de $v$, existe um levantamento dessa aresta \textit{que
+termina em $v$}, e isso faz toda a diferença. Observe o exemplo a seguir:
+
+\begin{example}\mylabel{surjection_not_encoding}
+    Considere o seguinte homomorfismo de grafos:
+
+    \begin{center}
+        \begin{minipage}{.55\linewidth}
+            % https://q.uiver.app/#q=WzAsNCxbMCwwLCJhIl0sWzIsMCwiYiJdLFs0LDAsImMiXSxbNiwwLCJkIl0sWzAsMSwiIiwwLHsiY29sb3VyIjpbMCw2MCw2MF19XSxbMSwyLCIiLDAseyJjb2xvdXIiOlsxMjAsNjAsNjBdfV0sWzIsMywiIiwwLHsiY29sb3VyIjpbMTgwLDYwLDYwXX1dXQ==
+            \[\begin{tikzcd}
+                a && b && c && d
+                \arrow[color={rgb,255:red,214;green,92;blue,92}, from=1-1, to=1-3]
+                \arrow[color={rgb,255:red,92;green,214;blue,92}, from=1-3, to=1-5]
+                \arrow[color={rgb,255:red,92;green,214;blue,214}, from=1-5, to=1-7]
+            \end{tikzcd}\]
+        \end{minipage}
+        \begin{minipage}{.1\linewidth}
+            \begin{equation*}
+                \implies[f]
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.3\linewidth}
+            % https://q.uiver.app/#q=WzAsMyxbMCwwLCIxIl0sWzIsMCwiMiJdLFsxLDIsIjMiXSxbMCwxLCIiLDAseyJjb2xvdXIiOlswLDYwLDYwXX1dLFsxLDIsIiIsMCx7ImNvbG91ciI6WzEyMCw2MCw2MF19XSxbMiwwLCIiLDAseyJjb2xvdXIiOlsxODAsNjAsNjBdfV1d
+            \[\begin{tikzcd}
+                1 && 2 \\
+                \\
+                & 3
+                \arrow[color={rgb,255:red,214;green,92;blue,92}, from=1-1, to=1-3]
+                \arrow[color={rgb,255:red,92;green,214;blue,92}, from=1-3, to=3-2]
+                \arrow[color={rgb,255:red,92;green,214;blue,214}, from=3-2, to=1-1]
+            \end{tikzcd}\]
+        \end{minipage}
+    \end{center}
+
+    Nesse caso, sendo $a$ e $d$ levados em $1$, $b$ levado em $2$ e $c$ levado em $3$, temos um
+    homomorfismo de grafos sobrejetor, mas $f$ não é encoding.
+
+    De fato, tome $a$ para testar a segunda cláusula da nossa definição. Então temos $f(a) = 1$.
+    Agora, considere a aresta $3 \to 1 = f(a)$. É claro que não existe nenhum levantamento dessa
+    aresta que termine em $a$, porque não existe aresta terminando em $a$ no primeiro grafo, ou,
+    mais geralmente, não existe na imagem inversa de $3 \to 1$ que termine em $a$.
+\end{example}
+
+Dado o exemplo acima, é claro que não basta somente que $f$ seja um epimorfismo para que tenha as
+propriedades que pedimos. Alguém poderia se perguntar, então, se alguma outra noção de fibração
+pré-existente na Teoria de Categorias se enquadra ou equivale à definição que damos de encoding. E
+mais uma vez, a resposta é não, pelo menos para as mais conhecidas: a noção de Grothendieck e a
+noção de um funtor exponencial.
+
+Comecemos com a definição do que é uma fibração de Grothendieck.
+
+\begin{definition}\mylabel{cartesian_morphism}
+    Sejam $A, B$ categorias e $F \colon A \to B$ um funtor entre elas. Um morfismo
+    $f \colon x \to y$ é dito \textbf{cartesiano} se, e somente se, para todo morfismo
+    $g \colon z \to y$ em $A$ e todo morfismo $w \colon F(z) \to F(x)$ tal que o seguinte diagrama
+    comuta
+
+    % https://q.uiver.app/#q=WzAsMyxbMCwwLCJGKGMpIl0sWzEsMiwiRihhKSJdLFszLDIsIkYoYikiXSxbMSwyLCJGKGYpIl0sWzAsMSwidyIsMl0sWzAsMiwiRihnKSIsMCx7ImN1cnZlIjotMX1dXQ==
+    \[\begin{tikzcd}
+        {F(z)} &&& \\
+        \\
+        & {F(x)} && {F(y)}
+        \arrow["w"', from=1-1, to=3-2]
+        \arrow["{F(g)}", curve={height=-6pt}, from=1-1, to=3-4]
+        \arrow["{F(f)}", from=3-2, to=3-4]
+    \end{tikzcd}\]
+    existe um único $w' \colon z \to x$ morfismo em $A$ tal que o seguinte diagrama comuta:
+
+    % https://q.uiver.app/#q=WzAsMyxbMCwwLCJjIl0sWzEsMiwiYSJdLFszLDIsImIiXSxbMSwyLCJmIl0sWzAsMiwiZyIsMCx7ImN1cnZlIjotMX1dLFswLDEsIncnIiwyXV0=
+    \[\begin{tikzcd}
+        z &&& \\
+        \\
+        & x && y
+        \arrow["{w'}"', from=1-1, to=3-2]
+        \arrow["g", curve={height=-6pt}, from=1-1, to=3-4]
+        \arrow["f", from=3-2, to=3-4]
+    \end{tikzcd}\]
+    e com $F(w') = w$.
+
+    Ou, simplificando a afirmação em diagramas, temos o seguinte:
+
+    \begin{center}
+        \begin{minipage}{.35\linewidth}
+            \[\begin{tikzcd}
+                z &&& \\
+                \\
+                & x && y
+                \arrow["{\exists! w'}"', from=1-1, to=3-2]
+                \arrow["{\forall g}", curve={height=-6pt}, from=1-1, to=3-4]
+                \arrow["f", from=3-2, to=3-4]
+            \end{tikzcd}\]
+        \end{minipage}
+        \begin{minipage}{.35\linewidth}
+            \[\begin{tikzcd}
+                {F(z)} &&& \\
+                \\
+                & {F(x)} && {F(y)}
+                \arrow["{\forall w}"', from=1-1, to=3-2]
+                \arrow["{F(g)}", curve={height=-6pt}, from=1-1, to=3-4]
+                \arrow["{F(f)}", from=3-2, to=3-4]
+            \end{tikzcd}\]
+        \end{minipage}
+    \end{center}
+    com $F(w') = w$.
+\end{definition}
+
+\begin{definition}\mylabel{grothendieck_fibration}
+    Sejam $A, B$ categorias e $F \colon A \to B$ um funtor entre elas. Nós dizemos que $F$ é uma
+    \textbf{fibração de Grothendieck} se todo morfismo em $A$ é cartesiano com relação a $F$.
+\end{definition}
+
+\begin{example}\mylabel{grothendieck_not_encoding}
+    Provaremos que a noção de fibração de Grothendieck não é equivalente à nossa definição de
+    encoding. Para isso, considere o seguinte homomorfismo de grafos:
+
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            % https://q.uiver.app/#q=WzAsNCxbMSwwLCJhIl0sWzAsMSwiYiJdLFsyLDEsImInIl0sWzEsMiwiYyJdLFswLDEsIiIsMCx7ImNvbG91ciI6WzAsNjAsNjBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJiYXJyZWQifX19XSxbMCwyLCIiLDIseyJjb2xvdXIiOlswLDYwLDYwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV0sWzEsMywiIiwwLHsiY29sb3VyIjpbMTIwLDYwLDYwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZG91YmxlIGJhcnJlZCJ9fX1dLFsyLDMsIiIsMix7ImNvbG91ciI6WzEyMCw2MCw2MF0sInN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRvdWJsZSBiYXJyZWQifX19XV0=
+            \[\begin{tikzcd}
+                & a & \\
+                b && {b'} \\
+                & c
+                \arrow["\shortmid"{marking, text={rgb,255:red,214;green,92;blue,92}}, color={rgb,255:red,214;green,92;blue,92}, from=1-2, to=2-1]
+                \arrow["\shortmid"{marking, text={rgb,255:red,214;green,92;blue,92}}, color={rgb,255:red,214;green,92;blue,92}, from=1-2, to=2-3]
+                \arrow["{\shortmid\shortmid}"{marking, text={rgb,255:red,92;green,214;blue,92}}, color={rgb,255:red,92;green,214;blue,92}, from=2-1, to=3-2]
+                \arrow["{\shortmid\shortmid}"{marking, text={rgb,255:red,92;green,214;blue,92}}, color={rgb,255:red,92;green,214;blue,92}, from=2-3, to=3-2]
+            \end{tikzcd}\]
+        \end{minipage}
+        \begin{minipage}{.05\linewidth}
+            \begin{equation*}
+                \implies[f]
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.4\linewidth}
+            % https://q.uiver.app/#q=WzAsMyxbMCwwLCIxIl0sWzIsMCwiMiJdLFs0LDAsIjMiXSxbMCwxLCIiLDIseyJjb2xvdXIiOlswLDYwLDYwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV0sWzEsMiwiIiwyLHsiY29sb3VyIjpbMTIwLDYwLDYwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZG91YmxlIGJhcnJlZCJ9fX1dXQ==
+            \[\begin{tikzcd}
+                1 && 2 && 3
+                \arrow["\shortmid"{marking, text={rgb,255:red,214;green,92;blue,92}}, color={rgb,255:red,214;green,92;blue,92}, from=1-1, to=1-3]
+                \arrow["{\shortmid\shortmid}"{marking, text={rgb,255:red,92;green,214;blue,92}}, color={rgb,255:red,92;green,214;blue,92}, from=1-3, to=1-5]
+            \end{tikzcd}\]
+        \end{minipage}
+    \end{center}
+
+    Testando a definição ponto a ponto, vemos que $f$ dá um encoding de grafos segundo a
+    \myref[definição]{encoding}. Vejamos, porém, se as flechas em $\Free(A)$ seriam cartesianas
+    segundo a \myref[definição]{cartesian_morphism}.
+
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            % https://q.uiver.app/#q=WzAsNCxbMSwwLCJhIl0sWzAsMSwiYiJdLFsyLDEsImInIl0sWzEsMiwiYyJdLFswLDEsIiIsMCx7ImNvbG91ciI6WzAsNjAsNjBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJiYXJyZWQifX19XSxbMCwyLCIiLDIseyJjb2xvdXIiOlswLDYwLDYwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV0sWzEsMywiIiwwLHsiY29sb3VyIjpbMTIwLDYwLDYwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZG91YmxlIGJhcnJlZCJ9fX1dLFsyLDMsIiIsMix7ImNvbG91ciI6WzEyMCw2MCw2MF0sInN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRvdWJsZSBiYXJyZWQifX19XSxbMCwzLCIiLDEseyJjdXJ2ZSI6LTIsImNvbG91ciI6WzE4MCw2MCw2MF19XSxbMCwzLCIiLDEseyJjdXJ2ZSI6MiwiY29sb3VyIjpbMTgwLDYwLDYwXX1dXQ==
+            \[\begin{tikzcd}
+                & a & \\
+                b && {b'} \\
+                & c
+                \arrow["\shortmid"{marking, text={rgb,255:red,214;green,92;blue,92}}, draw={rgb,255:red,214;green,92;blue,92}, from=1-2, to=2-1]
+                \arrow["\shortmid"{marking, text={rgb,255:red,214;green,92;blue,92}}, draw={rgb,255:red,214;green,92;blue,92}, from=1-2, to=2-3]
+                \arrow[color={rgb,255:red,92;green,214;blue,214}, curve={height=-12pt}, from=1-2, to=3-2]
+                \arrow[color={rgb,255:red,92;green,214;blue,214}, curve={height=12pt}, from=1-2, to=3-2]
+                \arrow["{\shortmid\shortmid}"{marking, text={rgb,255:red,92;green,214;blue,92}}, draw={rgb,255:red,92;green,214;blue,92}, from=2-1, to=3-2]
+                \arrow["{\shortmid\shortmid}"{marking, text={rgb,255:red,92;green,214;blue,92}}, draw={rgb,255:red,92;green,214;blue,92}, from=2-3, to=3-2]
+            \end{tikzcd}\]
+        \end{minipage}
+        \begin{minipage}{.06\linewidth}
+            \begin{equation*}
+                \implies[\Free f]
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.4\linewidth}
+            % https://q.uiver.app/#q=WzAsMyxbMCwwLCIxIl0sWzIsMCwiMiJdLFs0LDAsIjMiXSxbMCwxLCIiLDIseyJjb2xvdXIiOlswLDYwLDYwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV0sWzEsMiwiIiwyLHsiY29sb3VyIjpbMTIwLDYwLDYwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZG91YmxlIGJhcnJlZCJ9fX1dLFswLDIsIiIsMCx7ImN1cnZlIjotMywiY29sb3VyIjpbMTgwLDYwLDYwXX1dXQ==
+            \[\begin{tikzcd}
+                1 && 2 && 3
+                \arrow["\shortmid"{marking, text={rgb,255:red,214;green,92;blue,92}}, draw={rgb,255:red,214;green,92;blue,92}, from=1-1, to=1-3]
+                \arrow[color={rgb,255:red,92;green,214;blue,214}, curve={height=-18pt}, from=1-1, to=1-5]
+                \arrow["{\shortmid\shortmid}"{marking, text={rgb,255:red,92;green,214;blue,92}}, draw={rgb,255:red,92;green,214;blue,92}, from=1-3, to=1-5]
+            \end{tikzcd}\]
+        \end{minipage}
+    \end{center}
+    em que as flechas azuis são as composições das flechas vermelhas e verdes.
+
+    Tome a flecha $b \to c$ em $\Free(A)$ como teste. Considere, então, $a \to b' \to c$ como o $g$
+    da definição e $1 \to 2$ como $w$. Então é claro que o diagrama
+
+    % https://q.uiver.app/#q=WzAsMyxbMCwwLCIxIl0sWzEsMiwiMiJdLFszLDIsIjMiXSxbMSwyLCIiLDAseyJjb2xvdXIiOlsxMjAsNjAsNjBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkb3VibGUgYmFycmVkIn19fV0sWzAsMiwiXFxGcmVlIGYgKGcpID0gMSBcXHRvIDIgXFx0byAzIiwwLHsiY3VydmUiOi0xLCJjb2xvdXIiOlsxODAsNjAsNjBdfSxbMTgwLDYwLDYwLDFdXSxbMCwxLCJ3IiwyLHsiY29sb3VyIjpbMCw2MCw2MF0sInN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImJhcnJlZCJ9fX0sWzAsNjAsNjAsMV1dXQ==
+    \[\begin{tikzcd}
+        1 &&& \\
+        \\
+        & 2 && 3
+        \arrow["w"'{inner sep=.8ex}, "\shortmid"{marking, text={rgb,255:red,214;green,92;blue,92}}, color={rgb,255:red,214;green,92;blue,92}, from=1-1, to=3-2]
+        \arrow["{\Free f (g) = 1 \to 2 \to 3}", color={rgb,255:red,92;green,214;blue,214}, curve={height=-6pt}, from=1-1, to=3-4]
+        \arrow["{\shortmid\shortmid}"{marking, text={rgb,255:red,92;green,214;blue,92}}, draw={rgb,255:red,92;green,214;blue,92}, from=3-2, to=3-4]
+    \end{tikzcd}\]
+    em $\Free(B)$ comuta.
+
+    Para que $b \to c$ seja cartesiano, deve existir uma única flecha $a \to b$, levantamento de
+    $w$, isto é, $1 \to 2$, tal que o seguinte diagrama comute
+
+    % https://q.uiver.app/#q=WzAsMyxbMCwwLCJhIl0sWzEsMiwiYiJdLFszLDIsImMiXSxbMSwyLCIiLDAseyJjb2xvdXIiOlsxMjAsNjAsNjBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkb3VibGUgYmFycmVkIn19fV0sWzAsMiwiYSBcXHRvIGInIFxcdG8gYyIsMCx7ImN1cnZlIjotMSwiY29sb3VyIjpbMTgwLDYwLDYwXX0sWzE4MCw2MCw2MCwxXV0sWzAsMSwidyciLDIseyJjb2xvdXIiOlswLDYwLDYwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fSxbMCw2MCw2MCwxXV1d
+    \[\begin{tikzcd}
+        a &&& \\
+        \\
+        & b && c
+        \arrow["{w'}"'{inner sep=.8ex}, "\shortmid"{marking, text={rgb,255:red,214;green,92;blue,92}}, color={rgb,255:red,214;green,92;blue,92}, from=1-1, to=3-2]
+        \arrow["{a \to b' \to c}", color={rgb,255:red,92;green,214;blue,214}, curve={height=-6pt}, from=1-1, to=3-4]
+        \arrow["{\shortmid\shortmid}"{marking, text={rgb,255:red,92;green,214;blue,92}}, color={rgb,255:red,92;green,214;blue,92}, from=3-2, to=3-4]
+    \end{tikzcd}\]
+
+    Mas é claro que uma tal flecha não existe, porque $\Free(A)$ é uma categoria livre e, portanto,
+    os diferentes caminhos $a \to b \to c$ e $a \to b' \to c$ não são iguais.
+\end{example}
+
+É claro, então, que a noção de fibração de Grothendieck não captura exatamente o que queremos com
+a nossa noção de encoding. Agora, uma noção que, a princípio, teria potencial de fazer a ponte
+dessa noção para as categorias, é a noção de um funtor exponencial, ou uma fibração de Conduché,
+porque ela remove o problema da fatorização de caminhos na categoria livre. Veja a definição a
+seguir:
+
+\begin{definition}\mylabel{conduche_fibration}
+    Sejam $A, B$ categorias e $F \colon A \to B$ um funtor entre elas. Dizemos, então, que o funtor
+    $F$ é \textbf{exponencial}, ou uma \textbf{fibração de Conduché} se, se somente se, para todo
+    morfismo $\alpha \colon x \to y$ em $A$ e toda fatoração $F(x) \to_\beta z \to_\gamma F(y)$ de
+    $F \alpha$, valem as seguintes condições:
+
+    \begin{enumerate}
+        \item Existe uma fatoração $x \to_{\tilde{\beta}} \tilde{z} \to_{\tilde{\gamma}} y$ em $A$
+            de $\alpha$ tal que $F \tilde{\beta} = \beta$ e $F \tilde{\gamma} = \gamma$; \\
+        \item Para quaisquer duas fatorações $x \to_{\tilde{\beta}} \tilde{z} \to_{\tilde{\gamma}} y$
+            e $x \to_{\tilde{\beta}'} \tilde{z}' \to_{\tilde{\gamma}'} y$ de $\alpha$, existe um
+            morfismo $\delta \colon \tilde{z} \to \tilde{z}'$ tal que $F \delta = \id{z}$ e o
+            seguinte diagrama comuta:
+    \end{enumerate}
+
+    % https://q.uiver.app/#q=WzAsNCxbMCwxLCJ4Il0sWzEsMCwiXFx0aWxkZXt6fSJdLFsxLDIsIlxcdGlsZGV7en0nIl0sWzIsMSwieSJdLFswLDEsIlxcdGlsZGV7XFxiZXRhfSJdLFswLDIsIlxcdGlsZGV7XFxiZXRhfSciLDJdLFsyLDMsIlxcdGlsZGV7XFxnYW1tYX0nIiwyXSxbMSwzLCJcXHRpbGRle1xcZ2FtbWF9Il0sWzEsMiwiXFxkZWx0YSIsMV1d
+    \[\begin{tikzcd}
+        & {\tilde{z}} & \\
+        x && y \\
+        & {\tilde{z}'}
+        \arrow["{\tilde{\gamma}}", from=1-2, to=2-3]
+        \arrow["\delta"{description}, from=1-2, to=3-2]
+        \arrow["{\tilde{\beta}}", from=2-1, to=1-2]
+        \arrow["{\tilde{\beta}'}"', from=2-1, to=3-2]
+        \arrow["{\tilde{\gamma}'}"', from=3-2, to=2-3]
+    \end{tikzcd}\]
+\end{definition}
+
+\begin{example}\mylabel{conduche_not_encoding}
+    Para mostrar que a definição acima não equivale à definição de encoding que desejamos, usaremos
+    o mesmo exemplo de encoding $f$ do \myref[exemplo]{grothendieck_not_encoding}.
+
+    Considere, então, $\alpha \colon a \to b \to c$ em $\Free(A)$.
+\end{example}
 
 \begin{definition}\mylabel{functor_fibration}
     Seja $F \colon A \to B$ um funtor entre duas categorias $A, B$. Diremos, então, que $F$ é uma
@@ -691,25 +1488,38 @@ Chame $\Graph = [\Gamma, \Set]$.
     $B$, existe uma seta $f' \colon x' \to y$ em $A$ tal que $F f' = f$.
 \end{definition}
 
+\begin{lemma}\mylabel{conservative_reflects_id}
+    Sejam $A, B \in \Graph$ e $F \colon \Free(A) \to \Free(B)$ um funtor. Então, se $F$ é
+    conservativo, então $F$ reflete identidades, isto é, se $f \colon a \to b$ é um morfismo em
+    $\Free(A)$ tal que $F(f)$ é uma identidade em $\Free(B)$, então $a = b$ e $f = \id{a}$.
+\end{lemma}
+
+\begin{proof}
+    Se $F(f)$ é uma identidade, então, em particular, é um isomorfismo. Portanto, dado que $F$ é
+    conservativo, então $f$ também é isomorfismo. Mas, como os únicos isomorfismos de uma categoria
+    livre são as identidades, então $f$ é identidade.
+\end{proof}
+
 \begin{theorem}
     Sejam $A, B \in \Graph$, e $f \colon A \to B$ um encoding de grafos. Então
 
     \begin{equation*}
         \Free f \colon \Free(A) \to \Free(B)
     \end{equation*}
-    é uma fibração.
+    é uma fibração conservativa.
 
-    Por outro lado, se $F \colon C \to \Free(B)$ é uma fibração, existe
-    $f \colon A \to B$ encoding tal que
+    Por outro lado, se $F \colon \Free(C) \to \Free(B)$ é uma fibração conservativa, existe
+    um subgrafo $A \hookrightarrow C$ e um $f \colon A \to B$ encoding tal que o seguinte diagrama
+    comuta
 
-    \begin{equation*}
-        A = \Free(C)
-    \end{equation*}
-    e
-
-    \begin{equation*}
-        F = \Free f
-    \end{equation*}
+    \[\begin{tikzcd}
+        {\Free(A)} && {\Free(C)} \\
+        \\
+        && {\Free(B)}
+        \arrow["{\Free i}", hook, from=1-1, to=1-3]
+        \arrow["{\Free f}"', from=1-1, to=3-3]
+        \arrow["F", from=1-3, to=3-3]
+    \end{tikzcd}\]
 \end{theorem}
 
 \begin{proof}
@@ -732,14 +1542,51 @@ Chame $\Graph = [\Gamma, \Set]$.
     \end{equation*}
     que é mapeado por $\Free f$ para $p$.
 
-    ($\Longleftarrow$) Seja $F \colon C \to \Free(B)$ uma fibração. Além disso, seja $a \to b$ um
-    gerador em $\Free(B)$. Então, como $F$ é sobrejetor, sabemos que existe $b' \in C$ tal que
-    $b = F(b')$. Assim sendo, dado que $F$ é fibração, existe $a' \in C$ e flecha $a' \to b'$ que
-    é mapeada por $F$ em $a \to b$. Provaremos que $a' \to b'$ não é decomponível.
+    Além disso, suponha que $p \colon a \to b$ em $\Free(A)$ seja tal que $\Free(f)(p)$ seja
+    isomorfismo. Então, como $\Free(B)$ é categoria livre, sabemos que $\Free(f)(p)$ é uma
+    identidade. Logo, pela própria construção de $\Free(f)$, $p$ também é identidade; ou seja,
+    também é isomorfismo. Logo, o funtor $\Free(f)$ é conservativo.
+
+    ($\Longleftarrow$) Seja $F \colon \Free(C) \to \Free(B)$ uma fibração. Além disso, seja
+    $a \to b$ uma aresta em $B$ ou, equivalentemente, um gerador em $\Free(B)$. Então, como $F$ é
+    sobrejetor, sabemos que existe $b' \in \Obj{C}$ tal que $b = F(b')$. Assim sendo, dado que $F$
+    é fibração, existe $a' \in \Obj{C}$ e flecha $a' \to b'$ que é mapeada por $F$ em $a \to b$.
+    Provaremos que $a' \to b'$ não é decomponível.
 
     Seja $a' \to c \to b'$ uma decomposição de $a' \to b'$. Então, como $F$ é funtor,
-    $a \to F(c) \to b$ seria decomposição de $a \to b$, o que não pode acontecer porque $a \to b$
-    é gerador.
+    $a \to F(c) \to b$ seria decomposição de $a \to b$. Logo, como $a \to b$ é gerador, então
+    $F(c) = a$ ou $F(c) = b$ e a seta correspondente é uma identidade. Sem perda de generalidade,
+    assuma que $F(c) = b$ e $F(c) \to b$ é identidade. Então, pelo
+    \myref[Lema]{conservative_reflects_id}, $c = b'$ e $c \to b'$ é identidade.
+
+    Sendo assim, $a' \to b'$ é um gerador em $\Free(C)$, ou, equivalentemente, uma aresta em $C$.
+
+    Logo, podemos definir o seguinte grafo $A$:
+
+    \begin{equation}
+        \Ver{A} \defeq \{a \in \Obj{\Free(C)} \colon
+            a = \dom \gamma \, \vee \, a = \cod \gamma, \gamma \in F^{-1} \left[ \gen \Free(B) \right]\}
+    \end{equation}
+    \begin{equation}
+        \Edg{A} \defeq F^{-1} \left[ \gen \Free(B) \right]
+    \end{equation}
+
+    Como $F^{-1} \left[ \gen \Free(B) \right] \subseteq \gen \Free(C)$, podemos criar um
+    monomorfismo $i \colon A \hookrightarrow C$ de grafos pela identificação de uma aresta em $C$
+    com um gerador de $\Free(C)$.
+
+    Logo, podemos tomar a imagem inversa dos geradores de $\Free(C)$, e isso vai formar um subgrafo
+    $i \colon A \hookrightarrow C$ e uma função $f \colon A \to B$ que faz o mesmo papel de $F$
+    restrita à imagem inversa dos geradores de $\Free(B)$.
+
+    Por outro lado, considere $e' \colon a' \to b'$ um gerador em $\Free(A)$. Então $F(e')$ também
+    é gerador. Com efeito, suponha que $e \defeq F(e')$ tenha uma decomposição não trivial
+
+    \begin{equation*}
+        a \to_{\alpha} c \to_{\beta} b
+    \end{equation*}
+
+    Então, como $F$ é fibração, $a$
 \end{proof}
 
 \chapter*{TODOs}
