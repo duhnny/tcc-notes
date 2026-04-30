@@ -357,9 +357,9 @@ Vamos do fim para o começo. Onde queremos chegar é o seguinte teorema:
     \end{equation}
 \end{theorem}
 \begin{proof}
-    Repare que $\card{\prod_i GF(p_i^{r_i})} = n$. Logo,
-    $\left\langle \prod_i GF(p_i^{r_i}), * \right\rangle \encodes K_n$. Mas, segundo o lema
-    \TODO{inserir lema}, para cada $i$ existe $S_i \subseteq GF(p_i^{r_i})$ tal que :
+    Repare que $\card{\prod_i \Field{p_i^{r_i}}} = n$. Logo,
+    $\left\langle \prod_i \Field{p_i^{r_i}}, * \right\rangle \encodes K_n$. Mas, segundo o lema
+    \TODO{inserir lema}, para cada $i$ existe $S_i \subseteq \Field{p_i^{r_i}}$ tal que :
 \end{proof}
 
 \begin{lemma}\mylabel{leminhas}
@@ -401,7 +401,7 @@ Chame $\Graph = [\Gamma, \Set]$.
     $s \in N_i$. Seja ainda $K$ um clique. Então
 
     \begin{equation*}
-        \bigBoxProduct_i \Kayley{N_i}{*} \encodes_{K} \Kayley{G}{S}
+        \bigBoxProduct_i \Cayley{N_i}{*} \encodes_{K} \Cayley{G}{S}
     \end{equation*}
 \end{theorem}
 
@@ -433,15 +433,15 @@ Chame $\Graph = [\Gamma, \Set]$.
 
 
 \begin{proof}
-    Seja $G \defeq \prod_i GF(p_i^{r_i})$. Repare que $\card{G} = n$. Logo,
-    $\Kayley{G}{*} \cong K_n$. Mas, segundo o lema \TODO{inserir lema}, para cada $i$ existe
-    $S_i \subseteq GF(p_i^{r_i})$, um conjunto de vetores linearmente independentes sobre
-    $GF(p_i^{s_i})$ que geram $GF(p_i^{r_i})$ pela ação de $GF(p_i^{s_i})$ em $S_i$.
+    Seja $G \defeq \prod_i \Field{p_i^{r_i}}$. Repare que $\card{G} = n$. Logo,
+    $\Cayley{G}{*} \cong K_n$. Mas, segundo o lema \TODO{inserir lema}, para cada $i$ existe
+    $S_i \subseteq \Field{p_i^{r_i}}$, um conjunto de vetores linearmente independentes sobre
+    $\Field{p_i^{s_i}}$ que geram $\Field{p_i^{r_i}}$ pela ação de $\Field{p_i^{s_i}}$ em $S_i$.
     
     Sejam então
 
     \begin{equation}
-        G' \defeq \prod_i GF(p_i^{s_i})
+        G' \defeq \prod_i \Field{p_i^{s_i}}
     \end{equation}
     e
 
@@ -458,14 +458,14 @@ Chame $\Graph = [\Gamma, \Set]$.
         G \subseteq \sum_{s \in S} sG'
     \end{equation*}
 
-    Logo, pelo \myref[Teorema]{normal_enc_kayley}, temos que
+    Logo, pelo \myref[Teorema]{normal_enc_cayley}, temos que
 
     \begin{equation*}
-        \bigBoxProduct_{s \in S} \Kayley{s G'}{*} \encodes \Kayley{G}{*} \cong K_n
+        \bigBoxProduct_{s \in S} \Cayley{s G'}{*} \encodes \Cayley{G}{*} \cong K_n
     \end{equation*}
     
     Mas sabemos também que cada $s G'$ contém $m$ elementos. Sendo assim, temos
-    $\Kayley{s G'}{*} \cong K_{m}$ para todo $s \in S$. Mas isso significa que
+    $\Cayley{s G'}{*} \cong K_{m}$ para todo $s \in S$. Mas isso significa que
 
     \begin{equation*}
         Q_{\mu(m)} \encodes K_m
@@ -476,7 +476,7 @@ Chame $\Graph = [\Gamma, \Set]$.
 
     \begin{equation*}
         \bigBoxProduct_{s \in S} Q_{\mu(m)} \cong Q_{\card{S} \mu(m)} \encodes
-        \bigBoxProduct_{s \in S} K_m \cong \bigBoxProduct_{s \in S} \Kayley{s G'}{*} \cong K_n
+        \bigBoxProduct_{s \in S} K_m \cong \bigBoxProduct_{s \in S} \Cayley{s G'}{*} \cong K_n
     \end{equation*}
     donde, pela definição de $\mu$, tiramos imediatamente que
 
@@ -496,50 +496,207 @@ Chame $\Graph = [\Gamma, \Set]$.
 
 \chapter{Resultados na Teoria de Grafos}
 
-\begin{lemma}[Lema 1.4]\mylabel{degree_geq}
-    Se $f: G \encodes H$ é um encoding, e se $f(x) = u$, então $\deg_{f^{-1}(H)}(x) \geq \deg(u)$.
-\end{lemma}
+Nesta seção, desenvolveremos uma aplicação específica do conceito de encoding, com vistas a motivar
+o leitor quanto à sua utilidade.
 
-\begin{proof}
-    Prova é trivial pela definição de encoding.
-\end{proof}
+Para tanto, nos faremos uma pequena pergunta, a resposta da qual nos guiará pelo resto da
+seção:
 
-\begin{lemma}\mylabel{prod_kayley}
-    Sejam $G, H$ grupoides e $S \subseteq G$, $T \subseteq H$ subconjuntos desses. Então
+\begin{example}
+    Suponha que você tenha uma rede de processadores todos ligados entre si:
+
+    % https://q.uiver.app/#q=WzAsOCxbMSwwLCJcXGJveGVke1xcdGV4dHtDUFUgMX19Il0sWzAsMSwiXFxib3hlZHtcXHRleHR7Q1BVIDJ9fSJdLFswLDIsIlxcYm94ZWR7XFx0ZXh0e0NQVSAzfX0iXSxbMSwzLCJcXGJveGVke1xcdGV4dHtDUFUgNH19Il0sWzIsMywiXFxib3hlZHtcXHRleHR7Q1BVIDV9fSJdLFszLDIsIlxcYm94ZWR7XFx0ZXh0e0NQVSA2fX0iXSxbMywxLCJcXGJveGVke1xcdGV4dHtDUFUgN319Il0sWzIsMCwiXFxib3hlZHtcXHRleHR7Q1BVIDh9fSJdLFswLDEsIiIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsxLDIsIiIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsyLDMsIiIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFszLDQsIiIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFs0LDUsIiIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFs1LDYsIiIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFs2LDcsIiIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFs3LDAsIiIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFswLDIsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFswLDMsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFswLDQsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFswLDUsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFswLDYsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsxLDMsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsxLDQsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsxLDUsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsxLDYsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsxLDcsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsyLDQsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsyLDUsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsyLDYsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFsyLDcsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFszLDUsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFszLDYsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFszLDcsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFs0LDYsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFs0LDcsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dLFs1LDcsIiIsMSx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9fX1dXQ==
+    \[\begin{tikzcd}
+        & {\boxed{\text{CPU 1}}} & {\boxed{\text{CPU 8}}} & \\
+        {\boxed{\text{CPU 2}}} &&& {\boxed{\text{CPU 7}}} \\
+        {\boxed{\text{CPU 3}}} &&& {\boxed{\text{CPU 6}}} \\
+        & {\boxed{\text{CPU 4}}} & {\boxed{\text{CPU 5}}}
+        \arrow[tail reversed, from=1-2, to=2-1]
+        \arrow[tail reversed, from=1-2, to=2-4]
+        \arrow[tail reversed, from=1-2, to=3-1]
+        \arrow[tail reversed, from=1-2, to=3-4]
+        \arrow[tail reversed, from=1-2, to=4-2]
+        \arrow[tail reversed, from=1-2, to=4-3]
+        \arrow[tail reversed, from=1-3, to=1-2]
+        \arrow[tail reversed, from=2-1, to=1-3]
+        \arrow[tail reversed, from=2-1, to=2-4]
+        \arrow[tail reversed, from=2-1, to=3-1]
+        \arrow[tail reversed, from=2-1, to=3-4]
+        \arrow[tail reversed, from=2-1, to=4-2]
+        \arrow[tail reversed, from=2-1, to=4-3]
+        \arrow[tail reversed, from=2-4, to=1-3]
+        \arrow[tail reversed, from=3-1, to=1-3]
+        \arrow[tail reversed, from=3-1, to=2-4]
+        \arrow[tail reversed, from=3-1, to=3-4]
+        \arrow[tail reversed, from=3-1, to=4-2]
+        \arrow[tail reversed, from=3-1, to=4-3]
+        \arrow[tail reversed, from=3-4, to=1-3]
+        \arrow[tail reversed, from=3-4, to=2-4]
+        \arrow[tail reversed, from=4-2, to=1-3]
+        \arrow[tail reversed, from=4-2, to=2-4]
+        \arrow[tail reversed, from=4-2, to=3-4]
+        \arrow[tail reversed, from=4-2, to=4-3]
+        \arrow[tail reversed, from=4-3, to=1-3]
+        \arrow[tail reversed, from=4-3, to=2-4]
+        \arrow[tail reversed, from=4-3, to=3-4]
+    \end{tikzcd}\]
+    isto é, por exemplo, formando um grafo $K_8$.
+
+    Agora, suponha que você queira simular\footnote{O sentido exato da palavra \textit{simulação}
+    aqui será desenvolvido mais posteriormente nesta seção.} um processamento feito para a rede
+    acima em uma rede de processadores arranjados em um cubo $n$-dimensional, isto é, $Q_n$. Qual
+    seria o $n$ mínimo para que você pudesse fazer isso?
+
+    Como veremos mais afrente, a resposta seria, nesse caso, $n = 7$. Mas qual seria a resposta no
+    geral? Mais ainda, se admitirmos um custo de $r$ ciclos, isto é, que, em vez de uma informação
+    passar diretamente de um processador para o outro haja um caminho de comprimento menor ou igual
+    a $r$ que liga os processadores que precisamos, qual seria esse número?
+\end{example}
+
+\begin{definition}\mylabel{mu}
+    Sejam $n, r \in \N$, $n, r \geq 1$. Então definimos $\mu_r(n)$ como o menor número $k$ tal que
+    $Q_k^{(r)}$ encoda $K_n$, isto é
 
     \begin{equation*}
-        \Kayley{G}{S} \boxProduct \Kayley{H}{T}
-            \cong \Kayley{G \oplus H}{(S \times \{e_H\}) \cup (\{e_G\} \times T)}
+        \mu_r(n) \defeq \min \left\{ k \in \N \colon Q_k^{(n)} \encodes K_n \right\}
+    \end{equation*}
+\end{definition}
+
+\section{Resultados algébricos}
+
+Nesta seção, mostraremos alguns resultados algébricos que nos serão úteis para estabelecer fatos
+sobre $\mu_r$.
+
+Para que isso aconteça, no entanto, utilizaremos a seguinte definição que faz a ponte entre os
+grupos e os grafos:
+
+\begin{definition}\mylabel{cayley}
+    Seja $G \in \Group$ um grupo e $S \subseteq G$ um subconjunto de $G$. Então o \textbf{grafo de
+    Cayley} de $G$ no subconjunto $S$ é o grafo $\Cayley{G}{S}$ que tem como conjunto de vértices
+    $G$ e tal que, se $a, b \in G$, existe uma aresta $a \to b$ em $\Cayley{G}{S}$ se, e somente
+    se, existe $s \in S$ tal que
+
+    \begin{equation*}
+        b = a \cdot s
+    \end{equation*}
+
+    Caso $S = G$, representaremos o grafo com um asterisco ($*$) para simplificar a notação, isto
+    é,
+
+    \begin{equation}
+        \Cayley{G}{*} \defeq \Cayley{G}{G}
+    \end{equation}
+\end{definition}
+
+Agora, vamos relacionar essa definição com o conceito de produto caixa:
+
+\begin{lemma}\mylabel{prod_cayley}
+    Sejam $G, H$ grupos e $S \subseteq G$, $T \subseteq H$ subconjuntos desses. Então
+
+    \begin{equation*}
+        \Cayley{G}{S} \boxProduct \Cayley{H}{T}
+            \cong \Cayley{G \oplus H}{(S \times \{e_H\}) \cup (\{e_G\} \times T)}
     \end{equation*}
 \end{lemma}
 
 \begin{proof}
     $(a, b) \to (a', b')$ é uma aresta de
-    $\Kayley{G \oplus H}{(S \times \{e_H\}) \cup (\{e_G\} \times T)}$ se, e somente se, existe
+    $\Cayley{G \oplus H}{(S \times \{e_H\}) \cup (\{e_G\} \times T)}$ se, e somente se, existe
     $c \in S \times \{e_H\} \cup \{e_G\} \times T$ tal que $(a',b') = (a, b) \cdot c$. Mas isso
     implica que $a = a'$ ou $b = b'$.
 
     Suponha, sem perda de generalidade, que $a = a'$. Então existe $t \in T$ tal que
-    $b' = b \cdot t$. Logo, $b \to b'$ é aresta de $\Kayley{H}{T}$, e, portanto,
-    $(a, b) \to (a', b')$ é aresta de $\Kayley{G}{S} \boxProduct \Kayley{H}{T}$.
+    $b' = b \cdot t$. Logo, $b \to b'$ é aresta de $\Cayley{H}{T}$, e, portanto,
+    $(a, b) \to (a', b')$ é aresta de $\Cayley{G}{S} \boxProduct \Cayley{H}{T}$.
 
     Voltando o argumento, temos o outro lado do isomorfismo.
 \end{proof}
 
-\begin{corollary}
-    $Q_n \cong \Kayley{(\Z_2)^n}{\{(1, 0, 0, \cdots, 0), (0, 1, \cdots, 0), \cdots (0, 0, \cdots, 1)\}}$
+\begin{corollary}\mylabel{q_n_iso_cayley}
+    $Q_n \cong \Cayley{(\Z_2)^n}{\{(1, 0, 0, \cdots, 0), (0, 1, \cdots, 0), \cdots (0, 0, \cdots, 1)\}}$
 \end{corollary}
 
 \begin{proof}
-    Como $Q_1 \cong \Kayley{\Z_2}{\{1\}}$, a prova segue do \myref[lema]{prod_kayley}.
+    Como $Q_1 \cong \Cayley{\Z_2}{\{1\}}$, a prova segue do \myref[lema]{prod_cayley}.
 \end{proof}
 
-\begin{lemma}\mylabel{kayley_enc_kayley}
-    Sejam $G, H$ grupoides, $S \subseteq G$ e $T \subseteq H$ subconjuntos desses, e
-    $f \colon G \to H$ um homomorfismo sobrejetor de grupoides tal que $f(S) \supseteq T$. Então
+Repare que o corolário acima nos dá uma representação dos grafos $Q_n$. Além disso, repare que,
+para qualquer grupo $G$ com $n$ elementos, temos
+
+\begin{equation*}
+    K_n \cong \Cayley{G}{*}
+\end{equation*}
+
+Essas duas representações nos dão um ótimo ponto de partida para trabalhar com esse tipo de grafo.
+E isso não se restringe a esses grafos.
+
+\begin{example}
+    O grafo de linha infinito, $L$, como na seguinte imagem,
+
+    % https://q.uiver.app/#q=WzAsNSxbMCwwLCJcXGNkb3RzIl0sWzIsMCwiXFxidWxsZXQiXSxbNCwwLCJcXGJ1bGxldCJdLFs2LDAsIlxcYnVsbGV0Il0sWzgsMCwiXFxjZG90cyJdLFswLDEsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMSwyLCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMywiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFszLDQsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XV0=
+    \[\begin{tikzcd}
+        \cdots && \bullet && \bullet && \bullet && \cdots
+        \arrow[no head, from=1-1, to=1-3]
+        \arrow[no head, from=1-3, to=1-5]
+        \arrow[no head, from=1-5, to=1-7]
+        \arrow[no head, from=1-7, to=1-9]
+    \end{tikzcd}\]
+    pode ser representado da forma
 
     \begin{equation*}
-        \Kayley{G}{S} \encodes \Kayley{H}{T}
+        L \cong \Cayley{\Z}{\{-1, 0, 1\}}
+    \end{equation*}
+    onde usamos um par de flechas indo e vindo de cada vértice para representar o grafo sem
+    direção, e mais um loop (porque $0 \in S$) para tornar o grafo reflexivo, como se pode ver
+    abaixo
+
+    % https://q.uiver.app/#q=WzAsNSxbMiwwLCItMSJdLFs0LDAsIjAiXSxbNiwwLCIxIl0sWzgsMCwiXFxjZG90cyJdLFswLDAsIlxcY2RvdHMiXSxbNCwwLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMCw0LCIiLDEseyJjdXJ2ZSI6LTF9XSxbMCwxLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMSwwLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMSwyLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMiwxLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMiwzLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMywyLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMCwwLCIiLDEseyJyYWRpdXMiOjF9XSxbMSwxLCIiLDEseyJyYWRpdXMiOjF9XSxbMiwyLCIiLDEseyJyYWRpdXMiOjF9XV0=
+    \[\begin{tikzcd}
+        \cdots && \bullet && \bullet && \bullet && \cdots
+        \arrow[curve={height=-6pt}, from=1-1, to=1-3]
+        \arrow[curve={height=-6pt}, from=1-3, to=1-1]
+        \arrow[from=1-3, to=1-3, loop, in=60, out=120, distance=5mm]
+        \arrow[curve={height=-6pt}, from=1-3, to=1-5]
+        \arrow[curve={height=-6pt}, from=1-5, to=1-3]
+        \arrow[from=1-5, to=1-5, loop, in=60, out=120, distance=5mm]
+        \arrow[curve={height=-6pt}, from=1-5, to=1-7]
+        \arrow[curve={height=-6pt}, from=1-7, to=1-5]
+        \arrow[from=1-7, to=1-7, loop, in=60, out=120, distance=5mm]
+        \arrow[curve={height=-6pt}, from=1-7, to=1-9]
+        \arrow[curve={height=-6pt}, from=1-9, to=1-7]
+    \end{tikzcd}\]
+
+    Da mesma forma, podemos representar os ciclos $C_n$
+
+        % https://q.uiver.app/#q=WzAsOCxbMCwxLCJcXGJ1bGxldCJdLFsxLDAsIlxcYnVsbGV0Il0sWzIsMCwiXFxidWxsZXQiXSxbMywxLCJcXGJ1bGxldCJdLFszLDIsIlxcYnVsbGV0Il0sWzIsMywiXFxidWxsZXQiXSxbMCwyLCJcXGJ1bGxldCJdLFsxLDMsIlxcZGRvdHMiXSxbMCwxLCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzEsMiwiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsyLDMsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMyw0LCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsNSwiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs1LDcsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbNyw2LCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzYsMCwiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dXQ==
+    \[\begin{tikzcd}
+        & \bullet & \bullet & \\
+        \bullet &&& \bullet \\
+        \bullet &&& \bullet \\
+        & \ddots & \bullet
+        \arrow[no head, from=1-2, to=1-3]
+        \arrow[no head, from=1-3, to=2-4]
+        \arrow[no head, from=2-1, to=1-2]
+        \arrow[no head, from=2-4, to=3-4]
+        \arrow[no head, from=3-1, to=2-1]
+        \arrow[no head, from=3-4, to=4-3]
+        \arrow[no head, from=4-2, to=3-1]
+        \arrow[no head, from=4-3, to=4-2]
+    \end{tikzcd}\]
+    como $C_n \cong \Cayley{\Z_n}{\{-1, 0, 1\}}$
+\end{example}
+
+Em geral, \TODO{buscar quais grafos podem ser representados como Cayley}
+
+Bom, estabelecido que os grafos de Cayley são úteis na representação de grafos, introduziremos um
+lema que nos permitirá encontrar encodings entre tais grafos.
+
+\begin{lemma}\mylabel{cayley_enc_cayley}
+    Sejam $G, H$ grupos, $S \subseteq G$ e $T \subseteq H$ subconjuntos desses, e
+    $f \colon G \to H$ um homomorfismo sobrejetor de grupos tal que $f(S) \supseteq T$. Então
+
+    \begin{equation*}
+        \Cayley{G}{S} \encodes \Cayley{H}{T}
     \end{equation*}
 \end{lemma}
 
@@ -547,15 +704,15 @@ Chame $\Graph = [\Gamma, \Set]$.
     Dadas essas condições, construa, parcialmente, o seguinte homomorfismo $\bar{f}$ de grafos:
 
     \begin{equation*}
-        \bar{f}(a) = f(a),\hspace{5pt} \forall a \in \Ver{\Kayley{G}{S}} = G
+        \bar{f}(a) = f(a),\hspace{5pt} \forall a \in \Ver{\Cayley{G}{S}} = G
     \end{equation*}
-    e, para toda aresta $a \to b$ de $\Kayley{G}{S}$, sabemos que existe $s \in S$ tal que
+    e, para toda aresta $a \to b$ de $\Cayley{G}{S}$, sabemos que existe $s \in S$ tal que
     $a \cdot s$. Nesse caso, se $f(s) \in T$, definimos
 
     \begin{equation*}
         f(a \to b) = f(a) \to f(b) = f(a \cdot s) = f(a) \cdot f(s)
     \end{equation*}
-    que está em $\Edg{\Kayley{H}{T}}$ porque $f(s) \in T$. Caso contrário, não definimos $\bar{f}$
+    que está em $\Edg{\Cayley{H}{T}}$ porque $f(s) \in T$. Caso contrário, não definimos $\bar{f}$
     sobre a aresta.
 
     Agora, para mostrar que $\bar{f}$ é encoding, tome $b \in G$ e uma aresta
@@ -572,7 +729,40 @@ Chame $\Graph = [\Gamma, \Set]$.
     e $b \cdot s^{-1} \to b$ é mapeada para $a \to f(b)$ por $\bar{f}$.
 \end{proof}
 
+Este lema que acabamos de demonstrar nos dá simples condições para encontrar encodings. Não só
+isso, ele nos dá um algoritmo para encontrar tais encodings. Ele nos será útil mais afrente para
+encontrarmos o que apelidaremos de encoding de Hamming, por sua ligação com o código de Hamming.
+
+Bom, esses são todos os preliminares de que precisamos antes de atacar a questão posta acima. Além
+disso, precisamos somente de um resultado direto da definição de encoding, que será necessária para
+provar que esse encoding de Hamming é, de fato, o menor encoding possível:
+
+\begin{lemma}\mylabel{degree_geq}
+    Se $f: G \encodes H$ é um encoding, e se $f(x) = v$, então $\deg_{f^{-1}(H)}(x) \geq \deg(v)$.
+\end{lemma}
+
+\begin{proof}
+    Pela definição de encoding, se $f(x) = v$ e existe uma aresta $u \to v$ em $H$, então existe um
+    levantamento $u' \to x$ dessa aresta em $G$. Além disso, como $f$ é uma função (parcial), é
+    claro que uma mesma aresta em $G$ não pode ser mapeada para diferentes arestas em $H$.
+
+    Logo,
+
+    \begin{align*}
+        \deg(v) &=    \card{\{\alpha \in \Edg{H} \colon \tg{\alpha} = v\}} \\
+                &\leq \card{\{\alpha' \in \Edg{f^{-1}[H]} \colon \tg{\alpha'} = x
+                    \logicalAnd \tg{f(\alpha')} = v\}} \\
+                &=    \card{\{\alpha' \in \Edg{f^{-1}[H]} \colon \tg{\alpha'} = x\}} \\
+                &=    \deg_{f^{-1}[H]}(x)
+    \end{align*}
+\end{proof}
+
+Agora estamos prontos para iniciar a busca pelo melhor encoding $Q_k^{(r)} \encodes K_n$.
+
 \section{Para r = 1}
+
+Comecemos com o caso $r = 1$, isto é, queremos encontrar o menor $k \in \N$ tal que
+$Q_k \encodes K_n$, para um $n \in \N$ qualquer.
 
 \begin{proposition}\mylabel{mu_1_n_geq_n_minus_1}
     $\mu_1(n) \geq n - 1$
@@ -580,33 +770,54 @@ Chame $\Graph = [\Gamma, \Set]$.
 
 \begin{proof}
     A prova é uma conclusão do \myref[lema]{degree_geq} e do fato de que $K_n$ é regular de grau
-    $n-1$.
+    $n-1$, isto é, que cada vértice de $K_n$ tem o mesmo grau, $n-1$.
+
+    Com efeito, um vértice de um grafo $Q_k$ tem grau $k$, pois, para cada vetor binário e cada
+    componente nesse vetor, existe um outro vetor com o valor trocado somente nessa componente,
+    que, pela definição de $Q_k$, implica que existe uma aresta desse outro para o primeiro.
 \end{proof}
+
+De fato, na desigualdade do lema acima vale a igualdade no caso $n = 2^k$, e esse é o caso que nos
+dá o encoding de Hamming. Vejamos a sua construção abaixo.
 
 \begin{theorem}\mylabel{mu_1_2_k_n_minus_1}
     $\mu_1(2^k) = 2^k - 1$
 \end{theorem}
 
 \begin{proof}
-    Podemos representar $K_{2^k}$ como $\Kayley{(\Z_2)^k}{*}$, isto é,
-    $K_{2^k} \cong \Kayley{(\Z_2)^k}{*}$, porque $(\Z_2)^k$, como um grupo aditivo, tem $2^k$
+    Podemos representar $K_{2^k}$ como $\Cayley{(\Z_2)^k}{*}$, isto é,
+    $K_{2^k} \cong \Cayley{(\Z_2)^k}{*}$, porque $(\Z_2)^k$, como um grupo aditivo, tem $2^k$
     elementos.
 
-    \TODO{terminar essa prova}
+    Da mesma forma, temos, pelo \myref[corolário]{q_n_iso_cayley}, que
+    $Q_{2^k-1} \cong \Cayley{(\Z_2)^{2^k-1}}{\{(1, 0, 0 \cdots), \cdots, (\cdots, 0, 0, 1)\}}$.
+
+    Agora, se mapearmos cada um dos $2^k - 1$ elementos da base de $(\Z_2)^{2^k-1}$ para cada
+    elemento não nulo de $(\Z_2)^k$, isso define um homomorfismo de grupos (considerando ambos como
+    grupos aditivos), e, portanto, pelo \myref[lema]{cayley_enc_cayley},
+
+    \begin{equation*}
+        \Cayley{(\Z_2)^{2^k-1}}{\{(1, 0, 0 \cdots), \cdots, (\cdots, 0, 0, 1)\}}
+            \encodes \Cayley{(\Z_2)^k}{*}
+    \end{equation*}
 \end{proof}
 
-\begin{theorem}\mylabel{normal_enc_kayley}
+De fato, veremos que $\mu_1$ não desvia muito dessa tendência. De forma mais precisa, afirmamos que
+$\mu_1$ é assintóticamente equivalente a $n$. Para demonstrar isso, no entanto, vamos precisar de
+mais alguns teoremas.
+
+\begin{theorem}\mylabel{normal_enc_cayley}
     Seja $G$ um grupo, $N_i$ uma família de subgrupos normais de $G$ tais que $G = \prod_i N_i$ e
     $S \subseteq G$ um subconjunto de $G$ qualquer tal que para todo $s \in S$, existe $i$ tal que
     $s \in N_i$.
 
     \begin{equation*}
-        \bigBoxProduct_i \Kayley{N_i}{*} \encodes \Kayley{G}{S}
+        \bigBoxProduct_i \Cayley{N_i}{*} \encodes \Cayley{G}{S}
     \end{equation*}
 \end{theorem}
 
 \begin{proof}
-    Defina $f \colon \bigBoxProduct_i \Kayley{N_i}{*} \to \Kayley{G}{S}$ parcialmente levando cada
+    Defina $f \colon \bigBoxProduct_i \Cayley{N_i}{*} \to \Cayley{G}{S}$ parcialmente levando cada
     vértice $(n_i)_{i \in I}$ no produto $\prod_i n_i \in G$. Além disso, para cada aresta, que é
     da forma
 
@@ -623,11 +834,11 @@ Chame $\Graph = [\Gamma, \Set]$.
 
     Provaremos que $f$ assim dada é um encoding. Nesse caso, dado que $f$ é sobrejetora nos
     vértices porque $\prod_i N_i = G$, basta mostrar que, para todo ponto
-    $n \in \bigBoxProduct_i N_i$ e para toda aresta $g \to f(n)$ de $\Kayley{G}{S}$, há um
+    $n \in \bigBoxProduct_i N_i$ e para toda aresta $g \to f(n)$ de $\Cayley{G}{S}$, há um
     levantamento da aresta dado por $f$.
 
     De fato, podemos escrever a aresta acima como $g \to sg$, para algum $s \in S$, por construção
-    de $\Kayley{G}{S}$. Ou seja, $f(n) = sg$ para algum $s \in S$. Sabemos, então, que, dado que
+    de $\Cayley{G}{S}$. Ou seja, $f(n) = sg$ para algum $s \in S$. Sabemos, então, que, dado que
     $G = \prod_i N_i$, podemos escrever
 
     \begin{equation*}
@@ -681,14 +892,8 @@ Chame $\Graph = [\Gamma, \Set]$.
     \end{equation*}
 \end{proof}
 
-\begin{lemma}\mylabel{li_finite_field}
-    Seja $p$ um primo. Se $t$ é um elemento primitivo do corpo finito $GF(p^r)$, então $t^a$ e
-    $t^b$ são linearmente independentes em um subcorpo $GF(p^s)$ sse.
-
-    \begin{equation*}
-        a \cong b \\ \left( \operatorname{mod} \frac{p^r -1}{p^s - 1} \right)
-    \end{equation*}
-\end{lemma}
+Além do teorema acima, precisaremos de mais um teorema essencial para entender a ligação do
+conceito de encoding com o de produto caixa.
 
 \begin{theorem}\mylabel{prod_enc_prod}
     Sejam $A, B, C, D \in \Graph$ grafos tais que $A \encodes B$ e $C \encodes D$. Então
@@ -722,7 +927,33 @@ Chame $\Graph = [\Gamma, \Set]$.
     é uma aresta em $A \boxProduct C$ que é levada em $(b_1, d_1) \to (b_2, d_2)$.
 \end{proof}
 
-\begin{theorem}[Teorema 2.10]\mylabel{factor_mu_1}
+Mais afrente, no próximo capítulo, aprofundaremos o conceito de produto caixa e entenderemos essa
+relação em um contexto mais geral. Por ora, no entanto, basta saber que o produto caixa se
+relaciona bem com a noção de encoding, como se pode ver acima.
+
+Agora, para a próxima etapa da nossa demonstração, tomaremos emprestado alguns conceitos da
+álgebra que nos serão convenientes para lidar com as representações de Cayley dos nossos grafos.
+
+\begin{definition}
+    Para cada $n \in \N$, seja $\Field{n}$ o corpo finito com $n$ elementos.
+\end{definition}
+
+É fato conhecido que, se dois corpos finitos têm o mesmo número de elementos, então eles são
+isomorfos. Isso justifica a definição acima.
+
+Podemos usar a decomposição desses corpos para obter o seguinte lema:
+
+\begin{lemma}\mylabel{li_finite_field}
+    Seja $p$ um primo. Se $t$ é um elemento primitivo do corpo finito $\Field{p^r}$, então $t^a$ e
+    $t^b$ são linearmente independentes em um subcorpo $\Field{p^s}$ sse.
+
+    \begin{equation*}
+        a \cong b \\ \left( \operatorname{mod} \frac{p^r -1}{p^s - 1} \right)
+    \end{equation*}
+\end{lemma}
+
+
+\begin{theorem}\mylabel{factor_mu_1}
     Seja $n = p_1^{r_1} \cdots p_k^{r_k}$ e suponha que $s_1, \cdots, s_k \in \N$ sejam tais que
     $s_i | r_i, \forall i$. Então, tomando $m = p_1^{s_1} \cdots p_k^{s_k}$, temos que
 
@@ -733,15 +964,15 @@ Chame $\Graph = [\Gamma, \Set]$.
 \end{theorem}
 
 \begin{proof}
-    Seja $G \defeq \prod_i GF(p_i^{r_i})$. Repare que $\card{G} = n$. Logo,
-    $\Kayley{G}{*} \cong K_n$. Mas, segundo o \myref[Lema]{li_finite_field}, para cada $i$ existe
-    $S_i \subseteq GF(p_i^{r_i})$, um conjunto de vetores linearmente independentes sobre
-    $GF(p_i^{s_i})$ que geram $GF(p_i^{r_i})$ pela ação de $GF(p_i^{s_i})$ em $S_i$.
+    Seja $G \defeq \prod_i \Field{p_i^{r_i}}$. Repare que $\card{G} = n$. Logo,
+    $\Cayley{G}{*} \cong K_n$. Mas, segundo o \myref[Lema]{li_finite_field}, para cada $i$ existe
+    $S_i \subseteq \Field{p_i^{r_i}}$, um conjunto de vetores linearmente independentes sobre
+    $\Field{p_i^{s_i}}$ que geram $\Field{p_i^{r_i}}$ pela ação de $\Field{p_i^{s_i}}$ em $S_i$.
     
     Sejam então
 
     \begin{equation}
-        G' \defeq \prod_i GF(p_i^{s_i})
+        G' \defeq \prod_i \Field{p_i^{s_i}}
     \end{equation}
     e
 
@@ -758,14 +989,14 @@ Chame $\Graph = [\Gamma, \Set]$.
         G \subseteq \sum_{s \in S} sG'
     \end{equation*}
 
-    Logo, pelo \myref[Teorema]{normal_enc_kayley}, temos que
+    Logo, pelo \myref[Teorema]{normal_enc_cayley}, temos que
 
     \begin{equation*}
-        \bigBoxProduct_{s \in S} \Kayley{s G'}{*} \encodes \Kayley{G}{*} \cong K_n
+        \bigBoxProduct_{s \in S} \Cayley{s G'}{*} \encodes \Cayley{G}{*} \cong K_n
     \end{equation*}
     
     Mas sabemos também que cada $s G'$ contém $m$ elementos. Sendo assim, temos
-    $\Kayley{s G'}{*} \cong K_{m}$ para todo $s \in S$. Mas isso significa que
+    $\Cayley{s G'}{*} \cong K_{m}$ para todo $s \in S$. Mas isso significa que
 
     \begin{equation*}
         Q_{\mu(m)} \encodes K_m
@@ -776,7 +1007,7 @@ Chame $\Graph = [\Gamma, \Set]$.
 
     \begin{equation*}
         \bigBoxProduct_{s \in S} Q_{\mu(m)} \cong Q_{\card{S} \mu(m)} \encodes
-        \bigBoxProduct_{s \in S} K_m \cong \bigBoxProduct_{s \in S} \Kayley{s G'}{*} \cong K_n
+        \bigBoxProduct_{s \in S} K_m \cong \bigBoxProduct_{s \in S} \Cayley{s G'}{*} \cong K_n
     \end{equation*}
     donde, pela definição de $\mu$, tiramos imediatamente que
 
@@ -793,6 +1024,10 @@ Chame $\Graph = [\Gamma, \Set]$.
         \mu(n) \leq \left( \prod_i \frac{p^{s_i}}{p^{s_i} - 1} \right) \frac{\mu(m)}{m} n
     \end{equation*}
 \end{proof}
+
+O lema acima nos dá uma estimativa do crescimento de $\mu_1$ com relação a divisores específicos de
+$n$ usando alguns fatos sobre corpos finitos e primos. Usando os fatos seguintes sobre a
+distribuição dos números primos, obteremos finalmente uma estimativa para $\mu_1$ não recursiva.
 
 \begin{lemma}\mylabel{m_prox_n}
     Seja $\epsilon > 0$ e $p, q \in \N$ primos. Então existe um $n_0 \in \N$ tal que, para todo
@@ -827,6 +1062,9 @@ Chame $\Graph = [\Gamma, \Set]$.
 \begin{proof}
     \TODO{Inserir prova do lema com o Teorema dos Números Primos?}
 \end{proof}
+
+Agora temos tudo o que precisamos para provar que $\mu_1$ é assintóticamente equivalente a $n$.
+Basta demonstrar esse fato.
 
 \begin{theorem}\mylabel{lim_assintotico_mu_1}
     $\mu_1(n) \sim n$
@@ -889,10 +1127,138 @@ Chame $\Graph = [\Gamma, \Set]$.
     \myref{mu_1_n_geq_n_minus_1} que $\mu_1(n) \geq n-1$, segue o resultado.
 \end{proof}
 
-\section{Para um r fixo}
+\section{Para um r fixo qualquer}
+
+Na seção anterior obtivemos um resultado assintótico para $\mu_1$, isto é, quando o encoding se dá
+diretamente entre um cubo $Q_k$ e um grafo completo $K_n$. Como já dito, isso nos dá uma simulação
+direta de processamentos feitos para uma arquitetura arranjada no padrão de $K_n$ para uma
+arranjada no cubo.
+
+Agora, e se, em vez de exigir que uma infomação pudesse ser passada de um processador para outro em
+uma só etapa, admitíssemos um \textit{custo de retransmissão} de até $r$ etapas?
+
+Veja o exemplo a seguir:
+
+\begin{example}
+    Suponha que queiramos simular um determinado processamento feito para CPUs arranjadas em um
+    $K_5$ para um cubo $Q_3$.
+
+    \begin{center}
+        \begin{minipage}{.6\linewidth}
+            % https://q.uiver.app/#q=WzAsOCxbMCwzLCIoMCwwLDApIl0sWzIsMywiKDEsIDAsIDApIl0sWzAsMSwiKDAsIDEsIDApIl0sWzIsMSwiKDEsMSwwKSJdLFsxLDAsIigwLCAxLCAxKSJdLFsxLDIsIigwLCAwLCAxKSJdLFszLDIsIigxLCAwLCAxKSJdLFszLDAsIigxLCAxLCAxKSJdLFswLDUsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMiw0LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMCwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs0LDUsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMCwxLCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMywiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFszLDEsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbNyw2LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsNywiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs1LDYsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMSw2LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzMsNywiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dXQ==
+            \[\begin{tikzcd}
+                & {(0, 1, 1)} && {(1, 1, 1)} \\
+                {(0, 1, 0)} && {(1,1,0)} \\
+                & {(0, 0, 1)} && {(1, 0, 1)} \\
+                {(0,0,0)} && {(1, 0, 0)}
+                \arrow[no head, from=1-2, to=1-4]
+                \arrow[no head, from=1-2, to=3-2]
+                \arrow[no head, from=1-4, to=3-4]
+                \arrow[no head, from=2-1, to=1-2]
+                \arrow[no head, from=2-1, to=2-3]
+                \arrow[no head, from=2-1, to=4-1]
+                \arrow[no head, from=2-3, to=1-4]
+                \arrow[no head, from=2-3, to=4-3]
+                \arrow[no head, from=3-2, to=3-4]
+                \arrow[no head, from=4-1, to=3-2]
+                \arrow[no head, from=4-1, to=4-3]
+                \arrow[no head, from=4-3, to=3-4]
+            \end{tikzcd}\]
+        \end{minipage}
+        \begin{minipage}{.35\linewidth}
+            % https://q.uiver.app/#q=WzAsNSxbMSwwLCIxIl0sWzAsMSwiMiJdLFsxLDIsIjMiXSxbMiwxLCI0Il0sWzEsMSwiNSJdLFswLDEsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMCwzLCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzMsMiwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsyLDEsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMCwyLCIiLDEseyJjdXJ2ZSI6MSwic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsxLDMsIiIsMSx7ImN1cnZlIjoxLCJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzAsNCwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs0LDIsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMSw0LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsMywiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dXQ==
+            \[\begin{tikzcd}
+                & 1 & \\
+                2 & 5 & 4 \\
+                & 3
+                \arrow[no head, from=1-2, to=2-1]
+                \arrow[no head, from=1-2, to=2-2]
+                \arrow[no head, from=1-2, to=2-3]
+                \arrow[curve={height=6pt}, no head, from=1-2, to=3-2]
+                \arrow[no head, from=2-1, to=2-2]
+                \arrow[curve={height=6pt}, no head, from=2-1, to=2-3]
+                \arrow[no head, from=2-2, to=2-3]
+                \arrow[no head, from=2-2, to=3-2]
+                \arrow[no head, from=2-3, to=3-2]
+                \arrow[no head, from=3-2, to=2-1]
+            \end{tikzcd}\]
+        \end{minipage}
+    \end{center}
+
+    Pelo \myref[lema]{mu_1_n_geq_n_minus_1}, sabemos que um encoding é impossível entre esses
+    grafos, e, portanto, não podemos obter uma simulação direta: com efeito, qualquer função
+    parcial de $Q_3$ para $K_5$ levaria um vértice do cubo em um vértice de $K_5$ adjascente a
+    quatro outros vértices, enquanto o vértice em $Q_3$ é adjascente somente a três outros
+    vértices. Isso significa que qualquer processamento que esse vértice ficasse incumbido de
+    fazer, só poderia contar com o contado de outras $3$ CPUs, em vez das quatro em $K_5$.
+
+    Agora, suponha que, em vez de uma comunicação em uma etapa, admitíssemos que duas CPUs
+    transmitissem informações entre si em duas etapas, como mostrado abaixo:
+
+    % https://q.uiver.app/#q=WzAsOCxbMCwzLCIoMCwwLDApIl0sWzIsMywiKDEsIDAsIDApIl0sWzAsMSwiKDAsIDEsIDApIl0sWzIsMSwiKDEsMSwwKSJdLFsxLDAsIigwLCAxLCAxKSIsWzE4MCw2MCw2MCwxXV0sWzEsMiwiKDAsIDAsIDEpIl0sWzMsMiwiKDEsIDAsIDEpIl0sWzMsMCwiKDEsIDEsIDEpIl0sWzAsNSwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsyLDQsIiIsMSx7ImNvbG91ciI6WzEyMCw2MCw2MF19XSxbMiwwLCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsNSwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFswLDEsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMiwzLCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzMsMSwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs3LDYsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbNCw3LCIiLDEseyJjb2xvdXIiOlsxMjAsNjAsNjBdfV0sWzUsNiwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsxLDYsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMyw3LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV1d
+    \[\begin{tikzcd}
+        & \textcolor{rgb,255:red,92;green,214;blue,214}{{(0, 1, 1)}} && {(1, 1, 1)} \\
+        {(0, 1, 0)} && {(1,1,0)} \\
+        & {(0, 0, 1)} && {(1, 0, 1)} \\
+        {(0,0,0)} && {(1, 0, 0)}
+        \arrow[color={rgb,255:red,92;green,214;blue,92}, from=1-2, to=1-4]
+        \arrow[no head, from=1-2, to=3-2]
+        \arrow[no head, from=1-4, to=3-4]
+        \arrow[color={rgb,255:red,92;green,214;blue,92}, from=2-1, to=1-2]
+        \arrow[no head, from=2-1, to=2-3]
+        \arrow[no head, from=2-1, to=4-1]
+        \arrow[no head, from=2-3, to=1-4]
+        \arrow[no head, from=2-3, to=4-3]
+        \arrow[no head, from=3-2, to=3-4]
+        \arrow[no head, from=4-1, to=3-2]
+        \arrow[no head, from=4-1, to=4-3]
+        \arrow[no head, from=4-3, to=3-4]
+    \end{tikzcd}\]
+
+    Nesse caso, a CPU situada no ponto $(0, 1, 0)$ está se comunicando com a CPU em $(1, 1, 1)$ e a
+    CPU em $(0, 1, 1)$ está somente retransmitindo a informação.
+
+    Equivalentemente, poderíamos considerar $Q_3^{(2)}$, ou seja, o grafo dos caminhos em $Q_3$ de
+    comprimento menor ou igual a $2$. Mas isso ainda não é suficiente para um encoding. Para isso,
+    precisaríamos de $Q_3^{(3)}$. Nesse caso, teríamos $K_8 \hookrightarrow Q_3^{(3)}$ e é claro
+    que $K_8 \encodes K_5$, ou visualmente:
+
+    % https://q.uiver.app/#q=WzAsOCxbMCwzLCIoMCwwLDApIl0sWzIsMywiKDEsIDAsIDApIl0sWzAsMSwiKDAsIDEsIDApIixbMCw2MCw2MCwxXV0sWzIsMSwiKDEsMSwwKSIsWzAsNjAsNjAsMV1dLFsxLDAsIigwLCAxLCAxKSIsWzAsNjAsNjAsMV1dLFsxLDIsIigwLCAwLCAxKSJdLFszLDIsIigxLCAwLCAxKSIsWzAsNjAsNjAsMV1dLFszLDAsIigxLCAxLCAxKSIsWzAsNjAsNjAsMV1dLFswLDUsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMiw0LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMCwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs0LDUsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMCwxLCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMywiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFszLDEsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbNyw2LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsNywiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs1LDYsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMSw2LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzMsNywiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsyLDcsIiIsMSx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9LCJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsMywiIiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZG90dGVkIn0sImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbNiwyLCIiLDEseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifSwiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs2LDQsIiIsMSx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9LCJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzYsMywiIiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn0sImhlYWQiOnsibmFtZSI6Im5vbmUifX19XV0=
+    \[\begin{tikzcd}
+        & \textcolor{rgb,255:red,214;green,92;blue,92}{{(0, 1, 1)}} && \textcolor{rgb,255:red,214;green,92;blue,92}{{(1, 1, 1)}} \\
+        \textcolor{rgb,255:red,214;green,92;blue,92}{{(0, 1, 0)}} && \textcolor{rgb,255:red,214;green,92;blue,92}{{(1,1,0)}} \\
+        & {(0, 0, 1)} && \textcolor{rgb,255:red,214;green,92;blue,92}{{(1, 0, 1)}} \\
+        {(0,0,0)} && {(1, 0, 0)}
+        \arrow[no head, from=1-2, to=1-4]
+        \arrow[dotted, no head, from=1-2, to=2-3]
+        \arrow[no head, from=1-2, to=3-2]
+        \arrow[no head, from=1-4, to=3-4]
+        \arrow[no head, from=2-1, to=1-2]
+        \arrow[dashed, no head, from=2-1, to=1-4]
+        \arrow[no head, from=2-1, to=2-3]
+        \arrow[no head, from=2-1, to=4-1]
+        \arrow[no head, from=2-3, to=1-4]
+        \arrow[no head, from=2-3, to=4-3]
+        \arrow[no head, from=3-2, to=3-4]
+        \arrow[dashed, no head, from=3-4, to=1-2]
+        \arrow[dashed, no head, from=3-4, to=2-1]
+        \arrow[dashed, no head, from=3-4, to=2-3]
+        \arrow[no head, from=4-1, to=3-2]
+        \arrow[no head, from=4-1, to=4-3]
+        \arrow[no head, from=4-3, to=3-4]
+    \end{tikzcd}\]
+
+    É fácil ver que os vértices destacados formam um subgrafo completo. Logo, temos um encoding de
+    $Q_3$ em $K_5$ com custo de retransmissão de $3$.
+\end{example}
+
+Como se comporta esse número, no entanto, admitindo um custo de retransmissão fixo?
+
+Para responder a essa pergunta, primeiramente provaremos um resuldado que nos permita reduzir o
+problema recursivamente.
 
 \begin{lemma}\mylabel{prod_construction}
-    Seja $r = r_1 + r_2$ e $n = n_1 + n_2$. Então
+    Seja $r = r_1 + r_2$ e $n = n_1 \cdot n_2$. Então
 
     \begin{equation}
         \mu_r(n) \leq \mu_{r_1}(n_1) + \mu_{r_2}(n_2)
@@ -981,6 +1347,32 @@ Chame $\Graph = [\Gamma, \Set]$.
     garante o resultado.
 \end{proof}
 
+Agora provaremos um pequeno lema sobre a distribuição de potências de $2$ nos naturais que nos
+ajudará logo em seguida.
+
+\begin{lemma}\mylabel{n_2k_2n}
+    Seja $n \in \N$, $n \geq 1$. Então existe um $k \in \N$ e uma potência $2^k$ tal que
+
+    \begin{equation*}
+        n \leq 2^k \leq 2n
+    \end{equation*}
+\end{lemma}
+
+\begin{proof}
+    Considere o conjunto limitado $\{j \in \N \colon 2^j \leq n\}$. Esse conjunto é não vazio,
+    porque $2^0 = 1 \leq n$ e é limitado superiormente nos naturais. Logo, tem um máximo.
+
+    Seja $l$ o seu máximo. Então $2 \cdot 2^l > n$, porque, do contrário, $l+1$ estaria no
+    conjunto, o que não pode acontecer porque $l$ é máximo. Além disso, como $2^l \leq n$,
+    $2^{l+1} \leq 2n$. Desses dois fatos, segue, em particular, que
+
+    \begin{equation*}
+        n \leq 2^{l+1} \leq 2n
+    \end{equation*}
+\end{proof}
+
+Agora já temos o suficiente para fazer uma estimativa do crescimento de $\mu_r$.
+
 \begin{lemma}[Um limite exponencial]\mylabel{r_exp_limit}
     Sejam $n, r \geq 1$ inteiros. Então
 
@@ -1066,7 +1458,7 @@ Chame $\Graph = [\Gamma, \Set]$.
     \end{align*}
 
     Mas isso vale para $n = 2^k$. Agora, para qualquer $n \in \N$ existe um $k \in \N$ tal que
-    $n \leq 2^k \leq 2n$ \TODO{adicionar prova disso?}. Mas isso significa que:
+    $n \leq 2^k \leq 2n$ segundo o \myref[lema]{n_2k_2n}. Mas isso significa que:
 
     \begin{align*}
         \mu_r(n) &\leq \mu_r(2^k) \\
@@ -1076,6 +1468,8 @@ Chame $\Graph = [\Gamma, \Set]$.
     \end{align*}
     que nos dá o resultado.
 \end{proof}
+
+Por fim, podemos demonstrar o limite assintótico de $\mu_r$.
 
 \begin{theorem}
     Para todos $\epsilon > 0$ e $r \in \N$, $r \geq 1$, existe um número $N \in \N$ tal que
@@ -1500,6 +1894,30 @@ seguir:
     livre são as identidades, então $f$ é identidade.
 \end{proof}
 
+\begin{lemma}
+    Sejam $\A, \B$ categorias, e $F \colon \A \to \B$ um funtor que reflete identidades. Ademais,
+    seja $f \colon b_1 \to b_2$ uma flecha de $\B$ na imagem de $F$ que não tem decomposição não
+    trivial.
+
+    Então qualquer flecha $f'$ de $\A$ tal que $F(f') = f$ não tem decomposição não trivial.
+\end{lemma}
+
+\begin{proof}\mylabel{reflects_generators}
+    Com efeito, suponha que $f' \colon a_1 \to a_2$ tenha uma decomposição:
+
+    % https://q.uiver.app/#q=WzAsMyxbMCwwLCJhXzEiXSxbMiwwLCJhIl0sWzQsMCwiYV8yIl0sWzAsMSwiZyJdLFsxLDIsImgiXSxbMCwyLCJmJyIsMix7ImN1cnZlIjozfV1d
+    \[\begin{tikzcd}
+        {a_1} && a && {a_2}
+        \arrow["g", from=1-1, to=1-3]
+        \arrow["{f'}"', curve={height=18pt}, from=1-1, to=1-5]
+        \arrow["h", from=1-3, to=1-5]
+    \end{tikzcd}\]
+
+    Então, como $F$ é funtor, sabemos que $F(f') = f = F(g) \circ F(h)$. Logo, como $f$ não tem
+    decomposição não trivial, é necessário que $F(g)$ ou $F(h)$ sejam a uma identidade. Como $F$
+    reflete identidades, então $g$ ou $h$ são identidades.
+\end{proof}
+
 \begin{theorem}
     Sejam $A, B \in \Graph$, e $f \colon A \to B$ um encoding de grafos. Então
 
@@ -1588,6 +2006,72 @@ seguir:
 
     Então, como $F$ é fibração, $a$
 \end{proof}
+
+\begin{theorem}
+    Sejam $A, B, C, D \in \Obj{\Graph}$ grafos. Então vale a seguinte equivalência
+
+    \begin{alignat*}{3}
+        A \boxProduct B \encodes C \boxProduct D \quad
+            && \iff \quad
+            && \Free(A) \,\times\, \Free(B) \encodes
+                    \Free(C) \,\times\, \Free(D)
+    \end{alignat*}
+\end{theorem}
+
+\begin{proof}
+    ($\Longleftarrow$) A volta desse teorema é fácil. Seja
+
+    \begin{equation*}
+        F \colon \Free(A) \,\times\, \Free(B) \to \Free(C) \,\times\, \Free(D)
+    \end{equation*}
+    um encoding de categorias. Basta notar que, se $(a, b)$ é um
+    vértice de $A \boxProduct B$, e existe uma aresta
+
+    \begin{equation*}
+        \gamma \colon (c', d') \to (c, d) \defeq F(a, b)
+    \end{equation*}
+
+    Sem perda de generalidade, assuma $d' = d$. Então existe uma seta em
+    $\Free(C) \,\times\, \Free(D)$ na forma $(\tilde{\gamma}, \id{d})$, em que $\tilde\gamma$ é o
+    caminho de comprimento $1$ que leva $c'$ até $c$ em $C$ correspondente à aresta $\gamma$.
+
+    Agora, é claro que $(\tilde\gamma, \id{d})$ não tem decomposição não trivial. Além disso,
+    repare que, como os únicos isomorfismos de $\Free(A) \,\times\, \Free(B)$ e
+    $\Free(C) \,\times\, \Free(D)$ são as identidades, $F$ ser conservativo implica que reflete
+    identidades. Assim sendo, pelo \myref[lema]{reflects_generators}, sabemos que qualquer
+    pré-imagem de $(\tilde\gamma, \id{d})$ não tem decomposição não trivial.
+
+    Em segundo lugar, pela definição de encoding de categorias, existe um objeto
+    $(a', b') \in \Free(A) \,\times\, \Free(B)$ e um morfismo
+
+    \begin{equation*}
+        (\alpha, \beta) \colon (a', b') \to (a, b)
+    \end{equation*}
+    (lembre que os morfismos de $\Free(A) \,\times\, \Free(B)$ são pares de morfismos de $\Free(A)$
+    e $\Free(B)$), tal que $F(\alpha, \beta) = (\tilde\gamma, \id{d})$. Agora, como
+    $(\alpha, \beta)$ não tem decomposição não trivial, isso significa que $\alpha$ é identidade ou
+    $\beta$ é uma identidade; caso contrário, poderíamos escrever
+
+    \begin{equation*}
+        (\alpha, \beta) = (\alpha, \id{b}) \circ (\id{a'}, \beta)
+    \end{equation*}
+
+    Agora, $\alpha$ não pode ser uma identidade, porque, caso fosse, $\tilde\gamma$ seria uma
+    identidade, o que não pode acontecer pela escolha de $\gamma$. Assim sendo, $b' = b$ e
+    $\beta = \id{b}$. Agora, $\alpha$ não tem decomposição não trivial, e não é uma identidade.
+    Logo, $\alpha$ é um gerador de $\Free(A)$. Assim sendo, existe uma aresta $\bar{\alpha}$
+    correspondente a $\alpha$ em $A$:
+
+    \begin{equation*}
+        \bar\alpha \colon a' \to a
+    \end{equation*}
+    que, pela definição de produto caixa, nos dá uma aresta $(a', b) \to (a, b)$.
+
+    ($\Longrightarrow$)
+\end{proof}
+
+\TODO{exemplo com comma category}
+\TODO{se a conta sair trivial, olhar lema do Yoneda}
 
 \chapter*{TODOs}
     \PrintTODOs
