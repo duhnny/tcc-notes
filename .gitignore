@@ -1,6 +1,8 @@
 main.synctex*
 main.out
 main.bcf*
+main.bbl
+main.blg
 main.log
 main.run.xml
 main.fdb_latexmk
