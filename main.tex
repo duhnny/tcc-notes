@@ -37,7 +37,7 @@
 \usepackage{expl3}
 \usepackage{csquotes}
 \usepackage[brazilian,provide=*]{babel}
-\usepackage[style=authoryear, backend=biber]{biblatex}
+\usepackage[style=ieee, backend=biber]{biblatex}
 \addbibresource{bibliography.bib}
 
 % Fim dos pacotes ---------------------------------------------------
@@ -498,6 +498,9 @@ Chame $\Graph = [\Gamma, \Set]$.
 
 Nesta seção, desenvolveremos uma aplicação específica do conceito de encoding, com vistas a motivar
 o leitor quanto à sua utilidade.
+
+Os resultados abaixo se devem, quase em sua totalidade, a \autocite{fellows}. Nosso trabalho, nesta
+seção, é o de destrinchar esses resultados, e fazer pequenas correções à tese original.
 
 Para tanto, nos faremos uma pequena pergunta, a resposta da qual nos guiará pelo resto da
 seção:
@@ -1578,6 +1581,18 @@ Por fim, podemos demonstrar o limite assintótico de $\mu_r$.
     Escolhendo $N = N_4$, temos, portanto, o resultado.
 \end{proof}
 
+\section{Simulação}
+
+Nesta seção, nós trataremos do que exatamente queremos dizer com o termo simulação, e provaremos
+que a presente abordagem com encodings nos entrega melhores resultados do que a estratégia mais
+conhecida, chamada de \textit{graph embedding}.
+
+Para isso, imagine o seguinte cenário, também de \cite{fellows}:
+
+\begin{example}
+    Suponha que 
+\end{example}
+
 \chapter{Rumo a uma categorização de encodings}
 
 Neste capítulo, procuraremos uma forma de desenvolver a teoria que a aproxime melhor da Teoria das
@@ -1918,7 +1933,7 @@ seguir:
     reflete identidades, então $g$ ou $h$ são identidades.
 \end{proof}
 
-\begin{theorem}
+\begin{theorem}\mylabel{graph_encoding_iff_cat_encoding}
     Sejam $A, B \in \Graph$, e $f \colon A \to B$ um encoding de grafos. Então
 
     \begin{equation*}
@@ -2067,7 +2082,61 @@ seguir:
     \end{equation*}
     que, pela definição de produto caixa, nos dá uma aresta $(a', b) \to (a, b)$.
 
-    ($\Longrightarrow$)
+    ($\Longrightarrow$) Seja
+
+    \begin{equation*}
+        f \colon A \boxProduct B \to C \boxProduct D
+    \end{equation*}
+    um encoding.
+
+    O \myref[teorema]{graph_encoding_iff_cat_encoding} nos diz, então, que o funtor parcial
+
+    \begin{equation*}
+        \Free f \colon \Free(A \boxProduct B) \to \Free(C \boxProduct D)
+    \end{equation*}
+    é um encoding de categorias.
+
+    Defina um funtor (provaremos que, de fato, é um funtor mais abaixo) parcialmente de
+    $\Free(A) \,\times\, \Free(B)$ a $\Free(C) \,\times\, \Free(D)$ da seguinte forma:
+
+    \begin{equation*}
+        F(a, b) = f(a, b), \hspace{5pt} \forall a \in \Ver{A}, \forall b \in \Ver{B}
+    \end{equation*}
+    pois os objetos de $\Free(A)$ são justamente os vértices de $A$, e da mesma forma com $B$.
+
+    Agora, para definir $F$ sobre as setas, tome, por exemplo,
+
+    \begin{equation*}
+        (\alpha, \beta) \in \Hom[\Free(A) \times \Free(B)]{(a, b)}{(a_0, b_0)}
+    \end{equation*}
+    e decomponha esses caminhos nos geradores:
+
+    \begin{align*}
+        \alpha &\colon a \to a_n \to \cdots \to a_1 \to a_0 \\
+        \beta  &\colon b \to b_m \to \cdots \to b_1 \to b_0
+    \end{align*}
+
+    Por fim, seguiremos o seguinte processo indutivamente para definir a que seta o par acima será
+    mapeado: definimos $(\gamma, \delta) \defeq F(\alpha, \beta)$ e começaremos tomando o caminho
+    $\beta$, do fim para o começo. Se $f$ estiver definido sobre a aresta
+
+    \begin{equation*}
+        (a_0, b_1) \to (a_0, b_0)
+    \end{equation*}
+    correspondente à aresta $b_1 \to b_0$ de $\beta$, tome a imagem dessa aresta
+
+    \begin{equation*}
+        (c', d') \to (c_0, d_0)
+    \end{equation*}
+
+    Se essa aresta corresponder a uma aresta em $D$, tomamos $d_1 \to d_0$ a aresta correspondente,
+    em que $d_0$ é a imagem de $b_0$ por $f$, e esse será o final do caminho $\delta$. Caso
+    contrário, tomamos a aresta $c_1 \to c_0$ correspondente em $C$ e esse será o final de
+    $\gamma$.
+
+    \TODO{Provar que é funtor}
+
+    Agora, 
 \end{proof}
 
 \TODO{exemplo com comma category}
@@ -2078,14 +2147,5 @@ seguir:
 
 \chapter*{Bibliografia}
     \printbibliography
-    \begin{itemize}
-    \item VIANA, M.; OLIVEIRA, K. \textit{Fundamentos da teoria ergódica}. Rio de Janeiro: SBM, 2014. v. 90. 
-    \item MAQUERA, H. \textit{Teorema de Furstenberg sobre o produto aleatório de matrizes}. São Carlos: USP, Dissertação de Mestrado do Programa de Pós-Graduação em Matemática, 2018.
-    \end{itemize}
-
-
-
-
-
 
 \end{document}
