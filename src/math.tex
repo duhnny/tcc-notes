@@ -24,6 +24,14 @@
         \end{tikzpicture}%
     }\,%
 }
+\def\liftingProperty{
+    \,\parbox{9pt}{%
+        \begin{tikzpicture}[scale=1.1]%
+            \draw (0ex,0) rectangle (1.5ex,1.5ex);%
+            \draw (0ex,0) -- (1.5ex,1.5ex);%
+        \end{tikzpicture}%
+    }\,%
+}
 
 % general conventions
 \newcommand{\logicalAnd}{\hspace{5pt}\text{\&\&}\hspace{5pt}}
@@ -34,10 +42,19 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\A}{\mathcal{A}}
 \newcommand{\B}{\mathcal{B}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\I}{\mathcal{I}}
+\newcommand{\Cat}{\operatorname{Cat}}
 \newcommand{\Graph}{\operatorname{Graph}}
 \newcommand{\Group}{\operatorname{Group}}
+\newcommand{\Poset}{\operatorname{Poset}}
+\newcommand{\Top}{\operatorname{Top}}
+\newcommand{\Groupoid}{\operatorname{Grpd}}
 \newcommand{\Enc}{\operatorname{Enc}}
 \newcommand{\Obj}[1]{\operatorname{Obj}\left( #1 \right)}
+\newcommand{\Mor}[1]{\operatorname{Mor}\left( #1 \right)}
+\newcommand{\Cone}[1]{\operatorname{Cone}\left( #1 \right)}
+\newcommand{\Cocone}[1]{\operatorname{Cocone}\left( #1 \right)}
 \NewDocumentCommand{\Hom}{o m m}{
     \IfNoValueTF{#1}{
         \operatorname{Hom}\left(#2, #3\right)
@@ -45,8 +62,8 @@
         \operatorname{Hom}_{#1}\left(#2, #3\right)
     }
 }
-\newcommand{\dom}{\operatorname{dom}}
-\newcommand{\cod}{\operatorname{cod}}
+\newcommand{\dom}[1]{\operatorname{dom}\left( #1 \right)}
+\newcommand{\cod}[1]{\operatorname{cod}\left( #1 \right)}
 \newcommand{\Ver}[1]{\mathbb{V}\left(#1\right)}
 \newcommand{\Edg}[1]{\mathbb{E}\left(#1\right)}
 \newcommand{\tg}[1]{\operatorname{tg}\left(#1\right)}
@@ -61,3 +78,10 @@
 \newcommand\boxProduct{\mathbin{\text{\scalebox{.84}{$\square$}}}}
 \newcommand\Free{\operatorname{Free}}
 \newcommand\gen{\operatorname{gen}}
+\newcommand{\mono}{\rightarrowtail}
+\newcommand{\epi}{\twoheadrightarrow}
+\newcommand{\iso}{\cong}
+\newcommand{\inclusion}{\hookrightarrow}
+\newcommand{\initial}{\emptyset}
+\newcommand{\terminal}{*}
+\newcommand{\op}[1]{{#1}^{\operatorname{op}}}

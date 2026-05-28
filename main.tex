@@ -494,13 +494,1575 @@ Chame $\Graph = [\Gamma, \Set]$.
     \end{equation*}
 \end{proof}
 
-\chapter{Resultados na Teoria de Grafos}
+\chapter{Teoria de Categorias}
+
+Neste capítulo, trataremos dos conceitos básicos de Teoria de Categorias, de que precisaremos para
+trazermos os resultados de Fellows para esse contexto mais geral de categorias. Nosso objetivo
+principal com isto é tornar a tese auto-contida.
+
+Durante este capítulo, seguiremos principalmente \cite{awodey} para as definições e resultados.
+
+Comecemos com a definição do que é uma categoria:
+
+\begin{definition}
+    Uma \textbf{categoria} $\C$ é uma coleção de objetos, que denotamos $\Obj{\C}$ e flechas, que
+    denotamos $\Mor{\C}$. A cada flecha $f \in \Mor{\C}$, correspondem dois objetos de $\C$:
+
+    \begin{equation*}
+        \dom{f} \hspace{10pt} \text{e} \hspace{10pt} \cod{f}
+    \end{equation*}
+
+    Sejam $a = \dom{f}$ e $b = \cod{f}$. Para simplificar isso, escrevemos:
+
+    \begin{equation*}
+        f \colon a \to b
+    \end{equation*}
+    ou ainda podemos representar
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJhIl0sWzIsMCwiYiJdLFswLDEsImYiXV0=
+        \begin{tikzcd}
+            a && b
+            \arrow["f", from=1-1, to=1-3]
+        \end{tikzcd}
+    \end{center}
+    como um diagrama.
+
+    Ademais, uma categoria é munida de uma operação de \textbf{composição} $\circ$ da seguinte
+    forma: se $f \colon a \to b$ e $g \colon b \to c$ são flechas de $\C$, então
+    $g \circ f \in \Mor{\C}$ é uma flecha tal que
+
+    \begin{equation*}
+        \dom{g \circ f} = a \logicalAnd \cod{g \circ f} = c
+    \end{equation*}
+
+    Essa composição deve ser associativa, isto é, para quaisquer flechas $f, g, h \in \Mor{\C}$,
+    existe $f \circ (g \circ h)$ se, e somente se, existe $(f \circ g) \circ h$ e, nesse caso,
+    ambas as flechas são iguais. (Repare que, para que a composição esteja definida entre duas
+    flechas, é necessário que o contradomínio da primeira seja o domínio da segunta).
+
+    Por fim, para cada objeto $a \in \Obj{\C}$, existe uma flecha $\id{a} \in \Mor{\C}$, chamada a
+    \textbf{identidade de $a$} tal que, para toda flecha $f \colon a \to b$, $f \circ \id{a} = f$,
+    e, para toda flecha $g \colon c \to a$, $\id{a} \circ g = g$.
+\end{definition}
+
+A definição acima é relativamente abstrata. Convém observar alguns exemplos de categorias para
+desenvolver a intuição sobre o tipo de estrutura com a qual estamos lidando.
+
+\begin{example}
+    Considere a categoria $\Set$, em que os objetos $x, y, \cdots \in \Obj{\Set}$ são conjuntos, e
+    onde as flechas $f, g, \cdots \in \Mor{\Set}$ são funções entre conjuntos.
+
+    Para cada conjunto $x$, defina a identidade em $x$ como a função que leva qualquer elemento de
+    $x$ nele próprio, ou, em termos conjuntistas
+
+    \begin{equation*}
+        \id{x} \defeq \{(y, z) \in x \times x \colon y = z\}
+    \end{equation*}
+
+    De fato, $\id{x}$ é uma função, pois qualquer $y \in x$ é levado em somente um elemento do
+    contradomínio de $\id{x}$, a saber, ele mesmo.
+
+    Além disso, a composição de funções aqui faz o papel da composição de flechas na categoria e,
+    de fato, ela é associativa.
+\end{example}
+
+\begin{example}
+    Um conjunto parcialmente ordenado (\textit{partially ordered set}) é um par $(X, \leq_X)$ em
+    que $X$ é um conjunto e $\leq_X$ é uma relação de ordem em $X$, isto é, que obedece as
+    seguintes regras:
+
+    \begin{enumerate}
+        \item[reflexiva]      $x \leq_X x$, para todo $x \in X$;
+        \item[antissimétrica] Se $x \leq_X y$ e $y \leq_X x$, então $x = y$, para todos
+            $x, y \in X$;
+        \item[transitiva]     Se $x \leq_X y$, e $y \leq_X z$, então $x \leq_X z$, para todos
+            $x, y, z \in X$.
+    \end{enumerate}
+
+    Defina um morfismo entre conjuntos parcialmente ordenados
+    $f \colon (X, \leq_X) \to (Y, \leq_Y)$ como uma função $f \colon X \to Y$ que preserva a ordem,
+    isto é, tal que se $x_1, x_2 \in X$ e $x_1 \leq_X x_2$, então $f(x_1) \leq_Y f(x_2)$. Também
+    chamamos essas funções de \textbf{crescentes}.
+
+    A coleção dos conjuntos parcialmente ordenados (ou posets), com os morfismos definidos acima,
+    composição de funções e as identidades como as em $\Set$ formam uma categoria, que denotamos
+    $\Poset$.
+
+    De fato, as identidades preservam a ordem, porque $x \leq_X x$ para todo $x \in X$, pela
+    propriedade reflexiva da ordem. Ademais, a composição de duas funções preserva a ordem, porque,
+    sendo $f \colon (X, \leq_X) \to (Y, \leq_Y)$ e $g \colon (Y, \leq_Y) \to (Z, \leq_Z)$ duas
+    funções crescentes. Então
+
+    \begin{align*}
+        x_1 \leq_X x_2 &\implies f(x_1)           \leq_Y f(x_2) \\
+                       &\implies g(f(x_1))        \leq_Z g(f(x_2)) \\
+                       &\implies (g \circ f)(x_1) \leq_Z (g \circ f)(x_2)
+    \end{align*}
+
+    Logo, $g \circ f \colon (X, \leq_X) \to (Z, \leq_Z)$ é uma função crescente.
+\end{example}
+
+\begin{example}
+    Um \textbf{grupo} é uma tripla ordenada $(G, \cdot_G, e_G, i_G)$ em que $G$ é um conjunto,
+    $\cdot_G$ é uma operação binária associativa em $G$ e $e_G$ é a identidade em $G$ para essa
+    operação, isto é, $a \cdot_G e_G = e_G \cdot_G a = a$, para todo $a \in G$, e, por fim,
+    $i_G \colon G \to G$ é uma função que leva cada elemento de $G$ no seu inverso na operação de
+    $G$, isto é, tal que $a \cdot_G i_G(a) = i_G(a) \cdot_G a = e_G$ para todo $a \in G$.
+
+    Grupos com homomorfismos de grupo, isto é, funções que preservam a identidade, a operação do
+    grupo e os inversos formam uma categoria, que escrevemos $\Group$. Explicitamente, essas
+    exigências sobre os homomorfismos de grupo são o seguinte:
+
+    \begin{equation*}
+        f(e_G) = e_H,
+    \end{equation*}
+
+    \begin{equation*}
+        f(a \cdot_G b) = f(a) \cdot_H f(b)
+    \end{equation*}
+    e
+
+    \begin{equation*}
+        f(i_G(a)) = i_H(f(a))
+    \end{equation*}
+    para quaisquer $a, b \in G$, dado $f \colon (G, \cdot_G, e_G, i_G) \to (H, \cdot_H, e_H, i_H)$
+    um homomorfismo de grupos.
+
+    É fácil ver que a composição de dois homomorfismos de grupo dá um homomorfismo de grupo. Além
+    disso, a identidade como no caso dos conjuntos nos dá uma identidade para esta categoria.
+\end{example}
+
+Em geral, classes de estruturas com funções entre elas que preservam essas estruturas nos dão uma
+categoria. Mas isso nos levanta uma pergunta: existem "funções" entre categorias que preservem a
+estrutura da categoria? E a resposta é sim, elas são chamadas de funtores:
+
+\begin{definition}\mylabel{functor}
+    Sejam $\A, \B$ duas categorias. Um \textbf{funtor} $F$ de $\A$ para $\B$, que denotamos, como
+    morfismos, $F \colon \A \to \B$, é um mapa de objetos $\A$ para objetos de $\B$ e de flechas de
+    $\A$ para flechas de $\B$ tal que:
+
+    \begin{enumerate}
+        \item[(i)]   Se $f \colon a \to a'$ é um morfismo de $\A$, então $F(f)$ é um morfismo de
+            $F(a)$ para $F(a')$ em $\B$;
+        \item[(ii)]  $F(\id{a}) = \id{F(a)}$, para todo $a \in \Obj{A}$;
+        \item[(iii)] $F(g \circ f) = F(g) \circ F(f)$, para todos $f, g \in \Mor{\A}$ tais que
+            $\cod{f} = \dom{g}$.
+    \end{enumerate}
+\end{definition}
+
+Isso nos dá uma forma simples de expressar relações entre diferentes categorias e nos permite fazer
+uma certa "tradução" de conceitos entre duas categorias. Por exemplo, se temos um funtor $\Group
+\to \Set$, podemos pegar uma flecha em $\Group$ com determinadas propriedades, e ver o que seria o
+equivalente em $\Set$, ou vice e versa. Além disso, há funtores que preservam certas propriedades,
+como \textit{limites} e \textit{colimites}, como veremos adiante, e isso muitas vezes nos permite
+passar resultados que temos sobre uma categoria para outra, semelhante ao que se faz em topologia
+com propriedades que são preservadas por certas funções: por exemplo, se $f \colon X \to Y$ é um
+homeomorfismo de espaços topológicos e $X$ é compacto, então sabemos que $Y$ também é.
+
+Agora, é fácil verificar que a composição de dois funtores nos dá um funtor. E além disso, o mapa
+que leva objetos neles mesmos e flechas nelas mesmas é um funtor que serve como a identidade da
+composição de dois funtores. Assim sendo, podemos definir a seguinte categoria:
+
+\begin{example}
+    $\Cat$ é a categoria das categorias pequenas, isto é, tais que $\Obj{\C}$ e $\Mor{\C}$ são
+    conjuntos para todo $\C \in \Obj{\C}$, em que os morfismos são funtores entre as categorias.
+\end{example}
+
+\begin{example}\mylabel{poset_to_cat}
+    Há um funtor $P \colon \Poset \to \Cat$ que leva um poset $(X, \leq_X)$ na seguinte categoria:
+
+    \begin{align*}
+        \Obj{P((X, \leq_X))} &\defeq X \\
+        \Mor{P((X, \leq_X))} &\defeq \leq_X
+    \end{align*}
+    isto é, cada par $(x_1, x_2) \in \leq_X$ será uma flecha $x_1 \to x_2$. A composição é definida
+    da seguinte forma:
+
+    \begin{equation*}
+        (x_2, x_3) \circ (x_1, x_2) = (x_1, x_3)
+    \end{equation*}
+
+    De fato, $P((X, \leq_X))$ é uma categoria, porque temos composição: se $x_1 \leq_X x_2$ e
+    $x_2 \leq_X x_3$, então $x_1 \leq_X x_3$; e também há uma flecha de identidade, porque
+    $x \leq_X x$ para todo $x \in X$.
+
+    Agora, cada morfismo $f \colon (X, \leq_X) \to (Y, \leq_Y)$ deve ser levado em um funtor:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMCwwLCIoWCwgXFxsZXFfWCkiXSxbMCwyLCIoWSwgXFxsZXFfWSkiXSxbMSwxLCJcXHhSaWdodGFycm93e1B9Il0sWzIsMCwiUChYLCBcXGxlcV9YKSJdLFsyLDIsIlAoWSwgXFxsZXFfWSkiXSxbMCwxLCJmIiwyXSxbMyw0LCJQKGYpIl1d
+        \begin{tikzcd}
+        	{(X, \leq_X)} && {P(X, \leq_X)} \\
+        	& {\xRightarrow{P}} \\
+        	{(Y, \leq_Y)} && {P(Y, \leq_Y)}
+        	\arrow["f"', from=1-1, to=3-1]
+        	\arrow["{P(f)}", from=1-3, to=3-3]
+        \end{tikzcd} 
+    \end{center}
+
+    O funtor será definido da seguinte forma: sobre os objetos de $P(X, \leq_X)$, isto é, sobre
+    $X$, $P(f)$ levara cada $x \in X$ em $f(x) \in Y = \Obj{P(Y, \leq_Y)}$. Sobre os morfismos,
+    isto é, sobre $\leq_X$, $P(f)$ fará o seguinte:
+
+    \begin{equation}\label{eq:def_Pf}
+        P(f)(x_1, x_2) = (f(x_1), f(x_2))
+    \end{equation}
+
+    Sabemos que $(f(x_1), f(x_2)) \in \leq_Y$ sempre que $(x_1, x_2) \in \leq_X$ porque $f$ é
+    crescente. Resta, então, verificar somente as condições (i), (ii) e (iii) da
+    \myref[Definição]{functor}:
+
+    (i) Essa condição sai imediatamente da definição de $P(f)$ sobre morfismos na equação
+    \eqref{eq:def_Pf}.
+
+    (ii) Seja $x \in X$, então
+
+    \begin{align*}
+        P(f)(\id{x}) &= P(f)(x, x) \\
+                     &= (f(x), f(x)) \\
+                     &= \id{f(x)} \\
+                     &= \id{P(f)(x)}
+    \end{align*}
+
+    (iii) Sejam $(x_1, x_2), (x_2, x_3) \in \leq_X$, então
+
+    \begin{align*}
+        P(f)((x_2, x_3) \circ (x_1, x_2)) &= P(f)((x_1, x_3)) \\
+                                          &= (f(x_1), f(x_3)) \\
+                                          &= (f(x_2), f(x_3)) \circ (f(x_1), f(x_2)) \\
+                                          &= P(f)(x_2, x_3) \circ P(f)(x_1, x_2)
+    \end{align*}
+
+    Logo, $P$ como definido acima é um funtor.
+\end{example}
+
+O funtor acima nos dá exemplos um pouco mais abstratos, porém ainda muito úteis para a Teoria de
+Categorias. Eles mostram como categorias são, fundamentamentalmente, uma álgebra de pontos e
+flechas:
+
+\begin{example}\mylabel{ex:poset_cat}
+    Na Teoria de Conjuntos, é bem comum, como acontece por exemplo em \cite{settheory}, definir os
+    números naturais como os primeiros ordinais da seguinte forma:
+
+    \begin{align*}
+        0 &\defeq \emptyset \\
+        1 &\defeq \{0\} \\
+        2 &\defeq \{0, 1\} \\
+        \vdots
+    \end{align*}
+
+    Dessa forma, cada número natural é um conjunto bem ordenado pela inclusão $\subseteq$. Em
+    particular, são conjuntos parcialmente ordenados pela inclusão. Disso, usando o nosso funtor do
+    \myref[Exemplo]{poset_to_cat} acima, podemos obter as seguintes categorias:
+
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                \mathbb{1} \defeq P(1, \subseteq)
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.5\linewidth}
+            % https://q.uiver.app/#q=WzAsMSxbMCwwLCIwIl0sWzAsMCwiXFxpZHswfSJdXQ==
+            \begin{tikzcd}
+                0
+                \arrow["{\id{0}}", from=1-1, to=1-1, loop, in=55, out=125, distance=10mm]
+            \end{tikzcd}
+        \end{minipage}
+    \end{center}
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                \mathbb{2} \defeq P(2, \subseteq)
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.5\linewidth}
+            % https://q.uiver.app/#q=WzAsMixbMCwwLCIwIl0sWzIsMCwiMSJdLFswLDAsIlxcaWR7MH0iXSxbMCwxXSxbMSwxLCJcXGlkezF9Il1d
+            \begin{tikzcd}
+            	0 && 1
+            	\arrow["{\id{0}}", from=1-1, to=1-1, loop, in=55, out=125, distance=10mm]
+            	\arrow[from=1-1, to=1-3]
+            	\arrow["{\id{1}}", from=1-3, to=1-3, loop, in=55, out=125, distance=10mm]
+            \end{tikzcd}
+        \end{minipage}
+    \end{center}
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                \mathbb{3} \defeq P(3, \subseteq)
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.5\linewidth}
+            % https://q.uiver.app/#q=WzAsMyxbMCwwLCIwIl0sWzIsMCwiMSJdLFsyLDIsIjIiXSxbMCwwLCJcXGlkezB9Il0sWzAsMV0sWzEsMSwiXFxpZHsxfSJdLFswLDJdLFsxLDJdLFsyLDIsIlxcaWR7Mn0iLDAseyJhbmdsZSI6OTB9XV0=
+            \begin{tikzcd}
+            	0 && 1 \\
+            	\\
+            	&& 2
+            	\arrow["{\id{0}}", from=1-1, to=1-1, loop, in=55, out=125, distance=10mm]
+            	\arrow[from=1-1, to=1-3]
+            	\arrow[from=1-1, to=3-3]
+            	\arrow["{\id{1}}", from=1-3, to=1-3, loop, in=55, out=125, distance=10mm]
+            	\arrow[from=1-3, to=3-3]
+            	\arrow["{\id{2}}", from=3-3, to=3-3, loop, in=325, out=35, distance=10mm]
+            \end{tikzcd}
+        \end{minipage}
+    \end{center}
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                \vdots
+            \end{equation*}
+        \end{minipage}
+    \end{center}
+\end{example}
+
+Repare que cada par de objetos em cada uma das categorias acima tem no máximo uma flecha ligando
+eles. Isso é verdadeiro para qualquer categoria na imagem de $P$ como definido acima. Isso porque
+em uma relação de ordem $\leq$, há no máximo um par $(x_1, x_2)$ e, além disso, se $(x_1, x_2) \in
+\leq$ e $(x_2, x_1) \in \leq$, então $x_1 = x_2$.
+
+Nesse contexto, surge a seguinte pergunta natural: se morfismos são setas entre objetos de uma
+categoria, e funtores são setas entre categorias, quais são as setas entre funtores?
+
+Bom, sabemos que as setas entre funtores têm de levar ao menos objetos de um em objetos do outro.
+Disto vem a seguinte definição, de \autocite{freeproduct}.
+
+\begin{definition}\mylabel{transformation}
+    Sejam $\A, \B$ duas categorias, e sejam $F, F' \colon \A \to \B$ dois funtores entre elas. Uma
+    \textbf{transformação} $\tau$ entre $F$ e $F'$, que denotamos $\tau \colon F \Rightarrow F'$, é
+    uma família $(\tau_a)_{a \in \Obj{\A}}$ de morfismos em $\B$ indexada pelos objetos de $a$ tal
+    que, para todo $a \in \Obj{\A}$, $\tau_a$ é um morfismo entre $F(a)$ e $F'(a)$, isto é:
+
+    \begin{equation*}
+        \tau_a \colon F(a) \to F'(a), \hspace{10pt} \forall a \in \Obj{\A}
+    \end{equation*}
+\end{definition}
+
+Perceba, no entanto, que isso não implica nada sobre os morfismos. Uma condição que nos é bem útil
+para manter a consistência desses morfismos através de transformações é a chamada \textit{condição
+de naturalidade}, enunciada a seguir:
+
+\begin{definition}\mylabel{natural_transformation}
+    Sejam $\A, \B$ duas categorias, e $F, F' \colon \A \to \B$ dois funtores entre elas. Seja,
+    ainda, $\eta \colon F \Rightarrow F'$ uma transformação entre esses dois funtores. Então
+    dizemos que $\eta$ tem a \textbf{condição de naturalidade} se, para todo morfismo
+    $f \colon x \to y$ em $\A$, o seguinte diagrama comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJGKHgpIl0sWzIsMCwiRih5KSJdLFswLDIsIkYnKHgpIl0sWzIsMiwiRicoeSkiXSxbMCwxLCJGKGYpIl0sWzAsMiwiXFxldGFfeCIsMl0sWzEsMywiXFxldGFfeSJdLFsyLDMsIkYnKGYpIiwyXV0=
+        \begin{tikzcd}
+        	{F(x)} && {F(y)} \\
+        	\\
+        	{F'(x)} && {F'(y)}
+        	\arrow["{F(f)}", from=1-1, to=1-3]
+        	\arrow["{\eta_x}"', from=1-1, to=3-1]
+        	\arrow["{\eta_y}", from=1-3, to=3-3]
+        	\arrow["{F'(f)}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Quando $\eta$ tem a condição de naturalidade, dizemos que $\eta$ é uma \textbf{transformação
+    natural}.
+\end{definition}
+
+\TODO{dar exemplo de transformação natural}
+
+Ademais, as transformações naturais, assim como as setas nas categorias, se compõem. Isso se dá da
+seguinte forma:
+
+\begin{definition}\mylabel{vertical_composition}
+    Sejam $\A, \B$ duas categorias, e $F, F', F'' \colon \A \to \B$ três funtores entre elas. Ainda
+    mais, sejam $\eta \colon F \Rightarrow F'$ e $\eta' \colon F' \Rightarrow F''$ duas
+    transformações naturais.
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXEEiXSxbMiwwLCJcXEIiXSxbMCwxLCJGIiwwLHsiY3VydmUiOi01fV0sWzAsMSwiRicnIiwyLHsiY3VydmUiOjV9XSxbMCwxLCJGJyIsMV0sWzIsNCwiXFxldGEiLDAseyJzaG9ydGVuIjp7InNvdXJjZSI6MjAsInRhcmdldCI6MjB9fV0sWzQsMywiXFxldGEnIiwwLHsic2hvcnRlbiI6eyJzb3VyY2UiOjIwLCJ0YXJnZXQiOjIwfX1dXQ==
+        \begin{tikzcd}[column sep= 1.5cm, row sep= 1cm, scale=1.2]
+        	\A && \B
+        	\arrow[""{name=0, anchor=center, inner sep=0}, "F", curve={height=-30pt}, from=1-1, to=1-3]
+        	\arrow[""{name=1, anchor=center, inner sep=0}, "{F''}"', curve={height=30pt}, from=1-1, to=1-3]
+        	\arrow[""{name=2, anchor=center, inner sep=0}, "{F'}"{description}, from=1-1, to=1-3]
+        	\arrow["\eta", between={0.2}{0.8}, Rightarrow, from=0, to=2]
+        	\arrow["{\eta'}", between={0.2}{0.8}, Rightarrow, from=2, to=1]
+        \end{tikzcd}
+    \end{center}
+
+    A \textbf{composição vertical} $\eta' \circ \eta$ das duas transformações naturais é a
+    transformação $(\eta'_a \circ \eta_a)_{a \in \Obj{\A}}$ dada pela composição, componente a
+    componente, das duas transformações naturais.
+\end{definition}
+
+\begin{proposition}\mylabel{vertical_composition_is_natural}
+    A composição vertical de duas transformações naturais é uma transformação natural.
+\end{proposition}
+
+\begin{proof}
+    Sejam $\eta, \eta'$ como na \myref[Definição]{vertical_composition}. Tome $f \colon x \to y$ um
+    morfismo de $\A$. Então temos o seguinte diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNixbMCwwLCJGKHgpIl0sWzIsMCwiRih5KSJdLFswLDIsIkYnKHgpIl0sWzIsMiwiRicoeSkiXSxbMCw0LCJGJycoeCkiXSxbMiw0LCJGJycoeSkiXSxbMCwxLCJGKGYpIl0sWzAsMiwiXFxldGFfeCIsMl0sWzEsMywiXFxldGFfeSJdLFsyLDMsIkYnKGYpIiwxXSxbMiw0LCJcXGV0YSdfeCIsMl0sWzMsNSwiXFxldGEnX3kiXSxbNCw1LCJGJycoZikiLDJdXQ==
+        \begin{tikzcd}
+        	{F(x)} && {F(y)} \\
+        	\\
+        	{F'(x)} && {F'(y)} \\
+        	\\
+        	{F''(x)} && {F''(y)}
+        	\arrow["{F(f)}", from=1-1, to=1-3]
+        	\arrow["{\eta_x}"', from=1-1, to=3-1]
+        	\arrow["{\eta_y}", from=1-3, to=3-3]
+        	\arrow["{F'(f)}"{description}, from=3-1, to=3-3]
+        	\arrow["{\eta'_x}"', from=3-1, to=5-1]
+        	\arrow["{\eta'_y}", from=3-3, to=5-3]
+        	\arrow["{F''(f)}"', from=5-1, to=5-3]
+        \end{tikzcd}
+    \end{center}
+
+    Em que os retângulos interiores comutam porque $\eta$ e $\eta'$ são transformações naturais.
+    Mas isso implica que o retângulo exterior também comuta:
+
+    \begin{align*}
+        \eta'_y \circ (\eta_y \circ F(f)) &= \eta'_y \circ (F'(f) \circ \eta_x)
+                                          & \text{($\eta$ é natural)} \\
+                                          &= (\eta'_y \circ F'(f)) \circ \eta_x \\
+                                          &= (F''(f) \circ \eta'_x) \circ \eta_x
+                                          & \text{($\eta'$ é natural)}
+    \end{align*}
+\end{proof}
+
+\section{Morfismos especiais}
+
+Nesta seção, classificaremos algumas propriedades abstratas de morfismos dentro das categorias. A
+vantagem desta abordagem é que nos permite observar como essas coisas se relacionam e até extrair
+resultados sobre eles sem o conhecimento preciso do que são, como, por exemplo, no
+
+\TODO{terminar introdução dessa parte}
+
+A definição mais fundamental para nós é uma que permeia toda a Matemática: a de
+\textit{isomorfismo}. Vejamos como na área de Categorias, o isomorfismo é definido:
+
+\begin{definition}\mylabel{isomorphism}
+    Seja $\C$ uma categoria. Um morfismo $f \colon x \to y$ é dito um \textbf{isomorfismo} se, e
+    somente se, existe um outro morfismo $g \colon y \to x$ em $\C$ tal que:
+
+    \begin{equation*}
+        g \circ f = \id{x} \logicalAnd f \circ g = \id{y}
+    \end{equation*}
+
+    Caso exista um isomorfismo entre $x, y \in \Obj{\C}$, escrevemos $x \iso y$.
+\end{definition}
+
+Para que se obtenha uma intuição sobre o que estamos tratando, vejamos alguns exemplos em
+categorias já conhecidas:
+
+\begin{example}\mylabel{ex:isomorphism_in_set}
+    Em $\Set$, os morfimos são funções. Sendo assim um isomorfismo $f \colon x \to y$ em $\Set$ é
+    uma função que tenha inversa à direita e à esquerda $g$.
+
+    Agora, é necessário que $f$ e $g$ sejam injetoras. Com efeito, suponha que
+    $x_1, x_2 \in \dom{f}$ sejam tais que $f(x_1) = f(x_2)$. Então, como $g$ é função, teríamos que
+    $g(f(x_1)) = g(f(x_2))$. Mas $g \circ f = \id{\dom{f}}$. Logo $x_1 = x_2$, e $f$ é injetora.
+    Repetindo o argumento com $f \circ g$, obtemos que $g$ também é injetora.
+
+    Também temos que ambas são sobrejetoras. Com efeito, seja $y_1 \in y = \cod{f}$. Como
+    $f \circ g = \id{y}$, sabemos que $f(g(y_1)) = y_1$. Mas $g(y_1) \in x = \dom{f}$. Logo, $y_1$
+    está na imagem de $f$, e $f$ é sobrejetora. Analogamente, $g$ é sobrejetora.
+
+    Assim, temos que, se $f$ é um isomorfismo, necessariamente é uma função bijetora. Mostraremos,
+    agora, que a volta também vale.
+
+    Seja $f \colon x \to y$ uma função bijetora. Tome, então, o conjunto:
+
+    \begin{equation*}
+        g \defeq \{(y_1, x_1) \in y \times x \colon f(x_1) = y_1\}
+    \end{equation*}
+
+    Provaremos que $g$ é uma função, e é inversa de $f$.
+
+    Suponha que tenhamos $(y_1, x_1), (y_1, x_2) \in g$. Então sabemos que $f(x_1) = y_1 = f(x_2)$.
+    Como $f$ é injetora, isso implica que $x_1 = x_2$. Além disso, como $f$ é sobrejetora, $g$ está
+    definida sobre todo $y$. Logo, $g \colon y \to x$ é função. Resta provar que é inversa de $f$.
+
+    Com efeito, seja $x_1 \in x$. Então $f(x_1) = y_1$ para algum $y_1 \in y$. Logo,
+    $(y_1, x_1) \in g$ e, portanto, $g(f(x_1)) = x_1$. Como isso vale para todo $x_1 \in x$,
+    $g \circ f = \id{x}$. Por outro lado, se $y_1 \in y$, então $y_1 = f(x_1)$ para algum $x_1$,
+    porque $f$ é sobrejetora. Assim sendo, $(y_1, x_1) \in g$ e $f(g(y_1)) = y_1$. Como isso vale
+    para todo $y_1 \in y$, $f \circ g = \id{y}$.
+
+    Assim sendo, os isomorfismos em $\Set$ são as funções bijetoras.
+\end{example}
+
+\begin{example}
+    Em $\Cat$, os objetos são categorias, e os morfismos são funtores entre elas. Seja, então,
+    $F \colon \A \to \B$ um isomorfismo. Então existe uma inversa $G$ para $F$.
+
+    Agora, escreva $F_0 \colon \Obj{\A} \to \Obj{\B}$, isto é, $F$ restrito aos objetos de $\A$.
+    Isso nos dá uma função nos objetos, e $G_0$ a função inversa. Sendo assim, pela argumentação
+    acima, temos que $F_0$ é uma bijeção. Analogamente, $F_1$ também é uma bijeção nos morfismos.
+
+    Isso nos prova que um funtor $F$ isomorfismo é uma bijeção nos objetos e nas flechas. Provemos
+    também a volta.
+
+    ($\Longleftarrow$) Seja $F \colon \A \to \B$ um funtor tal que $F_0$ e $F_1$ são bijeções. Pela
+    argumentação no \myref[Exemplo]{ex:isomorphism_in_set}, sabemos que existem funções $G_0$ e
+    $G_1$ inversas de $F_0$ e $F_1$, respectivamente. Provaremos que $G$ dada por $G_0$ e $G_1$ é
+    funtor, e é inverso de $F$. Para isso, precisamos, primeiramente, testar a
+    \myref[Definição]{functor}.
+
+    (i) Seja $f \colon b \to b'$ um morfismo em $\B$. Então $G_1(f)$ é um morfismo em $\A$ tal que
+    $F(G_1(f)) = f$. Mas, como $F$ é um funtor, isso implica que 
+
+    \begin{align*}
+        \dom{F(G_1(f))} &= F(\dom{G_1(f)}) \\
+                        &= F_0(\dom{G_1(f)})
+    \end{align*}
+
+    Mas $\dom{F(G_1(f))} = \dom{f} = b$. Logo,
+
+    \begin{align*}
+        \dom{G_1(f)} &= G_0\left( F_0 (\dom{G_1(f)}) \right) \\
+                     &= G_0(\dom{F(G_1(f))}) \\
+                     &= G_0(b)
+    \end{align*}
+
+    Analogamente, $\cod{G_1(f)} = G_0(b')$.
+
+    (ii) Tome $G_1(\id{b})$. Do item anterior, sabemos que
+
+    \begin{equation*}
+        \dom{G_1(\id{b})} = \cod{G_1(\id{b})} = G_0(b)
+    \end{equation*}
+
+    Como $F$ é funtor, sabemos que
+
+    \begin{align*}
+        F(\id{G_0(b)}) &= \id{F(G_0(b))} \\
+                       &= \id{F_0(G_0(b))} \\
+                       &= \id{b}
+    \end{align*}
+
+    Como $F$ é bijetora nos morfismos por hipótese, tiramos que $G_1(\id{b}) = \id{G_0(b)}$.
+
+    (iii) Sejam $f \colon b \to b'$ e $g \colon b' \to b''$ em $\B$. Então, pelo item (i), sabemos
+    que $G_1(f) \colon G_0(b) \to G_0(b')$ e $G_1(g) \colon G_0(b') \to G_0(b'')$. Logo, a
+    composição entre esses dois morfismos, $G_1(g) \circ G_1(f)$ está bem definida.
+
+    Agora, como $F$ é funtor, temos o seguinte
+
+    \begin{align*}
+        F(G_1(g) \circ G_1(f)) &= F(G_1(g)) \circ F(G_1(f)) \\
+                               &= g \circ f
+    \end{align*}
+
+    Mas $G_1(g \circ f)$ tem a mesma imagem por $F$. Como $F$ é injetora nos morfismos por
+    hipótese, temos então que
+
+    \begin{equation*}
+        G_1(g \circ f) = G_1(g) \circ G_1(f)
+    \end{equation*}
+
+    Como, então, a \myref[Definição]{functor} é satisfeita, $G \colon \B \to \A$ correspondente a
+    $G_0$ e $G_1$ é um funtor inverso de $F$. Logo, $F$ é isomorfismo.
+\end{example}
+
+Antes de olharmos para outras categorias, observe o seguinte resultado, que nos poupará de precisar
+fazer muitas contas.
+
+\begin{lemma}\mylabel{functor_preserves_iso}
+    Sejam $\A, \B$ categorias e $F \colon \A \to \B$ um funtor entre elas. Então, se
+    $f \colon a \to a'$ um morfismo de $\A$ é um isomorfismo, então $F(f)$ também é.
+\end{lemma}
+
+\begin{proof}
+    Se $f$ é um isomorfismo, então existe $g \in \Mor{\A}$ tal que $g \circ f = \id{x}$ e
+    $f \circ g = \id{y}$. Mas, como $F$ é funtor, $F$ leva identidade em identidade. Isso
+    significa que $F(g \circ f) = \id{F(a)}$. Mas
+
+    \begin{equation*}
+        F(g \circ f) = F(g) \circ F(f)
+    \end{equation*}
+
+    Logo,
+
+    \begin{equation*}
+        F(g) \circ F(f) = \id{F(a)}
+    \end{equation*}
+
+    Repetindo a argumentação para o outro lado, obtemos que
+
+    \begin{equation*}
+        F(f) \circ F(g) = \id{F(a')}
+    \end{equation*}
+
+    Logo, $F(f) \colon F(a) \to F(a')$ é um isomorfismo.
+\end{proof}
+
+\TODO{exemplo do funtor esquecimento Group to Cat}
+
+Isomorfimos são uma condição muito forte sobre os morfimos. Pense, por exemplo, no caso de espaços
+topológicos: em várias ocasiõe temos funções contínuas entre espaços topológicos, mas raramente
+temos homeomorfismos.
+
+Há um pequeno enfraquecimento da condição do isomorfismo que é apresentada a seguir:
+
+\begin{definition}\mylabel{section+retraction}
+    Seja $\C$ uma categoria e $f \colon x \to y$ e $g \colon y \to x$ dois morfismos tais que
+    
+    \begin{equation*}
+        g \circ f = \id{x}.
+    \end{equation*}
+
+    Nesse caso, dizemos que $f$ é uma \textbf{seção} de $g$, ou que $g$ é uma
+    \textbf{retração} de $f$.
+\end{definition}
+
+Repare que neste caso só exigimos que a inversa seja de um lado. Caso tenhamos morfimos como acima,
+podemos obter o seguinte resultado acerca deles, retirado diretamente de \autocite{awodey}:
+
+\begin{proposition}\mylabel{section_is_mono}
+    Seja $\C$ uma categoria e $f \colon b \to c$ e $g \colon c \to b$, com $f$ seção de $g$. Então,
+    para quaisquer morfismos $\alpha, \alpha' \colon a \to b$ quaisquer morfismos
+    $\beta, \beta' \colon c \to d$, temos que
+
+    \begin{enumerate}
+        \item[(i)]  Se $f \circ \alpha = f \circ \alpha'$, então $\alpha = \alpha'$;
+        \item[(ii)] Se $\beta \circ g = \beta' \circ g$, então $\beta = \beta'$;
+    \end{enumerate}
+\end{proposition}
+
+\begin{proof}
+    Observe o seguinte diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMCwwLCJhIl0sWzIsMCwiYiJdLFs0LDAsImMiXSxbNCwyLCJiIl0sWzYsMiwiZCJdLFswLDEsIlxcYWxwaGEiLDAseyJvZmZzZXQiOi0xfV0sWzAsMSwiXFxhbHBoYSciLDIseyJvZmZzZXQiOjF9XSxbMSwyLCJmIl0sWzIsMywiZyJdLFsxLDMsIlxcaWR7Yn0iLDJdLFszLDQsIlxcYmV0YSIsMCx7Im9mZnNldCI6LTF9XSxbMyw0LCJcXGJldGEnIiwyLHsib2Zmc2V0IjoxfV1d
+        \begin{tikzcd}
+        	a && b && c && \\
+        	\\
+        	&&&& b && d
+        	\arrow["\alpha", shift left, from=1-1, to=1-3]
+        	\arrow["{\alpha'}"', shift right, from=1-1, to=1-3]
+        	\arrow["f", from=1-3, to=1-5]
+        	\arrow["{\id{b}}"', from=1-3, to=3-5]
+        	\arrow["g", from=1-5, to=3-5]
+        	\arrow["\beta", shift left, from=3-5, to=3-7]
+        	\arrow["{\beta'}"', shift right, from=3-5, to=3-7]
+        \end{tikzcd}
+    \end{center}
+
+    (i) Se temos que $f \circ \alpha = f \circ \alpha'$, então podemos compôr ao fim com $g$, e
+    disso obtemos a identidade, que será "cancelada" na conta:
+
+    \begin{align*}
+        f \circ \alpha = f \circ \alpha'
+            &\implies g \circ (f \circ \alpha) = g \circ (f \circ \alpha') \\
+            &\implies (g \circ f) \circ \alpha = (g \circ f) \circ \alpha' \\
+            &\implies \id{b} \circ \alpha = \id{b} \circ \alpha \\
+            &\implies \alpha = \alpha'
+    \end{align*}
+
+    (ii) Analogamente, compondo com $f$ à direira, obtemos de $\beta \circ g = \beta' \circ g$ que
+    $\beta = \beta'$.
+\end{proof}
+
+O resultado acima não é importante apenas no caso de seções e retrações. Na verdade, define-se duas
+classes de morfismos justamente por essa propriedade:
+
+\begin{definition}\mylabel{monomorphism+epimorphism}
+    Seja $\C$ uma categoria. Um morfismo $m \colon x \to y$ de $\C$ é dito um \textbf{monomorfismo}
+    ou um \textbf{morfismo cancelável à esquerda} se, e somente se, para todo par de morfismos
+    $\alpha, \alpha' w \to x$, se $m \circ \alpha = m \circ \alpha'$, então $\alpha = \alpha'$.
+    Nesse caso, escrevemos $m \colon x \mono y$.
+
+    \textit{Dualmente}, um morfismo $e \colon x \to y$ é dito um \textbf{epimorfismo} ou um
+    \textbf{morfismo cancelável à direita} se, e somente se, para todo par de morfismos
+    $\beta, \beta' y \to z$, se $\beta \circ e = \beta' \circ e$, então $\beta = \beta'$.
+    Escrevemos, então, $e \colon x \epi y$.
+\end{definition}
+
+\begin{example}
+    Em $\Set$, os monomorfismos são as funções injetoras, e os epimorfismos são as funções
+    sobrejetoras.
+
+    Com efeito, suponha que $m \colon x \mono y$ seja um monomorfismo. Suponha que
+    $x_1, x_2 \in x$, e considere as funções inclusão $\alpha \colon \{x_1\} \inclusion x$ e
+    $\alpha' \colon \{x_2\} \inclusion x$. Então, se $m \circ \alpha = m \circ \alpha'$, ou
+    equivalentemente, se $m(x_1) = m(x_2)$, então, porque $m$ é mono, temos que $\alpha = \alpha'$,
+    ou equivalentemente, que $x_1 = x_2$.
+
+    Por outro lado, se $m \colon x \to y$ é uma função injetora, então, se
+    $m \circ \alpha = m \circ \alpha'$, então temos que, para todo
+    $w_1 \in w = \dom{\alpha}$, temos que $m(\alpha(w_1)) = m(\alpha'(w_1))$. Mas, como $m$ é
+    injetora, isso implica que $\alpha(w_1) = \alpha'(w_1)$, para todo $w_1 \in w$. Logo,
+    $\alpha = \alpha'$.
+
+    Agora, suponha que $e \colon x \epi y$ é um epimorfismo. Tome, então
+    $\beta, \beta' \colon y \to 2 = \{0, 1\}$ definidas da seguinte forma: $\beta$ é a função
+    constante e igual a zero em $y$, e $\beta'$ tem a seguinte definição:
+
+    \begin{equation*}
+        \beta'(y_1) \defeq \begin{cases}
+            0, & \text{se } y_1 \in g(x) \\
+            1, & \text{do contrário}
+        \end{cases}
+    \end{equation*}
+    ou seja, que é zero se $y_1$ está na imagem de $g$ e $1$ do contrário.
+
+    Por construção, $\beta \circ e = \beta' \circ e$. Dado que $e$ é epimorfismo, isso significa
+    que $\beta = \beta'$. Logo, as duas funções são constantes e iguais a zero e, portanto,
+    $g(x) = y$ e $g$ é sobrejetora.
+
+    Por outro lado, se $e \colon x \to y$ é sobrejetora, então, se
+    $\beta \circ e = \beta' \circ e$, isso significa que, para todo $y_1$ na imagem de $e$,
+    $\beta(y_1) = \beta'(y_1)$. Mas a imagem de $e$ é $y$. Logo, $\beta = \beta'$.
+\end{example}
+
+\section{Objetos especiais}
+
+Além de morfimos, existem algumas classes de objetos especiais que nos serão úteis mais afrente.
+
+\begin{definition}\mylabel{initial+terminal}
+    Seja $\C$ uma categoria. Dizemos que um objeto $\initial \in \Obj{\C}$ é dito \textbf{inicial}
+    se, e somente se, para qualquer outro objeto $x \in \Obj{\C}$ existe um único morfismo
+    $f \colon \initial \to \C$:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXGluaXRpYWwiXSxbMiwwLCJcXGZvcmFsbCB4Il0sWzAsMSwiXFxleGlzdHMhIGYiXV0=
+        \begin{tikzcd}
+        	\initial && {\forall x}
+        	\arrow["{\exists! f}", from=1-1, to=1-3]
+        \end{tikzcd}
+    \end{center}
+
+    \textit{Dualmente}, um objeto $\terminal \in \Obj{\C}$ é dito \textbf{terminal} se, e somente se,
+    para todo $x \in \Obj{\C}$ existe um único morfismo $f \colon x \to \terminal$:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXGZvcmFsbCB4Il0sWzIsMCwiXFxmaW5hbCJdLFswLDEsIlxcZXhpc3RzISBmIl1d
+        \begin{tikzcd}
+        	{\forall x} && \terminal
+        	\arrow["{\exists! f}", from=1-1, to=1-3]
+        \end{tikzcd}
+    \end{center}
+\end{definition}
+
+Repare que, a princípio, é possível termos mais de um objeto inicial (terminal). Mas, na verdade, o
+que acontece é que eles são únicos, a menos de isomorfismo:
+
+\begin{proposition}\mylabel{initial_unique_up_to_iso}
+    Seja $\C$ uma categoria, e sejam $\initial, \initial'$ objetos iniciais desta categoria. Então
+    $\initial \iso \initial'$.
+\end{proposition}
+
+\begin{proof}
+    Sejam $\initial, \initial'$ objetos iniciais de $\C$. Então existem únicos morfismos:
+
+    \begin{equation*}
+        f \colon \initial \to \initial' \logicalAnd g \colon \initial' \to \initial
+    \end{equation*}
+
+    Agora $g \circ f$ é um morfismo de $\initial$ para $\initial$, mas $\id{\initial}$ também é.
+    Como os morfismos partindo de $\initial$ são únicos, temos que $g \circ f = \id{\initial}$.
+
+    Repetindo a argumentação com $f \circ g$, obtemos que $f \circ g = \id{\initial'}$. Logo, $f$ é
+    um isomorfimo, e $\initial \iso \initial'$.
+\end{proof}
+
+É claro que a mesma argumentação vale para os objetos finais, basta inverter as flechas de lado.
+
+O seguinte exemplo justificará a notação que estamos usando para os objetos iniciais e finais:
+
+\begin{example}\mylabel{ex:initial+terminal_in_set}
+    Em $\Set$ o único objeto inicial é o conjunto vazio $\emptyset$ e qualquer conjunto unitário,
+    isto é, com apenas um elemento, é objeto terminal.
+
+    Com efeito, de $\emptyset$ para qualquer conjunto só existe uma função: a função vazia.
+
+    Além disso, tome qualquer conjunto unitário $\{y\}$. Se tivermos funções
+    $f, g \colon x \to \{y\}$, teremos que $f(x_1) = y = g(x_1)$, para todo $x_1 \in x$. Logo,
+    $f = g$. Isto é, existe somente uma função de qualquer conjunto para $\{y\}$ (até partindo de
+    $\emptyset$, a função vazia), ou seja, $\{y\}$ é um objeto terminal de $\Set$.
+\end{example}
+
+Repare que, como argumentamos na \myref[Proposição]{initial_unique_up_to_iso}, todos os conjuntos
+unitários são isomorfos (porque existe uma bijeção levando o único elemento de um no único
+elemento do outro). Logo, representamos, quando não nos importa dizer qual o elemento do conjunto
+unitário, os conjuntos dessa forma por um ponto $\terminal$.
+
+\begin{example}
+    Em $\Group$, os objetos iniciais e finais são os grupos de um só elemento.
+
+    Com efeito, em $\Group$, um morfismo tem de preservar a identidade do grupo, então qualquer
+    grupo $G$, $\{e\} \to G$ só pode ser mapeado para a identidade de $G$. Logo, só existe um
+    morfismo de $\{e\}$ para $G$.
+
+    Por outro lado, assim como no caso dos conjuntos, quaisquer dois mapas de $G$ para $\{e\}$
+    serão iguais. Além disso, esse mapa, qualquer que seja o grupo, preserva a identidade
+    (trivialmente), preserva a composição, porque $e \cdot e = e$. E preserva a inversa, porque o
+    inverso da identidade é a identidade. Logo, é um morfismo dessa categoria, e o único possível.
+\end{example}
+
+\section{Dualidade e construções sobre categorias}
+
+Ao longo das seções anteriores, viemos tratando de conceitos ou provas que eram similares, exceto
+pela troca de ordem de composições ou pela troca da direção das setas. Por vezes dizíamos
+"dualmente", e seguíamos com a explicação na direção contrária. Bom, isto não é por acaso.
+
+A Teoria de Categorias se beneficia grandemente de um conceito de dualidade, que nos permite
+expressar muitos conceitos, e seus "opostos" ou "correspondentes" sem ter de repetir definições ou
+provas na outra direção.
+
+Para chegar a isso, é importante considerar a seguinte construção abstrata:
+
+\begin{definition}\mylabel{opposite_category}
+    Seja $\C$ uma categoria. A \textbf{categoria oposta} $\op{\C}$ é a categoria que se obtém a
+    partir de $\C$ mantendo os objetos e formalmente invertendo as flechas. Isto é, as flechas e as
+    composições são as mesmas, apenas se troca o codomínio com o domínio.
+\end{definition}
+
+Talvez seja necessário um exemplo para entender o que a definição acima quer dizer:
+
+\begin{example}
+    Tome $\mathbb{1}$, $\mathbb{2}$ e $\mathbb{3}$ como no \myref[Exemplo]{ex:poset_cat}. As suas
+    categorias opostas são:
+
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                \op{\mathbb{1}}
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.5\linewidth}
+            % https://q.uiver.app/#q=WzAsMSxbMCwwLCIwIl0sWzAsMCwiXFxpZHswfSJdXQ==
+            \begin{tikzcd}
+                0
+                \arrow["{\id{0}}", from=1-1, to=1-1, loop, in=55, out=125, distance=10mm]
+            \end{tikzcd}
+        \end{minipage}
+    \end{center}
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                \op{\mathbb{2}}
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.5\linewidth}
+            % https://q.uiver.app/#q=WzAsMixbMCwwLCIwIl0sWzIsMCwiMSJdLFswLDAsIlxcaWR7MH0iXSxbMSwwXSxbMSwxLCJcXGlkezF9Il1d
+            \begin{tikzcd}
+            	0 && 1
+            	\arrow["{\id{0}}", from=1-1, to=1-1, loop, in=55, out=125, distance=10mm]
+            	\arrow[from=1-3, to=1-1]
+            	\arrow["{\id{1}}", from=1-3, to=1-3, loop, in=55, out=125, distance=10mm]
+            \end{tikzcd}
+        \end{minipage}
+    \end{center}
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                \op{\mathbb{3}}
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.5\linewidth}
+            % https://q.uiver.app/#q=WzAsMyxbMCwwLCIwIl0sWzIsMCwiMSJdLFsyLDIsIjIiXSxbMCwwLCJcXGlkezB9Il0sWzEsMF0sWzEsMSwiXFxpZHsxfSJdLFsyLDBdLFsyLDFdLFsyLDIsIlxcaWR7Mn0iLDAseyJhbmdsZSI6OTB9XV0=
+            \begin{tikzcd}
+            	0 && 1 \\
+            	\\
+            	&& 2
+            	\arrow["{\id{0}}", from=1-1, to=1-1, loop, in=55, out=125, distance=10mm]
+            	\arrow[from=1-3, to=1-1]
+            	\arrow["{\id{1}}", from=1-3, to=1-3, loop, in=55, out=125, distance=10mm]
+            	\arrow[from=3-3, to=1-1]
+            	\arrow[from=3-3, to=1-3]
+            	\arrow["{\id{2}}", from=3-3, to=3-3, loop, in=325, out=35, distance=10mm]
+            \end{tikzcd}
+        \end{minipage}
+    \end{center}
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            \begin{equation*}
+                \vdots
+            \end{equation*}
+        \end{minipage}
+    \end{center}
+\end{example}
+
+Repare que, como no caso de $\op{\mathbb{3}}$, as composições trocam de lugar: $g \circ f$ na
+categoria oposta é $f \circ g$.
+
+Tendo isso em mente, podemos refrasear algumas das definições acima usando essa linguagem dual:
+
+\begin{example}
+    As seguintes propriedades de morfismos e objetos podem ser representadas de forma dual:
+
+    \begin{enumerate}
+        \item Uma retração em $\C$ é uma seção na categoria oposta $\op{\C}$;
+        \item Um epimorfismo em $\C$ é um monomorfismo em $\op{\C}$;
+        \item Um objeto terminal em $\C$ é um objeto inicial em $\op{\C}$.
+    \end{enumerate}
+\end{example}
+
+Esta não é a única construção útil que se pode fazer a partir de uma categoria já existente. A
+seguinte construção nos será útil para definir a categoria dos grafos no capítulo
+\ref{graph_theory}.
+
+\begin{definition}\mylabel{exponential_category}
+    Sejam $\A, \B$ duas categorias. Então a \textbf{categoria de funtores de $\A$ até $\B$}, que
+    denotamos $\B^{\A}$ é a categoria cujos objetos são funtores de $\A$ até $\B$, e as flechas são
+    as transformações naturais entre esses funtores. Para cada funtor $F$, a identidade é a família
+    de morfismos $(\id{F(a)})_{a \in \Obj{\A}}$.
+\end{definition}
+
+Repare que a \myref[Proposição]{vertical_composition_is_natural}, junto com o fato de que a
+identidade é, de fato uma transformação natural -- porque o seguinte diagrama sempre comuta
+
+\begin{center}
+    % https://q.uiver.app/#q=WzAsNCxbMCwwLCJGKHgpIl0sWzIsMCwiRih5KSJdLFswLDIsIkYoeCkiXSxbMiwyLCJGKHkpIl0sWzAsMSwiRihmKSJdLFswLDIsIlxcaWR7eH0iLDJdLFsxLDMsIlxcaWR7eX0iXSxbMiwzLCJGKGYpIiwyXV0=
+    \begin{tikzcd}
+    	{F(x)} && {F(y)} \\
+    	\\
+    	{F(x)} && {F(y)}
+    	\arrow["{F(f)}", from=1-1, to=1-3]
+    	\arrow["{\id{x}}"', from=1-1, to=3-1]
+    	\arrow["{\id{y}}", from=1-3, to=3-3]
+    	\arrow["{F(f)}"', from=3-1, to=3-3]
+    \end{tikzcd}
+\end{center}
+--, garante que o que foi definido acima tem, de fato, estrutura de categoria.
+
+\TODO{dar exemplo de transformação natural}
+
+Mais uma construção sobre categorias será necessária antes de definirmos limites e colimites, e é
+a seguinte:
+
+\begin{definition}
+    Seja $\C$ uma categoria e $c$ um objeto de 
+\end{definition}
+
+\TODO{terminar slice categories}
+
+\section{Limites e colimites}
+
+A noção de \textit{produto}, bem como algumas outras noções categóricas como \textit{pullbacks} e
+\textit{pushouts} que vamos utilizar mais adiante podem ser derivadas de uma noção mais geral que
+se chama \textit{limite}. Passaremos a descrevê-la nesta seção.
+
+Primeiramente, convém formalizar a noção de \textit{diagrama} em uma categoria $\C$.
+
+\begin{definition}\mylabel{diagram}
+    Sejam $\I, \C$ duas categorias. Um \textbf{diagrama} (do tipo $\I$) em $\C$ é um funtor
+    $D \colon \I \to \C$. Nesse contexto, a categoria $\I$ é chamada de índice do diagrama.
+\end{definition}
+
+Para o caso em que $\I$ é finita, isso nos dá os exemplos de diagramas comutativos que vínhamos
+usando. Por exemplo, podemos criar um funtor $F \colon \mathbb{3} \to \C$ cuja imagem é o triângulo
+central do diagrama na \myref[Proposição]{section_is_mono}:
+
+\begin{center}
+    % https://q.uiver.app/#q=WzAsNyxbNCwwLCJiIl0sWzYsMCwiYyJdLFs2LDIsImIiXSxbMywxLCJcXHhtYXBzdG97Rn0iXSxbMCwwLCIwIl0sWzIsMCwiMSJdLFsyLDIsIjIiXSxbMCwxLCJmIl0sWzEsMiwiZyJdLFswLDIsIlxcaWR7Yn0iLDJdLFs0LDVdLFs1LDZdLFs0LDZdXQ==
+    \begin{tikzcd}
+    	0 && 1 && b && c \\
+    	&&& {\xmapsto{F}} \\
+    	&& 2 &&&& b
+    	\arrow[from=1-1, to=1-3]
+    	\arrow[from=1-1, to=3-3]
+    	\arrow[from=1-3, to=3-3]
+    	\arrow["f", from=1-5, to=1-7]
+    	\arrow["{\id{b}}"', from=1-5, to=3-7]
+    	\arrow["g", from=1-7, to=3-7]
+    \end{tikzcd}
+\end{center}
+onde omitimos as identidades.
+
+Repare que, como um funtor preserva a composição de funções, os diagramas como definidos acima
+serão sempre comutativos se os diagramas correspondentes na categoria $\I$ o forem.
+
+Dado um diagrama $D$, podemos definir a seguinte categoria:
+
+\begin{definition}\mylabel{cone+cocone}
+    Seja $\C$ uma categoria e $D \colon \I \to \C$ um diagrama sobre $\C$. Então a
+    \textbf{categoria dos cones comutativos sobre $D$}, denotada $\Cone{D}$, é uma categoria cujos
+    objetos são pares $(a, (\psi_i)_{i \in \Obj{\I}})$ em que $a \in \Obj{\C}$ e o segundo elemento
+    do par é uma família de morfismos em $\C$ indexada pelos objetos de $\I$ tal que, para todo
+    $f \colon i \to j$ em $\I$, temos que o seguinte diagrama comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMSwwLCJhIl0sWzAsMiwiRChpKSJdLFsyLDIsIkQoaikiXSxbMSwyLCJEKGYpIiwyXSxbMCwxLCJcXHBzaV9pIiwyXSxbMCwyLCJcXHBzaV9qIl1d
+        \begin{tikzcd}
+        	& a & \\
+        	\\
+        	{D(i)} && {D(j)}
+        	\arrow["{\psi_i}"', from=1-2, to=3-1]
+        	\arrow["{\psi_j}", from=1-2, to=3-3]
+        	\arrow["{D(f)}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Esses objetos dessa categoria são chamados de cones comutativos sobre $D$.
+
+    Os morfismos entre objetos dessa categoria são morfismos em $\C$, por exemplo
+    $f \colon a \to a'$, que leva um cone $(a, (\psi_i)_{i \in \Obj{\I}})$ no cone
+    $(a', (\psi'_i)_{i \in \Obj{I}})$, tais que o seguinte diagrama comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwwLCJhIl0sWzIsMCwiYSciXSxbMiwyLCJEKGkpIl0sWzAsMSwiZiJdLFswLDIsIlxccHNpX2kiLDJdLFsxLDIsIlxccHNpJ19pIl1d
+        \begin{tikzcd}
+        	a && {a'} \\
+        	\\
+        	&& {D(i)}
+        	\arrow["f", from=1-1, to=1-3]
+        	\arrow["{\psi_i}"', from=1-1, to=3-3]
+        	\arrow["{\psi'_i}", from=1-3, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Dualmente, a \textbf{categoria de cocones sobre $D$}, $\Cocone{D}$ é a categoria cujos objetos
+    são do tipo $(a, \psi_i)_{i \in \Obj{\I}}$ tais que os seguintes diagramas comutam sobre $D$:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwwLCJEKGkpIl0sWzIsMCwiRChqKSJdLFsxLDIsImEiXSxbMCwxLCJEKGYpIl0sWzAsMiwiXFxwc2lfaSIsMl0sWzEsMiwiXFxwc2lfaiJdXQ==
+        \begin{tikzcd}
+        	{D(i)} && {D(j)} \\
+        	\\
+        	& a
+        	\arrow["{D(f)}", from=1-1, to=1-3]
+        	\arrow["{\psi_i}"', from=1-1, to=3-2]
+        	\arrow["{\psi_j}", from=1-3, to=3-2]
+        \end{tikzcd}
+    \end{center}
+\end{definition}
+
+Uma ressalva a ser feita é que a definição acima de fato nos dá uma categoria, com $\id{a}$ em $\C$
+fazendo o papel de identidade nos cones, e com a composição bem definida (como em $\C$). Porque, se
+temos $f \colon (a, (\psi_i)_{i \in \Obj{\I}}) \to (a', (\psi'_i)_{i \in \Obj{\I}})$, e
+$g \colon (a', (\psi'_i)_{i \in \Obj{\I}}) \to (a'', (\psi''_i)_{i \in \Obj{\I}})$, temos que o
+seguinte diagrama:
+
+\begin{center}
+    % https://q.uiver.app/#q=WzAsNCxbMCwwLCJhIl0sWzIsMCwiYSciXSxbMiwyLCJEKGkpIl0sWzQsMCwiYScnIl0sWzAsMSwiZiJdLFswLDIsIlxccHNpX2kiLDJdLFsxLDIsIlxccHNpJ19pIiwxXSxbMywyLCJcXHBzaScnX2kiXSxbMSwzLCJnIl1d
+    \begin{tikzcd}
+    	a && {a'} && {a''} \\
+    	\\
+    	&& {D(i)}
+    	\arrow["f", from=1-1, to=1-3]
+    	\arrow["{\psi_i}"', from=1-1, to=3-3]
+    	\arrow["g", from=1-3, to=1-5]
+    	\arrow["{\psi'_i}"{description}, from=1-3, to=3-3]
+    	\arrow["{\psi''_i}", from=1-5, to=3-3]
+    \end{tikzcd}
+\end{center}
+comuta também no exterior, porque
+
+\begin{align*}
+    (\psi''_i \circ g) \circ f &= \psi'_i \circ f \\
+                               &= \psi_i
+\end{align*}
+
+Bom, com isso em mente, podemos finalmente definir o que são limites e colimites.
+
+\begin{definition}\mylabel{limit+colimit}
+    Seja $\C$ uma categoria e $D \colon \I \to \C$ um diagrama sobre $\C$. Um \textbf{limite} de
+    $D$ é um objeto terminal da categoria $\Cone{D}$.
+
+    Dualmente, um \textbf{colimite} de $D$ é um objeto inicial da categoria $\Cocone{D}$.
+\end{definition}
+
+Como tanto o limite quanto o colimite são objetos terminal e inicial, respectivamente, sabemos que
+estão definidos a menos de isomorfismo. Isso implica que também os objetos que formam o vértice do
+cone também estão definidos a menos de isomorfismo.
+
+\chapter{Preliminares}\label{graph_theory}
+
+Nesta seção trataremos das definições e resultados preliminares de que precisaremos para
+desenvolver a teoria. Trataremos de algumas bases da Teoria de Grafos e definiremos a noção de
+\textit{encoding}, sobre a qual discorreremos no resto do trabalho. O objetivo desta seção, além de
+tornar o texto auto-contido, é o de ir aos poucos aproximando a linguagem do que vamos usar aqui
+com a Teoria de Categorias, que utilizaremos para aprofundar o nosso entendimento do que é o
+\textit{encoding} e suas propriedades.
+
+Tendo tudo isso em vista, comecemos com a definição do que é um grafo:
+
+\begin{definition}\mylabel{graph}
+    Considere a categoria formal $\Gamma$, com dois objetos e duas flechas paralelas seguinte:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJFIl0sWzIsMCwiViJdLFswLDEsInMiLDAseyJvZmZzZXQiOi0yfV0sWzAsMSwidCIsMix7Im9mZnNldCI6Mn1dXQ==
+        \begin{tikzcd}
+        	E && V
+        	\arrow["s", shift left=2, from=1-1, to=1-3]
+        	\arrow["t"', shift right=2, from=1-1, to=1-3]
+        \end{tikzcd}
+    \end{center}
+
+    A \textbf{categoria dos grafos} é a categoria de funtores
+
+    \begin{equation*}
+        \Graph \defeq \Set^\Gamma
+    \end{equation*}
+    ou seja, um \textbf{grafo} $G \in \Obj{\Graph}$ é um funtor $G \colon \Gamma \to \Set$.
+
+    Da mesma forma, um \textbf{homomorfismo de grafos} $h$ é uma transformação natural entre dois
+    desses funtores.
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXEdhbW1hIl0sWzQsMCwiU2V0Il0sWzAsMSwiRyIsMCx7ImN1cnZlIjotNH1dLFswLDEsIkgiLDIseyJjdXJ2ZSI6NH1dLFsyLDMsImgiLDIseyJzaG9ydGVuIjp7InNvdXJjZSI6MjAsInRhcmdldCI6MjB9fV1d
+        \begin{tikzcd}
+        	\Gamma &&&& Set
+        	\arrow[""{name=0, anchor=center, inner sep=0}, "G", curve={height=-24pt}, from=1-1, to=1-5]
+        	\arrow[""{name=1, anchor=center, inner sep=0}, "H"', curve={height=24pt}, from=1-1, to=1-5]
+        	\arrow["h"', between={0.2}{0.8}, Rightarrow, from=0, to=1]
+        \end{tikzcd}
+    \end{center}
+\end{definition}
+
+Vejamos o que isso significa. Tome $G \colon \Gamma \to \Set$ um grafo. Como $\Gamma$ tem dois
+objetos, o funtor nos dá dois conjuntos associados a eles: $G(E)$ e $G(V)$. Além disso, há duas
+setas paralelas em $\Gamma$ --- $s, t \colon E \to V$. Isso, através de $G$, nos dará duas funções
+paralelas
+
+\begin{center}
+    % https://q.uiver.app/#q=WzAsMixbMCwwLCJHKEUpIl0sWzIsMCwiRyhWKSJdLFswLDEsIkcocykiLDAseyJvZmZzZXQiOi0yfV0sWzAsMSwiRyh0KSIsMix7Im9mZnNldCI6Mn1dXQ==
+    \begin{tikzcd}
+    	{G(E)} && {G(V)}
+    	\arrow["{G(s)}", shift left=2, from=1-1, to=1-3]
+    	\arrow["{G(t)}"', shift right=2, from=1-1, to=1-3]
+    \end{tikzcd}
+\end{center}
+de $G(E)$ para $G(V)$. Eis a forma como devemos interpretar isso: $G(V)$ será o conjunto de
+vértices do nosso grafo, e $G(E)$ o conjunto de arestas. Nesse contexto,
+$G(s) \colon G(E) \to G(V)$ e $G(t) \colon G(E) \to G(V)$ são as funções que associam a cada aresta
+uma origem (do inglês, \textit{source}) e um destino (do inglês, \textit{target}).
+
+Ao longo do texto, usaremos a seguinte notação para nos referirmos a esses objetos:
+
+\begin{equation*}
+    \Ver{G} \defeq G(V) \logicalAnd \Edg{G} \defeq G(E)
+\end{equation*}
+denotarão o conjunto dos vértices de $G$ e o conjunto das arestas, respectivamente, e
+
+\begin{equation*}
+    s_G \defeq G(s) \logicalAnd t_G \defeq G(t)
+\end{equation*}
+denotarão as funções origem e destino de $G$. Quando não houver ambiguidade sobre qual grafo
+estamos falando, omitiremos o subscrito. Por fim, usaremos letras do alfabeto romano para descrever
+vértices ($a, b, c, \cdots$) e letras gregas para descrever arestas
+($\alpha, \beta, \gamma, \cdots$).
+
+Agora, olhemos para que tipo de estrutura estamos descrevendo quando definimos grafos assim.
+Suponha que tenhamos dois vértices $a, b \in \Ver{G}$ e uma aresta $\alpha \in \Edg{G}$ tal que
+$s(\alpha) = a$ e $t(\alpha) = b$:
+
+% https://q.uiver.app/#q=WzAsMixbMCwwLCJhIl0sWzIsMCwiYiJdLFswLDEsIlxcYWxwaGEiXV0=
+\[\begin{tikzcd}
+	a && b
+	\arrow["\alpha", from=1-1, to=1-3]
+\end{tikzcd}\]
+
+Repare que não há nada na nossa definição que exija que haja uma outra aresta na direção contrária:
+
+% https://q.uiver.app/#q=WzAsMixbMCwwLCJhIl0sWzIsMCwiYiJdLFswLDEsIlxcYWxwaGEiXSxbMSwwLCJcXGJldGE/IiwwLHsib2Zmc2V0IjotMywiY3VydmUiOi0xLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XV0=
+\[\begin{tikzcd}
+	a && b
+	\arrow["\alpha", from=1-1, to=1-3]
+	\arrow["{\beta?}", shift left=3, curve={height=-6pt}, dashed, from=1-3, to=1-1]
+\end{tikzcd}\]
+
+Isso nos dá um senso de \textit{direção}, isto é, as arestas dos nossos grafos são
+\textit{orientadas}, no sentido de que têm uma origem e um destino, e invertê-los nos daria um
+outro grafo.
+
+Repare, além disso, que nada impede que haja múltiplas arestas conectando o mesmo par de vértices:
+basta que mais de uma aresta, por exemplo $\alpha$ e $\beta$, tenham as mesmas origens e destinos,
+isto é
+
+\begin{equation*}
+    s(\alpha) = s(\beta) \hspace{5pt}\logicalAnd\hspace{5pt} t(\alpha) = t(\beta)
+\end{equation*}
+
+No grafo, isso nos apareceria assim:
+
+% https://q.uiver.app/#q=WzAsMixbMCwwLCJhIl0sWzIsMCwiYiJdLFswLDEsIlxcYWxwaGEiLDAseyJjdXJ2ZSI6LTF9XSxbMCwxLCJcXGJldGEiLDIseyJjdXJ2ZSI6MX1dXQ==
+\[\begin{tikzcd}
+	a && b
+	\arrow["\alpha", curve={height=-6pt}, from=1-1, to=1-3]
+	\arrow["\beta"', curve={height=6pt}, from=1-1, to=1-3]
+\end{tikzcd}\]
+
+Pelos motivos acima, alguns preferem chamar estruturas desse tipo de "multidigrafos"
+(\textit{directed graphs}), mas nessa tese manteremos a palavra "grafo".
+
+\begin{example}
+    Veja abaixo alguns exemplos de grafo:
+
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            % https://q.uiver.app/#q=WzAsMSxbMCwwLCJcXGJ1bGxldCJdLFswLDAsIiIsMSx7InJhZGl1cyI6MX1dLFswLDAsIiIsMSx7InJhZGl1cyI6NX1dXQ==
+            \[\begin{tikzcd}
+                \bullet
+                \arrow[from=1-1, to=1-1, loop, in=60, out=120, distance=5mm]
+                \arrow[from=1-1, to=1-1, loop, in=50, out=130, distance=15mm]
+            \end{tikzcd}\]
+        \end{minipage}
+        \begin{minipage}{.3\linewidth}
+            % https://q.uiver.app/#q=WzAsNCxbMCwxLCJcXGJ1bGxldCJdLFsxLDAsIlxcYnVsbGV0Il0sWzIsMSwiXFxidWxsZXQiXSxbMSwyLCJcXGJ1bGxldCJdLFswLDIsIiIsMix7ImN1cnZlIjotMX1dLFsyLDAsIiIsMix7ImN1cnZlIjotMX1dLFsxLDMsIiIsMix7ImN1cnZlIjoxfV0sWzMsMSwiIiwyLHsiY3VydmUiOjF9XSxbMCwxLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMSwwXSxbMSwyLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMiwxXSxbMiwzLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMywyXSxbMywwLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMCwzXV0=
+            \[\begin{tikzcd}
+                & \bullet & \\
+                \bullet && \bullet \\
+                & \bullet
+                \arrow[from=1-2, to=2-1]
+                \arrow[curve={height=-6pt}, from=1-2, to=2-3]
+                \arrow[curve={height=6pt}, from=1-2, to=3-2]
+                \arrow[curve={height=-6pt}, from=2-1, to=1-2]
+                \arrow[curve={height=-6pt}, from=2-1, to=2-3]
+                \arrow[from=2-1, to=3-2]
+                \arrow[from=2-3, to=1-2]
+                \arrow[curve={height=-6pt}, from=2-3, to=2-1]
+                \arrow[curve={height=-6pt}, from=2-3, to=3-2]
+                \arrow[curve={height=6pt}, from=3-2, to=1-2]
+                \arrow[curve={height=-6pt}, from=3-2, to=2-1]
+                \arrow[from=3-2, to=2-3]
+            \end{tikzcd}\]
+        \end{minipage}
+    \end{center}
+    % https://q.uiver.app/#q=WzAsNSxbMiwwLCJcXGJ1bGxldCJdLFs0LDAsIlxcYnVsbGV0Il0sWzYsMCwiXFxidWxsZXQiXSxbOCwwLCJcXGNkb3RzIl0sWzAsMCwiXFxjZG90cyJdLFs0LDBdLFswLDFdLFsxLDJdLFsyLDNdXQ==
+    \[\begin{tikzcd}
+        \cdots && \bullet && \bullet && \bullet && \cdots
+        \arrow[from=1-1, to=1-3]
+        \arrow[from=1-3, to=1-5]
+        \arrow[from=1-5, to=1-7]
+        \arrow[from=1-7, to=1-9]
+    \end{tikzcd}\]
+
+    No grafo à esquerda, a origem e o destino de ambas as arestas são o mesmo ponto. Nesse caso,
+    dizemos que a aresta em questão é um \textbf{loop}. No grafo da direita, por sua vez, podemos
+    ver que, para cada aresta, há uma aresta oposta ligando os mesmos dois vértices, e elas estão
+    em pares. É assim que representaremos grafos "sem direção", no sentido estabelecido acima. A
+    ideia é que, em um grafo sem direção, o que pode ir por uma aresta, também pode viajar no
+    sentido contrário, e isso também é o que temos quando usamos pares opostos de arestas. Por fim,
+    no grafo de baixo, temos um exemplo em que ambos $\Ver{G}$ e $\Edg{G}$ são infinitos. Isso é
+    para dizer que, segundo nossa definição, não há nenhuma restrição para o tamanho desses
+    conjuntos. E é claro que também existe a possibilidade de $\Ver{G}$ e $\Edg{G}$ terem tamanhos
+    diferentes:
+
+    \begin{center}
+        \begin{minipage}{.3\linewidth}
+            % https://q.uiver.app/#q=WzAsMSxbMCwwLCJcXGJ1bGxldCJdLFswLDAsIiIsMCx7InJhZGl1cyI6MX1dLFswLDBdLFswLDAsIlxcdmRvdHMiLDAseyJyYWRpdXMiOjV9XV0=
+            \[\begin{tikzcd}
+                \bullet
+                \arrow[from=1-1, to=1-1, loop, in=60, out=120, distance=5mm]
+                \arrow[from=1-1, to=1-1, loop, in=55, out=125, distance=10mm]
+                \arrow["\vdots", from=1-1, to=1-1, loop, in=50, out=130, distance=15mm]
+            \end{tikzcd}\]
+        \end{minipage}
+        \begin{minipage}{.6\linewidth}
+           % https://q.uiver.app/#q=WzAsNSxbMiwwLCJcXGJ1bGxldCJdLFs0LDAsIlxcYnVsbGV0Il0sWzYsMCwiXFxidWxsZXQiXSxbOCwwLCJcXGNkb3RzIl0sWzAsMCwiXFxjZG90cyJdXQ==
+            \[\begin{tikzcd}
+                \cdots && \bullet && \bullet && \bullet && \cdots
+            \end{tikzcd}\]
+        \end{minipage}
+    \end{center}
+
+    No grafo da esqueda, $\Edg{G}$ é infinito e $\Ver{G}$ contém somente um ponto. No da direita,
+    $\Ver{G}$ é infinito e $\Edg{G}$ é vazio.
+\end{example}
+
+Só nos resta uma coisa para entender os grafos: como eles se relacionam, isto é, as funções ou
+\textit{morfismos} entre eles. Nós dissemos, anteriormente, que um homomorfismo entre dois grafos
+$h \colon G \to H$ é uma transformação natural entre eles enquanto funtores. Mas o que isso
+significa?
+
+$h$ ser uma transformação natural, significa que para cada objeto $a \in \Obj{\Gamma}$, existe um
+$h_a \colon G(a) \to H(a)$ tal que, para qualquer flecha $f \colon a \to b$ em $\Gamma$, o
+seguinte diagrama comuta:
+
+\begin{center}
+    % https://q.uiver.app/#q=WzAsNCxbMCwwLCJHKGEpIl0sWzIsMCwiSChhKSJdLFswLDIsIkcoYikiXSxbMiwyLCJIKGIpIl0sWzAsMiwiRyhmKSIsMl0sWzEsMywiSChmKSJdLFswLDEsImhfYSJdLFsyLDMsImhfYiIsMl1d
+    \begin{tikzcd}
+    	{G(a)} && {H(a)} \\
+    	\\
+    	{G(b)} && {H(b)}
+    	\arrow["{h_a}", from=1-1, to=1-3]
+    	\arrow["{G(f)}"', from=1-1, to=3-1]
+    	\arrow["{H(f)}", from=1-3, to=3-3]
+    	\arrow["{h_b}"', from=3-1, to=3-3]
+    \end{tikzcd}
+\end{center}
+
+Como $\Gamma$ só tem dois objetos e dois morfismos, podemos representar isso da com o seguinte
+diagrama:
+
+\begin{center}
+    % https://q.uiver.app/#q=WzAsNCxbMCwwLCJcXEVkZ3tHfSJdLFsyLDAsIlxcRWRne0h9Il0sWzAsMiwiXFxWZXJ7R30iXSxbMiwyLCJcXFZlcntIfSJdLFswLDEsImhfRSJdLFswLDIsInNfRyIsMSx7ImN1cnZlIjoxLCJjb2xvdXIiOlsyNDAsNjAsNjBdfSxbMjQwLDYwLDYwLDFdXSxbMiwzLCJoX1YiLDJdLFsxLDMsInNfSCIsMSx7ImN1cnZlIjoxLCJjb2xvdXIiOlsyNDAsNjAsNjBdfSxbMjQwLDYwLDYwLDFdXSxbMCwyLCJ0X0ciLDEseyJjdXJ2ZSI6LTEsImNvbG91ciI6WzEyMCw2MCw2MF19LFsxMjAsNjAsNjAsMV1dLFsxLDMsInRfSCIsMSx7ImN1cnZlIjotMSwiY29sb3VyIjpbMTIwLDYwLDYwXX0sWzEyMCw2MCw2MCwxXV1d
+    \begin{tikzcd}
+    	{\Edg{G}} && {\Edg{H}} \\
+    	\\
+    	{\Ver{G}} && {\Ver{H}}
+    	\arrow["{h_E}", from=1-1, to=1-3]
+    	\arrow["{s_G}"{description}, color={rgb,255:red,92;green,92;blue,214}, curve={height=6pt}, from=1-1, to=3-1]
+    	\arrow["{t_G}"{description}, color={rgb,255:red,92;green,214;blue,92}, curve={height=-6pt}, from=1-1, to=3-1]
+    	\arrow["{s_H}"{description}, color={rgb,255:red,92;green,92;blue,214}, curve={height=6pt}, from=1-3, to=3-3]
+    	\arrow["{t_H}"{description}, color={rgb,255:red,92;green,214;blue,92}, curve={height=-6pt}, from=1-3, to=3-3]
+    	\arrow["{h_V}"', from=3-1, to=3-3]
+    \end{tikzcd}
+\end{center}
+que comuta para os pares de mesma cor, isto é, que as composições possíveis de mesma cor são
+iguais: $s_H \circ h_E = h_V \circ s_G$ e $t_H \circ h_E = h_V \circ t_G$.
+
+Intuitivamente, o que a definição acima quer dizer é que, quando temos um homomorfismo de grafos, a
+origem e o destino das arestas são preservados, isto é, que a origem e o destino de uma aresta
+$\alpha$ serão levados por $h$ na origem e no destino da imagem de $\alpha$ por $h$:
+
+\begin{center}
+    % https://q.uiver.app/#q=WzAsOSxbMCwwLCJhIl0sWzIsMCwiYiJdLFs0LDAsImMiXSxbNiwwLCJkIl0sWzMsMl0sWzMsMV0sWzIsMywiaChhKSJdLFs0LDMsImgoYikiXSxbMyw0LCJoKGMpIl0sWzAsMSwiXFxhbHBoYSJdLFsxLDIsIlxcYmV0YSJdLFsyLDMsIlxcZ2FtbWEiXSxbNSw0LCJoIiwyXSxbNiw3LCJoKFxcYWxwaGEpIl0sWzcsOCwiaChcXGJldGEpIl0sWzgsNiwiaChcXGdhbW1hKSJdXQ==
+    \begin{tikzcd}
+    	a && b && c && d \\
+    	&&& {} \\
+    	&&& {} \\
+    	&& {h(a)} && {h(b)} \\
+    	&&& {h(c)}
+    	\arrow["\alpha", from=1-1, to=1-3]
+    	\arrow["\beta", from=1-3, to=1-5]
+    	\arrow["\gamma", from=1-5, to=1-7]
+    	\arrow["h"', from=2-4, to=3-4]
+    	\arrow["{h(\alpha)}", from=4-3, to=4-5]
+    	\arrow["{h(\beta)}", from=4-5, to=5-4]
+    	\arrow["{h(\gamma)}", from=5-4, to=4-3]
+    \end{tikzcd}
+\end{center}
+
+No diagrama acima, repare que, para $h$ ser um homomorfismo, é necessário que $h(d) = h(a)$, porque
+$t_A(\gamma) = d$ e $t_B(h(\gamma)) = h(a)$.
+
+Vale também a seguinte observação: quando lidarmos com um homomorfismo de grafos, escreveremos,
+para a imagem de $\alpha$, uma aresta, por $h$, $h(\alpha)$, em vez de $h_E(\alpha)$, e
+semelhantemente para os vértices, com o objetivo de simplificar a notação. A qual das duas funções
+estamos nos referindo, deixaremos claro pelo contexto.
+
+\section{Grafos especiais}
+
+É claro então, pelo que foi visto acima, que grafos podem ser bem variados quanto à sua estrutura e
+aparência. Alguns grafos, porém, serão examinados mais afundo ao longo do texto, então convém
+dá-los nomes:
+
+\begin{definition}\mylabel{complete_graph}
+    Seja $n \in \N$, $n \geq 1$. Então o \textbf{grafo completo de $n$ vértices}, escrito $K_n$, é
+    o grafo tal que
+
+    \begin{align*}
+        \Ver{K_n} &\defeq \Z_n \\
+        \Edg{K_n} &\defeq \{(a, b) \in \Z_n \times \Z_n \colon a - b \neq 0\}
+    \end{align*}
+    e em que $s_{K_n} \defeq \pi_1$ e $t_{K_n} \defeq \pi_2$ são as projeções nas primeira e
+    segunda coordenadas, respectivamente, dos pares ordenados.
+\end{definition}
+
+Repare que $K_n$ tem $n$ vértices e duas arestas conectando cada par de dois vértices
+diferentes $a, b \in \Z_n$, um $(a, b)$ e o outro $(b, a)$. Nós já vimos um exemplo de grafo
+assim acima:
+
+    % https://q.uiver.app/#q=WzAsNCxbMCwxLCJcXGJ1bGxldCJdLFsxLDAsIlxcYnVsbGV0Il0sWzIsMSwiXFxidWxsZXQiXSxbMSwyLCJcXGJ1bGxldCJdLFswLDIsIiIsMix7ImN1cnZlIjotMX1dLFsyLDAsIiIsMix7ImN1cnZlIjotMX1dLFsxLDMsIiIsMix7ImN1cnZlIjoxfV0sWzMsMSwiIiwyLHsiY3VydmUiOjF9XSxbMCwxLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMSwwXSxbMSwyLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMiwxXSxbMiwzLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMywyXSxbMywwLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMCwzXV0=
+\[
+    \begin{tikzcd}[column sep= 2cm, row sep= 2cm, scale=2.5]
+        & \bullet & \\
+        \bullet && \bullet \\
+        & \bullet
+        \arrow[from=1-2, to=2-1]
+        \arrow[curve={height=-6pt}, from=1-2, to=2-3]
+        \arrow[curve={height=6pt}, from=1-2, to=3-2]
+        \arrow[curve={height=-6pt}, from=2-1, to=1-2]
+        \arrow[curve={height=-6pt}, from=2-1, to=2-3]
+        \arrow[from=2-1, to=3-2]
+        \arrow[from=2-3, to=1-2]
+        \arrow[curve={height=-6pt}, from=2-3, to=2-1]
+        \arrow[curve={height=-6pt}, from=2-3, to=3-2]
+        \arrow[curve={height=6pt}, from=3-2, to=1-2]
+        \arrow[curve={height=-6pt}, from=3-2, to=2-1]
+        \arrow[from=3-2, to=2-3]
+    \end{tikzcd}
+\]
+
+Esse é o $K_4$, ou seja, o grafo completo de $4$ vértices. Mas esses não são os únicos grafos que
+podem ser construídos assim.
+
+A representação que demos acima de $K_n$ é chamada de \textit{representação de Cayley} de $K_n$.
+Mais abaixo, na \myref[Definição]{cayley}, destrincharemos exatamente o que se quer dizer com isso.
+Essa representação nos será muito útil, porque tanto os grafos completos $K_n$ como os cubos $Q_n$
+têm representação de Cayley, o que nos permite trabalhar com eles usando propriedades algébricas.
+
+\begin{definition}\mylabel{cayley}
+    Seja $G$ um grupo e $S \subseteq G$ um subconjunto de $G$ qualquer (não necessáriamente um
+    subgrupo). Então o \textbf{grafo de Cayley de $G$ com relação a $S$}, denotado por
+    $\Cayley{G}{S}$, é o grafo definido da seguinte forma:
+
+    \begin{equation*}
+        \Ver{\Cayley{G}{S}} \defeq G
+    \end{equation*}
+    e
+    \begin{equation*}
+        \Edg{\Cayley{G}{S}} \defeq \{(a, a \cdot s) \colon a \in G \logicalAnd s \in S\}
+    \end{equation*}
+
+    Para simplificar a notação, quando $S = G \smallsetminus \{e_G\}$, escrevemos
+
+    \begin{equation*}
+        \Cayley{G}{*} \defeq \Cayley{G}{G \smallsetminus \{e_G\}}
+    \end{equation*}
+\end{definition}
+
+Ou seja, na definição acima que demos de $K_n$, temos $K_n = \Cayley{\Z_n}{*}$, tomando $\Z_n$ como
+um grupo aditivo. Mais geralmente, $K_n$ é isomorfo a qualquer grafo na forma $\Cayley{G}{*}$, com
+$\card{G} = n$.
+
+Ainda nesse tópico, repare que $K_4$, ou, mais geralmente, $K_n$ é \textit{vértice-transitivo},
+isto é, que, para cada par $a, b \in \Ver{K_n}$, existe um isomorfismo de grafos
+$f \colon K_n \to K_n$, a saber, $f \colon x \mapsto x + (b - a)$ que leva $a$ em $b$.
+Intuitivamente, isso significa que se olharmos o grafo a partir de qualquer vértice, ele é o mesmo.
+
+De fato, um grafo $H$ que tem no máximo uma aresta ligando cada par $a, b \in \Ver{H}$ em cada
+direção é isomorfo a um grafo de Cayley $\Cayley{G}{S}$ se, e somente se, seu grupo de
+automorfismos tem um subgrupo $G$ que age sobre $H$ de forma transitiva (\autocite{sabidussi}).
+Isso quer dizer que existe uma ação $a \colon G \times \Ver{H} \to \Ver{H}$ tal que $a(g, \bullet)$
+é um automorfismo de $H$ para todo $g \in G$.
+
+Há uma miríade de grafos que podem ser representados como grafos de Cayley. Veja alguns exemplos a
+seguir:
+
+\begin{example}
+    O grafo de linha infinito, $L$, como na seguinte imagem,
+
+    % https://q.uiver.app/#q=WzAsNSxbMCwwLCJcXGNkb3RzIl0sWzIsMCwiXFxidWxsZXQiXSxbNCwwLCJcXGJ1bGxldCJdLFs2LDAsIlxcYnVsbGV0Il0sWzgsMCwiXFxjZG90cyJdLFswLDEsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMSwyLCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMywiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFszLDQsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XV0=
+    \[\begin{tikzcd}
+        \cdots && \bullet && \bullet && \bullet && \cdots
+        \arrow[no head, from=1-1, to=1-3]
+        \arrow[no head, from=1-3, to=1-5]
+        \arrow[no head, from=1-5, to=1-7]
+        \arrow[no head, from=1-7, to=1-9]
+    \end{tikzcd}\]
+    pode ser representado da forma
+
+    \begin{equation*}
+        L \cong \Cayley{\Z}{\{-1, 1\}}
+    \end{equation*}
+    onde usamos um par de flechas indo e vindo de cada vértice para representar o grafo sem
+    direção, como se pode ver abaixo
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMiwwLCItMSJdLFs0LDAsIjAiXSxbNiwwLCIxIl0sWzgsMCwiXFxjZG90cyJdLFswLDAsIlxcY2RvdHMiXSxbNCwwLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMCw0LCIiLDEseyJjdXJ2ZSI6LTF9XSxbMCwxLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMSwwLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMSwyLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMiwxLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMiwzLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMywyLCIiLDEseyJjdXJ2ZSI6LTF9XV0=
+        \begin{tikzcd}
+            \cdots && {-1} && 0 && 1 && \cdots
+            \arrow[curve={height=-6pt}, from=1-1, to=1-3]
+            \arrow[curve={height=-6pt}, from=1-3, to=1-1]
+            \arrow[curve={height=-6pt}, from=1-3, to=1-5]
+            \arrow[curve={height=-6pt}, from=1-5, to=1-3]
+            \arrow[curve={height=-6pt}, from=1-5, to=1-7]
+            \arrow[curve={height=-6pt}, from=1-7, to=1-5]
+            \arrow[curve={height=-6pt}, from=1-7, to=1-9]
+            \arrow[curve={height=-6pt}, from=1-9, to=1-7]
+        \end{tikzcd}
+    \end{center}
+
+    Da mesma forma, podemos representar os ciclos $C_n$
+
+        % https://q.uiver.app/#q=WzAsOCxbMCwxLCJcXGJ1bGxldCJdLFsxLDAsIlxcYnVsbGV0Il0sWzIsMCwiXFxidWxsZXQiXSxbMywxLCJcXGJ1bGxldCJdLFszLDIsIlxcYnVsbGV0Il0sWzIsMywiXFxidWxsZXQiXSxbMCwyLCJcXGJ1bGxldCJdLFsxLDMsIlxcZGRvdHMiXSxbMCwxLCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzEsMiwiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsyLDMsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMyw0LCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsNSwiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs1LDcsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbNyw2LCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzYsMCwiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dXQ==
+    \[\begin{tikzcd}
+        & \bullet & \bullet & \\
+        \bullet &&& \bullet \\
+        \bullet &&& \bullet \\
+        & \ddots & \bullet
+        \arrow[no head, from=1-2, to=1-3]
+        \arrow[no head, from=1-3, to=2-4]
+        \arrow[no head, from=2-1, to=1-2]
+        \arrow[no head, from=2-4, to=3-4]
+        \arrow[no head, from=3-1, to=2-1]
+        \arrow[no head, from=3-4, to=4-3]
+        \arrow[no head, from=4-2, to=3-1]
+        \arrow[no head, from=4-3, to=4-2]
+    \end{tikzcd}\]
+    como $C_n \cong \Cayley{\Z_n}{\{-1, 1\}}$
+\end{example}
+
+O último grafo que nos interessa nomear são os cubos $n$ dimensionais. Aproveitaremos a
+\myref[Definição]{cayley} acima para defini-los de forma sucinta:
+
+\begin{definition}\mylabel{cube}
+    Um \textbf{cubo $n$-dimensional} $Q_n$, onde $n \in \N$, $n \geq 1$, é o grafo definido como
+
+    \begin{equation*}
+        Q_n \defeq \Cayley{(\Z_2)^n}{\{(1, 0, 0, \cdots, 0), \cdots, (0, 0, 0, \cdots, 1)\}}
+    \end{equation*}
+\end{definition}
+
+Em dimensões $1$, $2$ e $3$, temos os seguintes grafos:
+
+\begin{center}
+    \begin{minipage}{.3\linewidth}
+        \begin{center}
+            % https://q.uiver.app/#q=WzAsMixbMCwwLCIwIl0sWzIsMCwiMSJdLFswLDEsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XV0=
+            \begin{tikzcd}
+                0 && 1
+                \arrow[no head, from=1-1, to=1-3]
+            \end{tikzcd}
+        \end{center}
+    \end{minipage}
+    \begin{minipage}{.4\linewidth}
+        \begin{center}
+            % https://q.uiver.app/#q=WzAsNCxbMCwyLCIoMCwgMCkiXSxbMiwyLCIoMSwwKSJdLFswLDAsIigwLCAxKSJdLFsyLDAsIigxLDEpIl0sWzAsMSwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsyLDMsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMiwwLCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzMsMSwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dXQ==
+            \begin{tikzcd}
+                {(0, 1)} && {(1,1)} \\
+                \\
+                {(0, 0)} && {(1,0)}
+                \arrow[no head, from=1-1, to=1-3]
+                \arrow[no head, from=1-1, to=3-1]
+                \arrow[no head, from=1-3, to=3-3]
+                \arrow[no head, from=3-1, to=3-3]
+            \end{tikzcd}
+        \end{center}
+    \end{minipage}
+\end{center}
+\vspace{1cm}
+\begin{center}
+    % https://q.uiver.app/#q=WzAsOCxbMCwzLCIoMCwwLDApIl0sWzIsMywiKDEsMCwwKSJdLFswLDEsIigwLDEsMCkiXSxbMiwxLCIoMSwxLDApIl0sWzEsMiwiKDAsMCwxKSJdLFszLDIsIigxLDAsMSkiXSxbMSwwLCIoMCwxLDEpIl0sWzMsMCwiKDEsMSwxKSJdLFswLDEsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMiwzLCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMCwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFszLDEsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMCw0LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsNSwiIiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn0sImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbNiw3LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzcsNSwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs2LDQsIiIsMSx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9LCJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsNiwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsxLDUsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMyw3LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV1d
+    \begin{tikzcd}
+        & {(0,1,1)} && {(1,1,1)} \\
+        {(0,1,0)} && {(1,1,0)} \\
+        & {(0,0,1)} && {(1,0,1)} \\
+        {(0,0,0)} && {(1,0,0)}
+        \arrow[no head, from=1-2, to=1-4]
+        \arrow[dashed, no head, from=1-2, to=3-2]
+        \arrow[no head, from=1-4, to=3-4]
+        \arrow[no head, from=2-1, to=1-2]
+        \arrow[no head, from=2-1, to=2-3]
+        \arrow[no head, from=2-1, to=4-1]
+        \arrow[no head, from=2-3, to=1-4]
+        \arrow[no head, from=2-3, to=4-3]
+        \arrow[dashed, no head, from=3-2, to=3-4]
+        \arrow[no head, from=4-1, to=3-2]
+        \arrow[no head, from=4-1, to=4-3]
+        \arrow[no head, from=4-3, to=3-4]
+    \end{tikzcd}
+\end{center}
+
+Ou seja, o que se esperaria do grafo pelo nome. Também é possível visualizá-lo como um cubo de lado
+$1$ imerso no $\R^n$, em que as pontas são os vértices e as arestas, as arestas do grafo. É sobre
+esses grafos e os grafos completos que trataremos no capítulo \ref{fellows_results}.
+
+\section{Operações entre grafos}
+
+Há diversas operações possíveis entre grafos na literatura.
+
+\section{Sobre grafos acíclicos}
+
+\begin{lemma}
+    Sejam $G, H \in \Obj{\Graph}$ grafos. Se $G \encodes H$ e $H$ é uma multi-árvore, então $H$ é
+    uma retração de $G$.
+\end{lemma}
+
+\chapter{Resultados na Teoria de Grafos}\label{fellows_results}
 
 Nesta seção, desenvolveremos uma aplicação específica do conceito de encoding, com vistas a motivar
 o leitor quanto à sua utilidade.
 
 Os resultados abaixo se devem, quase em sua totalidade, a \autocite{fellows}. Nosso trabalho, nesta
 seção, é o de destrinchar esses resultados, e fazer pequenas correções à tese original.
+
+\TODO{Dizer que estamos já mudando a linguagem para mais geral}
 
 Para tanto, nos faremos uma pequena pergunta, a resposta da qual nos guiará pelo resto da
 seção:
@@ -591,7 +2153,9 @@ grupos e os grafos:
     \end{equation}
 \end{definition}
 
-Agora, vamos relacionar essa definição com o conceito de produto caixa:
+Agora, como veremos mais adiante, os grafos $Q_n$ podem ser descritos como iterações de
+produtos- caixa de grafos $K_2$. Sendo assim, será útil relacionar a definição acima com
+produtos-caixa através do seguinte lema:
 
 \begin{lemma}\mylabel{prod_cayley}
     Sejam $G, H$ grupos e $S \subseteq G$, $T \subseteq H$ subconjuntos desses. Então
@@ -620,7 +2184,7 @@ Agora, vamos relacionar essa definição com o conceito de produto caixa:
 \end{corollary}
 
 \begin{proof}
-    Como $Q_1 \cong \Cayley{\Z_2}{\{1\}}$, a prova segue do \myref[lema]{prod_cayley}.
+    Como $Q_1 \cong \Cayley{\Z_2}{\{1\}}$, a prova segue do \myref[Lema]{prod_cayley}.
 \end{proof}
 
 Repare que o corolário acima nos dá uma representação dos grafos $Q_n$. Além disso, repare que,
@@ -633,61 +2197,6 @@ para qualquer grupo $G$ com $n$ elementos, temos
 Essas duas representações nos dão um ótimo ponto de partida para trabalhar com esse tipo de grafo.
 E isso não se restringe a esses grafos.
 
-\begin{example}
-    O grafo de linha infinito, $L$, como na seguinte imagem,
-
-    % https://q.uiver.app/#q=WzAsNSxbMCwwLCJcXGNkb3RzIl0sWzIsMCwiXFxidWxsZXQiXSxbNCwwLCJcXGJ1bGxldCJdLFs2LDAsIlxcYnVsbGV0Il0sWzgsMCwiXFxjZG90cyJdLFswLDEsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMSwyLCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMywiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFszLDQsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XV0=
-    \[\begin{tikzcd}
-        \cdots && \bullet && \bullet && \bullet && \cdots
-        \arrow[no head, from=1-1, to=1-3]
-        \arrow[no head, from=1-3, to=1-5]
-        \arrow[no head, from=1-5, to=1-7]
-        \arrow[no head, from=1-7, to=1-9]
-    \end{tikzcd}\]
-    pode ser representado da forma
-
-    \begin{equation*}
-        L \cong \Cayley{\Z}{\{-1, 0, 1\}}
-    \end{equation*}
-    onde usamos um par de flechas indo e vindo de cada vértice para representar o grafo sem
-    direção, e mais um loop (porque $0 \in S$) para tornar o grafo reflexivo, como se pode ver
-    abaixo
-
-    % https://q.uiver.app/#q=WzAsNSxbMiwwLCItMSJdLFs0LDAsIjAiXSxbNiwwLCIxIl0sWzgsMCwiXFxjZG90cyJdLFswLDAsIlxcY2RvdHMiXSxbNCwwLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMCw0LCIiLDEseyJjdXJ2ZSI6LTF9XSxbMCwxLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMSwwLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMSwyLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMiwxLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMiwzLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMywyLCIiLDEseyJjdXJ2ZSI6LTF9XSxbMCwwLCIiLDEseyJyYWRpdXMiOjF9XSxbMSwxLCIiLDEseyJyYWRpdXMiOjF9XSxbMiwyLCIiLDEseyJyYWRpdXMiOjF9XV0=
-    \[\begin{tikzcd}
-        \cdots && \bullet && \bullet && \bullet && \cdots
-        \arrow[curve={height=-6pt}, from=1-1, to=1-3]
-        \arrow[curve={height=-6pt}, from=1-3, to=1-1]
-        \arrow[from=1-3, to=1-3, loop, in=60, out=120, distance=5mm]
-        \arrow[curve={height=-6pt}, from=1-3, to=1-5]
-        \arrow[curve={height=-6pt}, from=1-5, to=1-3]
-        \arrow[from=1-5, to=1-5, loop, in=60, out=120, distance=5mm]
-        \arrow[curve={height=-6pt}, from=1-5, to=1-7]
-        \arrow[curve={height=-6pt}, from=1-7, to=1-5]
-        \arrow[from=1-7, to=1-7, loop, in=60, out=120, distance=5mm]
-        \arrow[curve={height=-6pt}, from=1-7, to=1-9]
-        \arrow[curve={height=-6pt}, from=1-9, to=1-7]
-    \end{tikzcd}\]
-
-    Da mesma forma, podemos representar os ciclos $C_n$
-
-        % https://q.uiver.app/#q=WzAsOCxbMCwxLCJcXGJ1bGxldCJdLFsxLDAsIlxcYnVsbGV0Il0sWzIsMCwiXFxidWxsZXQiXSxbMywxLCJcXGJ1bGxldCJdLFszLDIsIlxcYnVsbGV0Il0sWzIsMywiXFxidWxsZXQiXSxbMCwyLCJcXGJ1bGxldCJdLFsxLDMsIlxcZGRvdHMiXSxbMCwxLCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzEsMiwiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsyLDMsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMyw0LCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsNSwiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs1LDcsIiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbNyw2LCIiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzYsMCwiIiwwLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dXQ==
-    \[\begin{tikzcd}
-        & \bullet & \bullet & \\
-        \bullet &&& \bullet \\
-        \bullet &&& \bullet \\
-        & \ddots & \bullet
-        \arrow[no head, from=1-2, to=1-3]
-        \arrow[no head, from=1-3, to=2-4]
-        \arrow[no head, from=2-1, to=1-2]
-        \arrow[no head, from=2-4, to=3-4]
-        \arrow[no head, from=3-1, to=2-1]
-        \arrow[no head, from=3-4, to=4-3]
-        \arrow[no head, from=4-2, to=3-1]
-        \arrow[no head, from=4-3, to=4-2]
-    \end{tikzcd}\]
-    como $C_n \cong \Cayley{\Z_n}{\{-1, 0, 1\}}$
-\end{example}
 
 Em geral, \TODO{buscar quais grafos podem ser representados como Cayley}
 
@@ -713,7 +2222,7 @@ lema que nos permitirá encontrar encodings entre tais grafos.
     $a \cdot s$. Nesse caso, se $f(s) \in T$, definimos
 
     \begin{equation*}
-        f(a \to b) = f(a) \to f(b) = f(a \cdot s) = f(a) \cdot f(s)
+        \bar{f}(a \to b) = f(a) \to f(b) = f(a \cdot s) = f(a) \cdot f(s)
     \end{equation*}
     que está em $\Edg{\Cayley{H}{T}}$ porque $f(s) \in T$. Caso contrário, não definimos $\bar{f}$
     sobre a aresta.
@@ -729,7 +2238,7 @@ lema que nos permitirá encontrar encodings entre tais grafos.
                           &= a \cdot s \cdot s^{-1} \\
                           &= a
     \end{align*}
-    e $b \cdot s^{-1} \to b$ é mapeada para $a \to f(b)$ por $\bar{f}$.
+    e a aresta $b \cdot s^{-1} \to b$ é mapeada para a aresta $a \to f(b)$ por $\bar{f}$.
 \end{proof}
 
 Este lema que acabamos de demonstrar nos dá simples condições para encontrar encodings. Não só
@@ -741,22 +2250,22 @@ disso, precisamos somente de um resultado direto da definição de encoding, que
 provar que esse encoding de Hamming é, de fato, o menor encoding possível:
 
 \begin{lemma}\mylabel{degree_geq}
-    Se $f: G \encodes H$ é um encoding, e se $f(x) = v$, então $\deg_{f^{-1}(H)}(x) \geq \deg(v)$.
+    Se $f: G \encodes H$ é um encoding, então $\deg_{f^{-1}[H]}(x) \geq \deg_H(f(x))$.
 \end{lemma}
 
 \begin{proof}
-    Pela definição de encoding, se $f(x) = v$ e existe uma aresta $u \to v$ em $H$, então existe um
+    Pela definição de encoding, se existe uma aresta $u \to f(x)$ em $H$, então existe um
     levantamento $u' \to x$ dessa aresta em $G$. Além disso, como $f$ é uma função (parcial), é
     claro que uma mesma aresta em $G$ não pode ser mapeada para diferentes arestas em $H$.
 
     Logo,
 
     \begin{align*}
-        \deg(v) &=    \card{\{\alpha \in \Edg{H} \colon \tg{\alpha} = v\}} \\
-                &\leq \card{\{\alpha' \in \Edg{f^{-1}[H]} \colon \tg{\alpha'} = x
-                    \logicalAnd \tg{f(\alpha')} = v\}} \\
-                &=    \card{\{\alpha' \in \Edg{f^{-1}[H]} \colon \tg{\alpha'} = x\}} \\
-                &=    \deg_{f^{-1}[H]}(x)
+        \deg_H(f(x)) &=    \card{\{\alpha \in \Edg{H} \colon \tg{\alpha} = f(x)\}} \\
+                     &\leq \card{\{\alpha' \in \Edg{f^{-1}[H]} \colon \tg{\alpha'} = x
+                         \logicalAnd \tg{f(\alpha')} = f(x)\}} \\
+                     &=    \card{\{\alpha' \in \Edg{f^{-1}[H]} \colon \tg{\alpha'} = x\}} \\
+                     &=    \deg_{f^{-1}[H]}(x)
     \end{align*}
 \end{proof}
 
@@ -772,7 +2281,7 @@ $Q_k \encodes K_n$, para um $n \in \N$ qualquer.
 \end{proposition}
 
 \begin{proof}
-    A prova é uma conclusão do \myref[lema]{degree_geq} e do fato de que $K_n$ é regular de grau
+    A prova é uma conclusão do \myref[Lema]{degree_geq} e do fato de que $K_n$ é regular de grau
     $n-1$, isto é, que cada vértice de $K_n$ tem o mesmo grau, $n-1$.
 
     Com efeito, um vértice de um grafo $Q_k$ tem grau $k$, pois, para cada vetor binário e cada
@@ -792,12 +2301,12 @@ dá o encoding de Hamming. Vejamos a sua construção abaixo.
     $K_{2^k} \cong \Cayley{(\Z_2)^k}{*}$, porque $(\Z_2)^k$, como um grupo aditivo, tem $2^k$
     elementos.
 
-    Da mesma forma, temos, pelo \myref[corolário]{q_n_iso_cayley}, que
+    Da mesma forma, temos, pelo \myref[Corolário]{q_n_iso_cayley}, que
     $Q_{2^k-1} \cong \Cayley{(\Z_2)^{2^k-1}}{\{(1, 0, 0 \cdots), \cdots, (\cdots, 0, 0, 1)\}}$.
 
     Agora, se mapearmos cada um dos $2^k - 1$ elementos da base de $(\Z_2)^{2^k-1}$ para cada
     elemento não nulo de $(\Z_2)^k$, isso define um homomorfismo de grupos (considerando ambos como
-    grupos aditivos), e, portanto, pelo \myref[lema]{cayley_enc_cayley},
+    grupos aditivos), e, portanto, pelo \myref[Lema]{cayley_enc_cayley},
 
     \begin{equation*}
         \Cayley{(\Z_2)^{2^k-1}}{\{(1, 0, 0 \cdots), \cdots, (\cdots, 0, 0, 1)\}}
@@ -907,7 +2416,7 @@ conceito de encoding com o de produto caixa.
 \end{theorem}
 
 \begin{proof}
-    Sejam $f \colon A \to B$ e $g \colon C \to D$ encodings. Além disso, seja tome
+    Sejam $f \colon A \to B$ e $g \colon C \to D$ encodings. Além disso, tome
     $(a_2, c_2) \in \Obj{A \boxProduct C}$.
 
     Seja, além disso, $(b_2, d_2) \defeq (f(a_2), g(c_2))$.
@@ -1074,7 +2583,7 @@ Basta demonstrar esse fato.
 \end{theorem}
 
 \begin{proof}
-    Fixe um $0 < \epsilon < 1$. Pelo \myref[lema]{dist_primos}, sabemos que existem $p, q \in \N$
+    Fixe um $0 < \epsilon < 1$. Pelo \myref[Lema]{dist_primos}, sabemos que existem $p, q \in \N$
     primos e $s, t \in \N$ inteiros tais que $p < 2^s$, $q < 2^t$ e
 
     \begin{center}
@@ -1106,14 +2615,14 @@ Basta demonstrar esse fato.
     \end{center}
 
     Como nos preocupamos somente com o comportamento assintótico de $\mu_1$, podemos considerar
-    somente valores de $n$ grandes o suficiente. Assim sendo, pelo \myref[lema]{m_prox_n}, sabemos
+    somente valores de $n$ grandes o suficiente. Assim sendo, pelo \myref[Lema]{m_prox_n}, sabemos
     que existe $n_0 \in \N$ tal que, para todo $n > n_0$, existe $m \defeq p^a q^b \geq n$ tal que
 
     \begin{equation*}
         \frac{m}{n} < 1 + \frac{\epsilon}{3}
     \end{equation*}
 
-    Logo, pelo \myref[teorema]{factor_mu_1}, temos
+    Logo, pelo \myref[Teorema]{factor_mu_1}, temos
     \begin{align*}
         \mu_1(n) &\leq \mu_1(p^a p^b) \\
                  &\leq \frac{p^a q^b \mu_1(pq)}{(p-1)(q-1)} \\
@@ -1188,7 +2697,7 @@ Veja o exemplo a seguir:
         \end{minipage}
     \end{center}
 
-    Pelo \myref[lema]{mu_1_n_geq_n_minus_1}, sabemos que um encoding é impossível entre esses
+    Pelo \myref[Lema]{mu_1_n_geq_n_minus_1}, sabemos que um encoding é impossível entre esses
     grafos, e, portanto, não podemos obter uma simulação direta: com efeito, qualquer função
     parcial de $Q_3$ para $K_5$ levaria um vértice do cubo em um vértice de $K_5$ adjascente a
     quatro outros vértices, enquanto o vértice em $Q_3$ é adjascente somente a três outros
@@ -1250,6 +2759,7 @@ Veja o exemplo a seguir:
         \arrow[no head, from=4-1, to=4-3]
         \arrow[no head, from=4-3, to=3-4]
     \end{tikzcd}\]
+    onde as linhas pontilhadas são os caminhos de comprimento maior do que $1$.
 
     É fácil ver que os vértices destacados formam um subgrafo completo. Logo, temos um encoding de
     $Q_3$ em $K_5$ com custo de retransmissão de $3$.
@@ -1400,7 +2910,7 @@ Agora já temos o suficiente para fazer uma estimativa do crescimento de $\mu_r$
           &= k_1 s + k_2 (s + 1)
     \end{align*}
 
-    Usando então o \myref[lema]{prod_construction}, podemos escrever:
+    Usando então o \myref[Lema]{prod_construction}, podemos escrever:
 
     \begin{align*}
         \mu_r(n) &=    \mu_r(2^k) \\
@@ -1461,7 +2971,7 @@ Agora já temos o suficiente para fazer uma estimativa do crescimento de $\mu_r$
     \end{align*}
 
     Mas isso vale para $n = 2^k$. Agora, para qualquer $n \in \N$ existe um $k \in \N$ tal que
-    $n \leq 2^k \leq 2n$ segundo o \myref[lema]{n_2k_2n}. Mas isso significa que:
+    $n \leq 2^k \leq 2n$ segundo o \myref[Lema]{n_2k_2n}. Mas isso significa que:
 
     \begin{align*}
         \mu_r(n) &\leq \mu_r(2^k) \\
@@ -1553,20 +3063,17 @@ Por fim, podemos demonstrar o limite assintótico de $\mu_r$.
     Por fim, se $n \geq N_4$, então existe uma $r$-potência $k^r$ entre $n$ e $(1 + \epsilon/3)n$.
     Então sabemos que
 
-    \begin{center}
-        \begin{minipage}{.3\linewidth}
-            \begin{equation*}
+    \begin{equation*}
                 \mu_1(k) \leq \left( 1 + \frac{\epsilon}{3} \right) k
-            \end{equation*}
-        \end{minipage}
-        \begin{minipage}{.3\linewidth}
-            \begin{align*}
-                         & k^r < \left( 1 + \frac{\epsilon}{3} \right) n \\
-                \implies & k < \left( 1 + \frac{\epsilon}{3} \right)^{1/r} n^{1/r} \\
-                \implies & k < \left( 1 + \frac{\epsilon}{3} \right) n^{1/r}
-            \end{align*}
-        \end{minipage}
-    \end{center}
+    \end{equation*}
+    e
+
+    \begin{align*}
+                 & k^r < \left( 1 + \frac{\epsilon}{3} \right) n \\
+        \implies & k < \left( 1 + \frac{\epsilon}{3} \right)^{1/r} n^{1/r}
+                     & (\text{porque}\hspace{4pt} k \geq N_4^{1/r})\\
+        \implies & k < \left( 1 + \frac{\epsilon}{3} \right) n^{1/r}
+    \end{align*}
 
     Assim sendo,
 
@@ -1587,10 +3094,115 @@ Nesta seção, nós trataremos do que exatamente queremos dizer com o termo simu
 que a presente abordagem com encodings nos entrega melhores resultados do que a estratégia mais
 conhecida, chamada de \textit{graph embedding}.
 
+Primeiramente, entendamos como as computações são feitas em CPUs
+
+\TODO{Explicar ligação de como CPUs são feitas com o modelo}
+
+\begin{definition}
+    Uma \textbf{arquitetura} de CPU $\mathfrak{A}$ é um conjunto de operações que uma CPU pode
+    fazer.
+\end{definition}
+
+\begin{definition}
+    Um \textbf{diagrama de computação} é um grafo acíclico $G$ tal que
+    $\Ver{G} \subseteq \mathfrak{A}$ para alguma arquitetura $\mathfrak{A}$ de CPU.
+\end{definition}
+
 Para isso, imagine o seguinte cenário, também de \cite{fellows}:
 
 \begin{example}
-    Suponha que 
+    Suponha que queiramos computar o valor de $x + xy$, dados $x, y$ são números inteiros
+    quaisquer, em uma arquitetura que contenha as operações "soma de inteiros" $+$ e multiplicação
+    de inteiros $*$. Nesse caso, precisaremos que se compute uma multiplicação, $x * y$ e uma soma,
+    entre o resultado dessa computação e $x$.
+
+    Um diagrama possível que realiza a computação acima seria o seguinte:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMCwwLCJ4Il0sWzIsMCwieSJdLFswLDIsImlkIl0sWzIsMiwiKiJdLFsyLDQsIisiXSxbMCwzXSxbMSwzXSxbMCwyXSxbMiw0XSxbMyw0XV0=
+        \begin{tikzcd}
+        	x && y \\
+        	\\
+        	id && {*} \\
+        	\\
+        	&& {+}
+        	\arrow[from=1-1, to=3-1]
+        	\arrow[from=1-1, to=3-3]
+        	\arrow[from=1-3, to=3-3]
+        	\arrow[from=3-1, to=5-3]
+        	\arrow[from=3-3, to=5-3]
+        \end{tikzcd}
+    \end{center}
+    em que $id$ é a operação que apenas mantém a entrada.
+
+    Digamos que queiramos realizar essa computação em um sistema com duas CPUs dispostas e ligadas
+    da seguinte forma:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXGJveGVke0NQVVxcLCAxfSJdLFsyLDAsIlxcYm94ZWR7Q1BVXFwsIDJ9Il0sWzAsMSwiIiwyLHsiY3VydmUiOi0yfV0sWzEsMCwiIiwyLHsiY3VydmUiOi0yfV1d
+        \begin{tikzcd}
+        	{\boxed{CPU\, 1}} && {\boxed{CPU\, 2}}
+        	\arrow[curve={height=-12pt}, from=1-1, to=1-3]
+        	\arrow[curve={height=-12pt}, from=1-3, to=1-1]
+        \end{tikzcd}
+    \end{center}
+
+    Podemos imaginar um grafo temporal discreto, em que as linhas simbolizam a transmissão de
+    informação de uma CPU para a outra no próximo instante de tempo.
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMTIsWzIsMCwiXFxib3hlZHtDUFVcXCwgMX0iXSxbNCwwLCJcXGJveGVke0NQVVxcLCAyfSJdLFswLDAsInQ9MCJdLFsyLDIsIlxcYm94ZWR7Q1BVXFwsMX0iXSxbNCwyLCJcXGJveGVke0NQVVxcLDJ9Il0sWzAsMiwidD0xIl0sWzAsNCwidD0yIl0sWzAsNiwiXFx2ZG90cyJdLFsyLDQsIlxcYm94ZWR7Q1BVXFwsMX0iXSxbNCw0LCJcXGJveGVke0NQVVxcLDJ9Il0sWzIsNiwiXFx2ZG90cyJdLFs0LDYsIlxcdmRvdHMiXSxbMCwzLCIiLDIseyJjb2xvdXIiOlswLDAsNDBdfV0sWzAsNCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFsxLDQsIiIsMix7ImNvbG91ciI6WzAsMCw0MF19XSxbMSwzLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV0sWzMsOSwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFszLDgsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF19XSxbNCw5LCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV0sWzQsOCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFs4LDEwLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV0sWzgsMTEsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF19XSxbOSwxMSwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFs5LDEwLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV1d
+        \begin{tikzcd}
+        	{t=0} && {\boxed{CPU\, 1}} && {\boxed{CPU\, 2}} \\
+        	\\
+        	{t=1} && {\boxed{CPU\,1}} && {\boxed{CPU\,2}} \\
+        	\\
+        	{t=2} && {\boxed{CPU\,1}} && {\boxed{CPU\,2}} \\
+        	\\
+        	\vdots && \vdots && \vdots
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-3, to=3-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-3, to=3-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-5, to=3-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-5, to=3-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-3, to=5-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-3, to=5-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-5, to=5-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-5, to=5-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-3, to=7-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-3, to=7-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-5, to=7-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-5, to=7-5]
+        \end{tikzcd}
+    \end{center}
+
+    Observe que nós podemos imbutir o diagrama de computação acima nesse grafo:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMTIsWzIsMCwiXFxib3hlZHt4fSJdLFs0LDAsIlxcYm94ZWR7eX0iXSxbMCwwLCJ0PTAiXSxbMiwyLCJcXGJveGVke2lkfSJdLFs0LDIsIlxcYm94ZWR7Kn0iXSxbMCwyLCJ0PTEiXSxbMCw0LCJ0PTIiXSxbMCw2LCJcXHZkb3RzIl0sWzIsNF0sWzQsNCwiXFxib3hlZHsrfSJdLFsyLDYsIlxcdmRvdHMiXSxbNCw2LCJcXHZkb3RzIl0sWzAsM10sWzAsNF0sWzEsNF0sWzEsMywiIiwwLHsiY29sb3VyIjpbMCwwLDQwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzMsOV0sWzMsOCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzQsOV0sWzQsOCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzgsMTAsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF0sInN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFs4LDExLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbOSwxMSwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzksMTAsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF0sInN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dXQ==
+        \begin{tikzcd}
+        	{t=0} && {\boxed{x}} && {\boxed{y}} \\
+        	\\
+        	{t=1} && {\boxed{id}} && {\boxed{*}} \\
+        	\\
+        	{t=2} && {} && {\boxed{+}} \\
+        	\\
+        	\vdots && \vdots && \vdots
+        	\arrow[from=1-3, to=3-3]
+        	\arrow[from=1-3, to=3-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=1-5, to=3-3]
+        	\arrow[from=1-5, to=3-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=3-3, to=5-3]
+        	\arrow[from=3-3, to=5-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=3-5, to=5-3]
+        	\arrow[from=3-5, to=5-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-3, to=7-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-3, to=7-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-5, to=7-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-5, to=7-5]
+        \end{tikzcd}
+    \end{center}
+
+    Ou seja, dado o diagrama acima, existe uma atribuição possível de operações para cada CPU em
+    cada instante de tempo tal que é possível computar a expressão desejada.
 \end{example}
 
 \chapter{Rumo a uma categorização de encodings}
@@ -1934,7 +3546,7 @@ seguir:
 \end{proof}
 
 \begin{theorem}\mylabel{graph_encoding_iff_cat_encoding}
-    Sejam $A, B \in \Graph$, e $f \colon A \to B$ um encoding de grafos. Então
+    Sejam $A, B \in \Graph$, e $f \colon A \to B$ um encoding total de grafos. Então
 
     \begin{equation*}
         \Free f \colon \Free(A) \to \Free(B)
@@ -2010,7 +3622,7 @@ seguir:
 
     Logo, podemos tomar a imagem inversa dos geradores de $\Free(C)$, e isso vai formar um subgrafo
     $i \colon A \hookrightarrow C$ e uma função $f \colon A \to B$ que faz o mesmo papel de $F$
-    restrita à imagem inversa dos geradores de $\Free(B)$.
+    restrita à imagem inversa dos geradores de $\Free(B)$. Provemos que $f$ é um encoding total.
 
     Por outro lado, considere $e' \colon a' \to b'$ um gerador em $\Free(A)$. Então $F(e')$ também
     é gerador. Com efeito, suponha que $e \defeq F(e')$ tenha uma decomposição não trivial
@@ -2053,7 +3665,7 @@ seguir:
     Agora, é claro que $(\tilde\gamma, \id{d})$ não tem decomposição não trivial. Além disso,
     repare que, como os únicos isomorfismos de $\Free(A) \,\times\, \Free(B)$ e
     $\Free(C) \,\times\, \Free(D)$ são as identidades, $F$ ser conservativo implica que reflete
-    identidades. Assim sendo, pelo \myref[lema]{reflects_generators}, sabemos que qualquer
+    identidades. Assim sendo, pelo \myref[Lema]{reflects_generators}, sabemos que qualquer
     pré-imagem de $(\tilde\gamma, \id{d})$ não tem decomposição não trivial.
 
     Em segundo lugar, pela definição de encoding de categorias, existe um objeto
@@ -2089,7 +3701,7 @@ seguir:
     \end{equation*}
     um encoding.
 
-    O \myref[teorema]{graph_encoding_iff_cat_encoding} nos diz, então, que o funtor parcial
+    O \myref[Teorema]{graph_encoding_iff_cat_encoding} nos diz, então, que o funtor parcial
 
     \begin{equation*}
         \Free f \colon \Free(A \boxProduct B) \to \Free(C \boxProduct D)
@@ -2136,8 +3748,335 @@ seguir:
 
     \TODO{Provar que é funtor}
 
-    Agora, 
+    Agora, sejam $a_0 \in \Ver{A}$ e $b_0 \in \Ver{B}$. Além disso, escreva
+    $(c_0, d_0) \defeq f(a_0, b_0)$. Esses serão os nossos pontos iniciais para a prova recursiva a
+    seguir. Seja, ademais, $\gamma \colon c \leadsto c_0$ um caminho em $C$ e
+    $\delta \colon d \leadsto d_0$ um caminho em $D$. Para provar que $F$ é funtor, temos de provar
+    que existem dois caminhos $\alpha \in \Hom[\Free(A)]{a}{a_0}$ e
+    $\beta \in \Hom[\Free(B)]{b}{b_0}$ tais que $F(\alpha, \beta) = (\gamma, \delta)$.
+
+    Com efeito, decomponha $\gamma$ e $\delta$:
+
+    \begin{align*}
+        \gamma &\colon c \to c_n \to c_{n-1} \to \cdots \to c_1 \to c_0 \\
+        \delta &\colon d \to d_m \to d_{m-1} \to \cdots \to d_1 \to d_0
+    \end{align*}
+
+    Agora, tome a aresta $d_1 \to d_0$. Sabemos que em $C \boxProduct D$, existe uma aresta
+
+    \begin{equation*}
+        (c_0, d_1) \to (c_0, d_0)
+    \end{equation*}
+    correspondente a ela. Sabemos, então, do fato de $f$ ser encoding, que existe uma aresta em
+    $A \boxProduct B$
+
+    \begin{equation*}
+        (a', b') \to (a_0, b_0)
+    \end{equation*}
+    que é levada em na aresta acima por $f$. Agora, essa aresta pode corresponder a uma aresta em
+    $A$ ou em $B$. Se existir aresta $b_1 \to b_0$ em $B$ tal que
+
+    \begin{equation*}
+        f\left( (a_0, b_1) \to (a_0, b_0) \right) = d_1 \to d_0
+    \end{equation*}
+    tomamos essa aresta $b_1 \to b_0$ para compor o final do nosso caminho $\beta$, e $a_0$, $b_1$,
+    $c_0$ e $d_1$ serão os nossos novos pontos iniciais. Caso contrário, então
+    $(a', b') \to (a_0, b_0)$ corresponde a uma aresta em $A$, isto é, uma aresta $a_1 \to a_0$ e
+    $b' = b_0$. Nesse caso, $\alpha$ terminará com $a_1 \to a_0$ e $a_1$, $b_0$, $c_0$ e $d_1$
+    serão os nossos novos pontos iniciais. Seguindo esse processo até o fim, obtemos caminhos
+    $\alpha \colon a \leadsto a_0$ e $\beta \colon b \leadsto b_0$. Resta provar que, de fato,
+
+    \begin{equation*}
+        F(\alpha, \beta) = (\gamma, \delta)
+    \end{equation*}
+
+    Escreva, para isso,
+
+    \begin{align*}
+        \alpha &\colon a \to a_k \to \cdots \to a_1 \to a_0 \\
+        \beta  &\colon b \to b_l \to \cdots \to b_1 \to b_0
+    \end{align*}
 \end{proof}
+
+\begin{theorem}
+    Seja $\mathcal{I}$ uma categoria discreta, $\C$ uma categoria $\mathcal{I}$-completa,
+    sejam $F, F' \colon \mathcal{I} \to \C$ dois funtores, $\eta \colon F \Rightarrow F'$ uma
+    transformação natural entre eles. Além disso, seja $i \in \Mor{\C}$. Então, se
+    $i \liftingProperty \eta_a$ para todo $a \in \Obj{\mathcal{I}}$, teremos que existe um morfismo
+    $k \colon \lim F \to \lim F'$ entre os produtos tal que $i \liftingProperty k$.
+\end{theorem}
+
+\begin{proof}
+    \def\I{\mathcal{I}}
+    Seja $i \colon x \to y$. Fixaremos um $a, b \in \Obj{\I}$ para ilustração, mas o argumento será
+    feita para toda a imagem de $F$ e $F'$. Tome, ademais, $f \colon x \to \lim F$ e
+    $g \colon y \to \lim F'$. Então temos o seguinte diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsOCxbMCwxLCJ4Il0sWzAsMywieSJdLFsyLDEsIlxcbGltIEYiXSxbMiwzLCJcXGxpbSBGJyJdLFszLDAsIkYoYSkiXSxbMywxLCJGKGIpIl0sWzMsMywiRicoYSkiXSxbMyw0LCJGJyhiKSJdLFswLDEsImkiLDJdLFswLDIsImYiXSxbMSwzLCJnIiwyXSxbNCw1LCJGKFxcYWxwaGEpIl0sWzYsNywiRicoXFxhbHBoYSkiXSxbMiw0LCJwX2EiXSxbMiw1LCJwX2IiLDJdLFszLDYsInAnX2EiXSxbMyw3LCJwJ19iIiwyXV0=
+        \begin{tikzcd}
+        	&&& {F(a)} \\
+        	x && {\lim F} & {F(b)} \\
+        	\\
+        	y && {\lim F'} & {F'(a)} \\
+        	&&& {F'(b)}
+        	\arrow["{F(\alpha)}", from=1-4, to=2-4]
+        	\arrow["f", from=2-1, to=2-3]
+        	\arrow["i"', from=2-1, to=4-1]
+        	\arrow["{p_a}", from=2-3, to=1-4]
+        	\arrow["{p_b}"', from=2-3, to=2-4]
+        	\arrow["g"', from=4-1, to=4-3]
+        	\arrow["{p'_a}", from=4-3, to=4-4]
+        	\arrow["{p'_b}"', from=4-3, to=5-4]
+        	\arrow["{F'(\alpha)}", from=4-4, to=5-4]
+        \end{tikzcd}
+    \end{center}
+    em que $p_a$, $p_b$ são os morfimos que fazem o cone de cima de vértice $\lim F$ comutar, e da
+    mesma forma com $p'_a$ e $p'_b$.
+
+    Além disso, como temos a transformação natural $\eta$, podemos desenhar o seguinte diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMSwwLCJcXGxpbSBGIl0sWzAsMiwiRihhKSJdLFsyLDIsIkYoYikiXSxbMCw0LCJGJyhhKSJdLFsyLDQsIkYnKGIpIl0sWzAsMiwicF9iIl0sWzAsMSwicF9hIiwyXSxbMSwyLCJGKFxcYWxwaGEpIl0sWzEsMywiXFxldGFfYSIsMl0sWzIsNCwiXFxldGFfYiJdLFszLDQsIkYnKFxcYWxwaGEpIiwyXV0=
+        \begin{tikzcd}
+        	& {\lim F} & \\
+        	\\
+        	{F(a)} && {F(b)} \\
+        	\\
+        	{F'(a)} && {F'(b)}
+        	\arrow["{p_a}"', from=1-2, to=3-1]
+        	\arrow["{p_b}", from=1-2, to=3-3]
+        	\arrow["{F(\alpha)}", from=3-1, to=3-3]
+        	\arrow["{\eta_a}"', from=3-1, to=5-1]
+        	\arrow["{\eta_b}", from=3-3, to=5-3]
+        	\arrow["{F'(\alpha)}"', from=5-1, to=5-3]
+        \end{tikzcd}
+    \end{center}
+
+    Como as partes de cima e de baixo do diagrama comutam, o diagrama todo comuta. Isso significa
+    que $\eta_b \circ p_b = F'(\alpha) \circ ( \eta_a \circ p_a )$, e isso vale, é claro, para todo
+    $\alpha \in \Mor{\I}$. Logo, $(\lim F, (\eta_a \circ p_a)_{a \in \Obj{\I}})$ é um cone
+    comutativo em $\C$, e portanto, existe um único $k \colon \lim F \to \lim F'$ tal que o
+    seguinte diagrama comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMSwwLCJcXGxpbSBGIl0sWzAsNCwiRicoYSkiXSxbMiw0LCJGJyhiKSJdLFsxLDIsIlxcbGltIEYnIl0sWzEsMiwiRicoXFxhbHBoYSkiLDJdLFszLDEsInAnX2EiLDFdLFszLDIsInAnX2IiLDFdLFswLDEsIlxcZXRhX2EgXFxjaXJjIHBfYSIsMix7ImN1cnZlIjoyfV0sWzAsMiwiXFxldGFfYiBcXGNpcmMgcF9iIiwwLHsiY3VydmUiOi0yfV0sWzAsMywiXFxleGlzdHMhIGsiLDEseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XV0=
+        \begin{tikzcd}
+        	& {\lim F} & \\
+        	\\
+        	& {\lim F'} \\
+        	\\
+        	{F'(a)} && {F'(b)}
+        	\arrow["{\exists! k}"{description}, dashed, from=1-2, to=3-2]
+        	\arrow["{\eta_a \circ p_a}"', curve={height=12pt}, from=1-2, to=5-1]
+        	\arrow["{\eta_b \circ p_b}", curve={height=-12pt}, from=1-2, to=5-3]
+        	\arrow["{p'_a}"{description}, from=3-2, to=5-1]
+        	\arrow["{p'_b}"{description}, from=3-2, to=5-3]
+        	\arrow["{F'(\alpha)}"', from=5-1, to=5-3]
+        \end{tikzcd}
+    \end{center}
+    
+    Isto nos dá o morfismo que completa o quadrado no diagrama acima:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsOCxbMCwxLCJ4Il0sWzAsMywieSJdLFsyLDEsIlxcbGltIEYiXSxbMiwzLCJcXGxpbSBGJyJdLFszLDAsIkYoYSkiXSxbMywxLCJGKGIpIl0sWzMsMywiRicoYSkiXSxbMyw0LCJGJyhiKSJdLFswLDEsImkiLDJdLFswLDIsImYiXSxbMSwzLCJnIiwyXSxbNCw1LCJGKFxcYWxwaGEpIl0sWzYsNywiRicoXFxhbHBoYSkiXSxbMiw0LCJwX2EiXSxbMiw1LCJwX2IiLDJdLFszLDYsInAnX2EiXSxbMyw3LCJwJ19iIiwyXSxbMiwzLCJcXGV4aXN0cyAhayIsMV1d
+        \begin{tikzcd}
+        	&&& {F(a)} \\
+        	x && {\lim F} & {F(b)} \\
+        	\\
+        	y && {\lim F'} & {F'(a)} \\
+        	&&& {F'(b)}
+        	\arrow["{F(\alpha)}", from=1-4, to=2-4]
+        	\arrow["f", from=2-1, to=2-3]
+        	\arrow["i"', from=2-1, to=4-1]
+        	\arrow["{p_a}", from=2-3, to=1-4]
+        	\arrow["{p_b}"', from=2-3, to=2-4]
+        	\arrow["{\exists !k}"{description}, from=2-3, to=4-3]
+        	\arrow["g"', from=4-1, to=4-3]
+        	\arrow["{p'_a}", from=4-3, to=4-4]
+        	\arrow["{p'_b}"', from=4-3, to=5-4]
+        	\arrow["{F'(\alpha)}", from=4-4, to=5-4]
+        \end{tikzcd}
+    \end{center}
+
+    Agora resta provar que existe um $h \colon y \to \lim F$ que faz todo o diagrama comutar e,
+    para isso, precisaremos usar a propriedade de levantamento dos $\eta_a$. Considere, então, o
+    seguinte diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJ4Il0sWzIsMCwiRihhKSJdLFswLDIsInkiXSxbMiwyLCJGJyhhKSJdLFswLDIsImkiLDJdLFswLDEsInBfYSBcXGNpcmMgZiJdLFsyLDMsInAnX2EgXFxjaXJjIGciLDJdLFsxLDMsIlxcZXRhX2EiXSxbMiwxLCJcXGV4aXN0cyBsX2EiLDFdXQ==
+        \begin{tikzcd}
+        	x && {F(a)} \\
+        	\\
+        	y && {F'(a)}
+        	\arrow["{p_a \circ f}", from=1-1, to=1-3]
+        	\arrow["i"', from=1-1, to=3-1]
+        	\arrow["{\eta_a}", from=1-3, to=3-3]
+        	\arrow["{\exists l_a}"{description}, from=3-1, to=1-3]
+        	\arrow["{p'_a \circ g}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Pela propriedade de levantamento de $\eta_a$, existe esse levantamento $l_a$ que faz com que o
+    diagrama acima comute. Da mesma forma, podemos obter um levantamento $l_b$ para $\eta_b$.
+    Repare que o seguinte cone comuta
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMSwwLCJ5Il0sWzAsMiwiRihhKSJdLFsyLDIsIkYoYikiXSxbMCwxLCJsX2EiLDJdLFswLDIsImxfYiJdLFsxLDIsIkYoXFxhbHBoYSkiLDJdXQ==
+        \begin{tikzcd}
+        	& y & \\
+        	\\
+        	{F(a)} && {F(b)}
+        	\arrow["{l_a}"', from=1-2, to=3-1]
+        	\arrow["{l_b}", from=1-2, to=3-3]
+        	\arrow["{F(\alpha)}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    \begin{align*}
+        l_a \circ i &= p_a \circ f
+    \end{align*}
+    \begin{align*}
+        F(\alpha) \circ l_a \circ i &= F(\alpha) \circ p_a \circ f \\
+                                    &= p_b \circ f \\
+                                    &= l_b \circ i
+    \end{align*}
+\end{proof}
+
+\section{Encoding em outras categorias}
+
+Tendo uma definição de encoding para funtores, dado qualquer funtor $F$ com codomínio $\Cat$,
+podemos extender nossa definição de encoding de uma forma simples. Isso nos permitirá ver como essa
+definição de encoding se comporta em outras categorias:
+
+\begin{definition}\mylabel{F_encoding}
+    Seja $F \colon \C \to \Cat$ um funtor de uma categoria $\C$ até $\Cat$. Um morfismo
+    $f \colon a \to b$ de $\C$ é dito um \textbf{$F$-encoding} se, e somente se, $F(f)$ é um
+    encoding.
+\end{definition}
+
+\begin{example}\mylabel{F_encoding_poset}
+    Considere o funtor $F \colon \Poset \hookrightarrow \Cat$ que leva um conjunto parcialmente
+    ordenado $(X, \leq_X)$ em uma categoria em que os morfismos são pares ordenados de pontos de
+    $X$ que pertencem à ordem, isto é,
+
+    \begin{equation*}
+        x \leq y \hspace{5pt} \iff \hspace{5pt} \exists! l \colon x \to y
+    \end{equation*}
+
+    Nesse caso, considere que $f \colon (X, \leq_X) \to (Y, \leq_Y)$ seja um homomorfismo de
+    conjuntos parcialmente ordenados. O que significa dizer que $f$ é $F$-encoding?
+
+    (Sobrejetor). Sobre os pontos, isso significa que $f$ é sobrejetor sobre os pontos de $Y$. Além
+    disso, por $f$ ser sobrejetor sobre os morfismos, temos que, se $y_1, y_2 \in Y$ são tais que
+    $y_1 \leq y_2$, então existem $x_1, x_2 \in X$, com $x_1 \leq x_2$ tais que $y_1 = f(x_1)$ e
+    $y_2 = f(x_2)$. Mais do que isso, como veremos a seguir.
+
+    (Propriedade de levantamento). $F(f)$ ter a propriedade de levantamento significa que,
+    $x_2 \in X$ e existe $y_1 \in Y$ tal que $y_1 \leq f(x_2)$, então existe um $x_1 \leq x_2$ tal
+    que $f(x_1) = y_1$.
+
+    (Conservativo). Os únicos isomorfismos nas categorias geradas por posets são as identidades. De
+    fato, se $x_1 \leq x_2$ é um iso, então existe a inversa $x_2 \leq x_1$, que, da antissimetria,
+    temos que $x_1 = x_2$. Logo, ser conservativo significa que $F(f)$ reflete identidades, ou
+    seja, se quaisquer dois pontos comparáveis $x_1 \leq x_2$ forem levados ao mesmo $y \in Y$,
+    então $x_1 = x_2$, porque o morfismo entre os dois será levado na identidade $\id{y}$.
+\end{example}
+
+\begin{example}\mylabel{F_encoding_top}
+    Considere o funtor $\Pi_1 \colon \Top \to \Groupoid$ que leva um espaço topológico em seu
+    grupóide de homotopia, isto é, um grupóide em que os pontos são os pontos do espaço topológico
+    e as setas entre dois pontos $x, y$ são as classes de homotopia dos caminhos entre $x$ e $y$.
+    Componha esse $\Pi_1$ com o funtor de esquecimento $U \colon \Groupoid \hookrightarrow \Cat$
+    que esquece a operação de inversão. Agora suponha que $h \colon X \to Y$ seja um seja um
+    $(U \circ \Pi_1)$-encoding. O que isso significa?
+
+    (Sobrejetor). Sobre os pontos, isso significa que $h$ é sobrejetor sobre $Y$. Sobre as flechas,
+    significa que todo caminho de $Y$ entre dois pontos $y_1, y_2 \in Y$ é homotópicamente
+    equivalente a um caminho $x_1 \leadsto x_2$ em $X$. Isso quer dizer, por exemplo, que a
+    seguinte situação não pode acontecer:
+
+    \TODO{Inserir diagrama com dois abertos separados sendo juntados em um}
+
+    \TODO{terminar exemplo com Top to Cat}
+\end{example}
+
+\begin{example}\mylabel{F_encoding_comma}
+    Considere o funtor $S \colon \Graph \to \Cat$ que leva cada grafo $H$ em sua slice category 
+    $\Graph / H$ e cada morfismo de grafos $h \colon A \to B$ é levado no funtor que compõe com $h$
+    à esquerda:
+
+    % https://q.uiver.app/#q=WzAsNSxbMCwwLCJBIl0sWzAsMiwiQiJdLFsxLDEsIlxcTG9uZ3JpZ2h0YXJyb3ciXSxbMiwwLCJcXEdyYXBoL0EiXSxbMiwyLCJcXEdyYXBoL0IiXSxbMCwxLCJmIiwyXSxbMyw0LCJcXF8gXFxjaXJjIGYiXV0=
+    \[\begin{tikzcd}
+        A && {\Graph/A} \\
+        & \implies[S] \\
+        B && {\Graph/B}
+        \arrow["h"', from=1-1, to=3-1]
+        \arrow["{h \circ \_}", from=1-3, to=3-3]
+    \end{tikzcd}\]
+
+    Vejamos o que significa ser um $S$-encoding.
+
+    Suponha que $h \colon A \to B$, um homomorfismo de grafos, seja um $S$-encoding. Isso significa
+    que $S(h) = h \circ \_$ é um funtor sobrejetor, conservativo, e com a propriedade de
+    levantamento. Vejamos o que cada um significa nesse contexto.
+
+    Primeiramente, vamos dissecar o que $S(h)$ faz. $S(h)$ leva um diagrama comutativo como o
+    abaixo terminando em $A$ até um terminando em $B$
+
+    % https://q.uiver.app/#q=WzAsNyxbMSwyLCJBIl0sWzAsMCwiWCJdLFsyLDAsIlkiXSxbNCwxLCJcXGltcGxpZXNbUyhoKV0iXSxbNiwwLCJYIl0sWzgsMCwiWSJdLFs3LDIsIkIiXSxbMSwyLCJmIl0sWzEsMCwiXFxwaV9YIiwyXSxbMiwwLCJcXHBpX1kiXSxbNCw2LCJoIFxcY2lyYyBcXHBpX1giLDJdLFs1LDYsImggXFxjaXJjIFxccGlfWSJdLFs0LDUsImYiXV0=
+    \[\begin{tikzcd}
+        X && Y &&&& X && Y \\
+        &&&& {\implies[S(h)]} \\
+        & A &&&&&& B
+        \arrow["f", from=1-1, to=1-3]
+        \arrow["{\pi_X}"', from=1-1, to=3-2]
+        \arrow["{\pi_Y}", from=1-3, to=3-2]
+        \arrow["{S(h)(f) = f}", from=1-7, to=1-9]
+        \arrow["{h \circ \pi_X}"', from=1-7, to=3-8]
+        \arrow["{h \circ \pi_Y}", from=1-9, to=3-8]
+    \end{tikzcd}\]
+
+    Isso estando estabelecido, observemos cada uma de suas propriedades e o que elas implicam nesse
+    contexto.
+
+    (Sobrejetor). $S(h)$ deve ser sobrejetor sobre ambas as flechas e os objetos de $\Graph / B$.
+    Sobre os objetos, que são morfismos até $B$, isso significa que todo morfismo
+    $g \colon X \to B$ pode ser decomposto com $h$ à esquerda, isto é, sempre existe $k$ tal que o
+    diagrama abaixo comuta
+
+    % https://q.uiver.app/#q=WzAsMyxbMCwyLCJYIl0sWzIsMiwiQiJdLFsyLDAsIkEiXSxbMiwxLCJoIl0sWzAsMSwiXFxmb3JhbGwgZyIsMl0sWzAsMiwiXFxleGlzdHMgayIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dXQ==
+    \[\begin{tikzcd}
+        && A \\
+        \\
+        X && B
+        \arrow["h", from=1-3, to=3-3]
+        \arrow["{\exists k}", dashed, from=3-1, to=1-3]
+        \arrow["{\forall g}"', from=3-1, to=3-3]
+    \end{tikzcd}\]
+
+    Em particular, se $g = \id{B}$, temos que existe um $k \in \Hom[\Graph]{B}{A}$ tal que
+
+    \begin{equation*}
+        \id{B} = h \circ k
+    \end{equation*}
+    
+    Ou seja, $h$ tem um inverso a direita. Por \cite{awodey}, isso significa que $h$ é epi. Mais do
+    que isso, $h$ é chamado de um \textit{split epimorphism}, ou uma retração.
+
+    O fato de que $S(h)$ é sobrejetor não implica em nada, porque, dado que todo morfismo até $B$
+    tem fatoração com $h$ à esquerda, qualquer morfismo entre dois elementos de $\Graph/B$ já é um
+    morfismo entre elementos de $\Graph/A$, porque $S(h)$ aplicado a um morfismo devolve o próprio
+    morfismo.
+
+    (Propriedade de levantamento). Assim como estabelecido logo acima, essa propriedade não implica
+    nada, porque um morfismo dem $\Graph/B$ já é um morfismo em $\Graph/A$.
+
+    (Conservativo). Novamente, isso não significa nada além do que já mostramos, dado que $S(h)$
+    não altera os morfismos.
+
+    \TODO{fazer com grafos pequenos}
+\end{example}
 
 \TODO{exemplo com comma category}
 \TODO{se a conta sair trivial, olhar lema do Yoneda}
@@ -2145,7 +4084,6 @@ seguir:
 \chapter*{TODOs}
     \PrintTODOs
 
-\chapter*{Bibliografia}
-    \printbibliography
+\printbibliography
 
 \end{document}
