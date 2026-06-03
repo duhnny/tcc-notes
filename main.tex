@@ -197,7 +197,7 @@
     Munidos do conhecimento de que o nosso objeto de estudo é uma categoria, podemos também definir
     um produto, que nos será muito útil mais afrente.
 
-    \begin{definition}\mylabel{product}
+    \begin{definition}
         Sejam $A, B \in \Graph$ grafos. Definimos então o grafo produto $A \times B$ como sendo o
         grafo com vértices $\Ver{A} \times \Ver{B}$ e em que, se $(a, b)$ e $(a', b')$ são
         dois vértices de $A \times B$, há uma aresta entre os dois se, e somente se,
@@ -1174,7 +1174,7 @@ classes de morfismos justamente por essa propriedade:
 
     \textit{Dualmente}, um morfismo $e \colon x \to y$ é dito um \textbf{epimorfismo} ou um
     \textbf{morfismo cancelável à direita} se, e somente se, para todo par de morfismos
-    $\beta, \beta' y \to z$, se $\beta \circ e = \beta' \circ e$, então $\beta = \beta'$.
+    $\beta, \beta' \colon y \to z$, se $\beta \circ e = \beta' \circ e$, então $\beta = \beta'$.
     Escrevemos, então, $e \colon x \epi y$.
 \end{definition}
 
@@ -1427,10 +1427,27 @@ identidade é, de fato uma transformação natural -- porque o seguinte diagrama
 \end{center}
 --, garante que o que foi definido acima tem, de fato, estrutura de categoria.
 
-\TODO{dar exemplo de transformação natural}
+\begin{example}\mylabel{topos}
+    Um exemplo importantíssimo de categorias de funtores são as categorias de funtores em $\Set$.
+    Por conta de algumas "boas propriedades" que a categoria $\Set$ tem, categorias desse tipo
+    também a possuem. Descreveremos algumas delas a seguir.
 
-Mais uma construção sobre categorias será necessária antes de definirmos limites e colimites, e é
-a seguinte:
+    Seja $\I$ uma categoria qualquer. Considere, então, a categoria $\C \defeq \Set^\I$.
+
+    (i) Os monomorfismos em $\C$ são famílias de funções injetoras. Com efeito, sejam
+    $F, F', F'' \colon \I \to \C$ três funtores e $f, g \colon F \Rightarrow F'$ e
+    $h \colon F \Rightarrow F'$ transformações naturais. Pela definição de transfromação natural,
+    $f$, $g$ e $h$ são famílias $(f_i)_{i \in \Obj{\I}}$ indexada pelos objetos de $\I$ de
+    morfismos em $\Set$, ou seja, de funções. Suponha que $h$ seja um monomorfismo em $\C$. Então,
+    se $h \circ f = h \circ g$, teremos que $f = g$. Mas $h \circ f$ é a família
+    $(h_i \circ f_i)_{i \in \Obj{\I}}$, e duas famílias dessa forma são iguais se, e somente se,
+    todas as suas componentes são iguais.
+
+    \TODO{terminar propriedades de topos}
+\end{example}
+
+Mais uma construção sobre categorias será necessária antes de definirmos limites e colimites. É a
+seguinte:
 
 \begin{definition}
     Seja $\C$ uma categoria e $c$ um objeto de 
@@ -1566,9 +1583,126 @@ Bom, com isso em mente, podemos finalmente definir o que são limites e colimite
 
 Como tanto o limite quanto o colimite são objetos terminal e inicial, respectivamente, sabemos que
 estão definidos a menos de isomorfismo. Isso implica que também os objetos que formam o vértice do
-cone também estão definidos a menos de isomorfismo.
+cone também estão definidos a menos de isomorfismo. Sendo assim, quando não nos importamos
+precisamente com a natureza do objeto em questão, denotaremos por $\lim D$ o vértice do limite do
+diagrama $D$. Semelhantemente, $\colim D$ será o vértice do colimite de $D$.
 
-\chapter{Preliminares}\label{graph_theory}
+Bom, isso nos dá abertura para tratar de três estruturas muito importantes na Teoria de Categorias:
+o produto, o equalizador e o pullback, bem como os seus duais.
+
+\begin{definition}\mylabel{product}
+    Seja $\C$ uma categoria e $\I$ uma categoria discreta. Seja, ademais, $D \colon \I \to \C$ um
+    diagrama de tipo $\I$ em $\C$. O \textbf{produto} da família de objetos de $\C$,
+    $(x_i)_{i \in \Obj{\I}}$, é o limite do diagrama $D$, denotado como
+
+    \begin{equation*}
+        \left( \prod_{i \in \Obj{\I}} x_i, (\pi_i)_{i \in \Obj{\I}} \right)
+    \end{equation*}
+
+    À família de flechas de $(\pi_i)_{i \in \Obj{\I}}$, chamamos de \textbf{projeções}.
+
+    Dualmente, o \textbf{coproduto} é o colimite de $D$, denotado:
+
+    \begin{equation*}
+        \left( \coprod_{i \in \Obj{\I}} x_i, (\iota)_{i \in \Obj{\I}} \right)
+    \end{equation*}
+    e chamamos a família $(\iota_i)_{i \in \Obj{\I}}$ de \textbf{injeções}.
+\end{definition}
+
+É comúm nos referirmos ao objeto $\prod_i x_i$ como o produto por abuso de linugagem, mas esteja
+claro que sempre que nos referirmos a um produto categórico, também estamos nos referindo,
+implícita ou explicitamente, à família de flechas que o acompanha.
+
+Repare, além disso, que, como exigimos que $\I$ seja discreta, não existe nenhum morfismo
+$f \colon i \to j$ como na \myref[Definição]{cone+cocone} que crie uma condição como naquele
+diagrama para que o cone comute. Isso quer dizer que qualquer objeto de $\C$ mais uma família de
+flechas para cada $D(i)$, com $i \in \Obj{\I}$, já nos dá um cone comutativo em $\Cone{D}$. Em
+outras palavras, isso quer dizer que, para qualquer objeto $y$ e família de morfismos
+$f_i \colon y \to x_i$, existe um único morfismo $f \colon y \to \prod_i x_i$ tal que o seguinte
+diagrama comute para todo $i \in \Obj{\I}$.
+
+\begin{center}
+    % https://q.uiver.app/#q=WzAsMyxbMCwwLCJ5Il0sWzIsMCwiXFxwcm9kX3tqIFxcaW4gXFxPYmp7XFxJfX0geF9qIl0sWzIsMiwieF9pIl0sWzAsMSwiZiJdLFsxLDIsIlxccGlfaSJdLFswLDIsImZfaSIsMl1d
+    \begin{tikzcd}
+    	y && {\prod_{j \in \Obj{\I}} x_j} \\
+    	\\
+    	&& {x_i}
+    	\arrow["f", from=1-1, to=1-3]
+    	\arrow["{f_i}"', from=1-1, to=3-3]
+    	\arrow["{\pi_i}", from=1-3, to=3-3]
+    \end{tikzcd}
+\end{center}
+
+E semelhantemente para o colimite de uma família. Vejamos um exemplo mais familiar:
+
+\begin{example}\mylabel{limit+colimit_in_set}
+    Em $\Set$, os produtos categóricos são o produtos cartesianos, e os coprodutos são uniões
+    disjuntas.
+
+    Com efeito, seja $\I$ uma categoria discreta e seja $D \colon \I \to \Set$ um funtor que nos dá
+    uma família $(x_i)_{i \in \Obj{\I}}$ de conjuntos. Suponha, também que se tenha um conjunto $y$
+    e uma famlília de funções $(f_i)_{i \in \Obj{\I}}$ tal que cada $f_i \colon y \to x_i$.
+
+    Tome ainda o produto cartesiano
+
+    \begin{equation*}
+        \prod_{i \in \Obj{\I}} x_i \defeq \left\{x \in \left( \bigcup_i x_i \right)^{\Obj{\I}}
+            \colon x(i) \in x_i, \hspace{5pt} \forall i\right\}
+    \end{equation*}
+    que é um conjunto de funções de $\Obj{\I}$ em cada $x_i$, com suas projeções canônicas
+
+    \begin{align*}
+        \pi_i \colon \prod_j x_j &\to     x_i \\
+                             x   &\mapsto x(i)
+    \end{align*}
+
+    Temos, então, uma função $f \colon y \to \prod_i x_i$ que, a cada $y_1 \in y$, nos devolve a
+    função:
+
+    \begin{align*}
+        f(y_1) \colon \Obj{\I} &\to     \bigcup x_j \\
+                             i &\mapsto f_i(y_1)
+    \end{align*}
+
+    É claro, por construção, que $f$ faz o diagrama com as projeções comutarem. Além disso, se
+    alguma função $f'$ fizer esse diagrama comutar também, então terá que ser igual a $f$ em todos
+    os pontos de $y$ e, logo, $f$ é única.
+
+    Sendo assim, o produto cartesiano como definido acima é, a menos de isomorfismo, que no caso
+    dos conjuntos é bijeção, o produto categórico de $\Set$.
+
+    Por outro lado, considere a união disjunta de $(x_i)$:
+
+    \begin{equation*}
+        \bigsqcup_{i \in \Obj{\I}} x_i \defeq
+            \left\{ (i, x) \colon i \in \Obj{\I} \logicalAnd x \in x_i \right\}
+    \end{equation*}
+    junto com as injeções canônicas
+
+    \begin{align*}
+        \iota_i \colon x_i &\to \bigsqcup_j x_j \\
+                       x   &\mapsto (i, x)
+    \end{align*}
+
+    Tome, agora, um objeto $y$ e uma família de funções $f_i \colon x_i \to y$. Então existe uma
+    única função $f$:
+
+    \begin{align*}
+        f \colon \bigsqcup_j x_j &\to     y \\
+                          (i, x) &\mapsto f_i(x)
+    \end{align*}
+    tal que $f \circ \iota_i = f_i$.
+
+    Novamente, é fácil de ver que o diagrama comuta, e, se qualquer outra função $f'$ fizesse o
+    mesmo papel, seria igual à $f$ em todo ponto da união disjunta. Logo, a união disjunta é o
+    coproduto de $\Set$.
+\end{example}
+
+\TODO{explicar equalizador}
+\TODO{explicar pullback}
+\TODO{lema: produto+equalizador=pullback}
+
+\chapter{Sobre os grafos}\label{graph_theory}
 
 Nesta seção trataremos das definições e resultados preliminares de que precisaremos para
 desenvolver a teoria. Trataremos de algumas bases da Teoria de Grafos e definiremos a noção de
@@ -2045,9 +2179,107 @@ esses grafos e os grafos completos que trataremos no capítulo \ref{fellows_resu
 
 \section{Operações entre grafos}
 
-Há diversas operações possíveis entre grafos na literatura.
+Há diversas operações possíveis entre grafos na literatura. Trataremos de dois deles, que usaremos
+ao longo do texto: o produto caixa e o produto tensorial.
+
+\begin{definition}\mylabel{graph_tensor_product}
+    Sejam $A, B \in \Obj{\Graph}$ dois grafos.
+\end{definition}
 
 \section{Sobre grafos acíclicos}
+
+Nesta seção, seguiremos alguns resultados simples de \autocite{digraphs}.
+
+Já vimos, anteriormente o que são os ciclos $C_n$. Disso podemos tirar a seguinte definição:
+
+\begin{definition}\mylabel{acyclic}
+    Um grafo $G$ é dito \textbf{acíclico} se não existe $f \colon C_n \mono G$ para todo
+    $n \in \N$, $n \geq 1$.
+\end{definition}
+
+Em outras palavras, isso quer dizer que não existe nenhum caminho $\gamma \colon g_1 \leadsto g_n$
+em $G$ tal que $g_1 = g_n$.
+
+Grafos desse tipo nos serão importantes, porque, como veremos no capítulo \ref{fellows_results},
+eles nos servem de modelo para uma computação paralela feita ao longo do tempo, e, nesse caso, não
+podemos ter informações voltando no tempo.
+
+É conveniente pensar nos grafos acíclicos como grafos em que as arestas vão somente em uma direção:
+
+\begin{center}
+    % https://q.uiver.app/#q=WzAsOSxbMCwxLCJcXGJ1bGxldCJdLFswLDIsIlxcYnVsbGV0Il0sWzIsMCwiXFxidWxsZXQiXSxbMiwzLCJcXGJ1bGxldCJdLFsyLDIsIlxcYnVsbGV0Il0sWzIsMSwiXFxidWxsZXQiXSxbNCwxLCJcXGJ1bGxldCJdLFs0LDAsIlxcYnVsbGV0Il0sWzQsMiwiXFxidWxsZXQiXSxbMCwyXSxbMCw1XSxbMCw0XSxbMSw0XSxbMSwzXSxbNCw2XSxbNSw2XSxbMyw2XSxbMiw4XSxbMiw3XSxbMiw2XSxbNywyLCJcXHRpbWVzIiwzLHsib2Zmc2V0IjoyLCJjdXJ2ZSI6NCwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV1d
+    \begin{tikzcd}
+    	&& \bullet && \bullet \\
+    	\bullet && \bullet && \bullet \\
+    	\bullet && \bullet && \bullet \\
+    	&& \bullet
+    	\arrow[from=1-3, to=1-5]
+    	\arrow[from=1-3, to=2-5]
+    	\arrow[from=1-3, to=3-5]
+    	\arrow["\times"{marking, allow upside down}, shift right=2, curve={height=24pt}, dashed, from=1-5, to=1-3]
+    	\arrow[from=2-1, to=1-3]
+    	\arrow[from=2-1, to=2-3]
+    	\arrow[from=2-1, to=3-3]
+    	\arrow[from=2-3, to=2-5]
+    	\arrow[from=3-1, to=3-3]
+    	\arrow[from=3-1, to=4-3]
+    	\arrow[from=3-3, to=2-5]
+    	\arrow[from=4-3, to=2-5]
+    \end{tikzcd}
+\end{center}
+em que a seta pontilhada, que "volta na direção contrária", não pode existir, porque criaria um
+ciclo.
+
+Intuitivamente, isso nos mostra que grafos assim deveriam, então, ter um "início" e um "fim", assim
+como computações na vida real, que devem ter um início, com as entradas, e um fim, com o resultado
+da computação. Convém formalizar essa noção.
+
+\begin{definition}\mylabel{degree}
+    Seja $G$ um grafo e $v \in \Ver{G}$ um de seus vértices. O \textbf{grau de entrada} de $v$,
+    denotado $\deg^-(v)$, é o número de arestas que terminam em $v$, isto é
+
+    \begin{equation*}
+        \deg^-(v) \defeq \card{\{\alpha \in \Edg{G} \colon t(\alpha) = v\}}
+    \end{equation*}
+
+    Semelhantemente, o \textbf{grau de saída} de $v$ é o número de arestas que iniciam em $v$:
+
+    \begin{equation*}
+        \deg^+(v) \defeq \card{\{\alpha \in \Edg{G} \colon s(\alpha) = v\}}
+    \end{equation*}
+\end{definition}
+
+Nessa linguagem, o "início" e "final" do grafo são, respectivamente, pontos com grau de entrada ou
+saída igual a 0.
+
+\begin{lemma}
+    Seja $G$ um grafo finito, acíclico e não vazio. Então $G$ têm vértices com grau de entrada
+    nulo, e vértices com grau de saída nulo.
+\end{lemma}
+
+\begin{proof}
+    Suponha que todos os vértices de $G$, um grafo finito, tenham grau de saída positivo. Pegue um
+    vértice qualquer $v_0 \in \Ver{G}$. Então existe uma aresta $v_0 \edg[\alpha_0] v_1$. Como
+    $v_1$ também tem grau de saída positivo, siga por indução construindo a sequência infinita
+    $\gamma = (v_n)_{n \in \N}$. Como o grafo é finito, isso significa que a sequência tem
+    repetições. Tome os dois primeiros vértices que repetem $v_n = v_m$, com $m \geq n$. Então
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJ2X24iXSxbMSwwLCJ2X3tuKzF9Il0sWzIsMCwiXFxjZG90cyJdLFszLDAsInZfbSJdLFswLDEsIlxcYWxwaGFfbiJdLFsxLDIsIlxcYWxwaGFfe24rMX0iXSxbMiwzLCJcXGFscGhhX3ttLTF9Il1d
+        \begin{tikzcd}
+        	{v_n} & {v_{n+1}} & \cdots & {v_m}
+        	\arrow["{\alpha_n}", from=1-1, to=1-2]
+        	\arrow["{\alpha_{n+1}}", from=1-2, to=1-3]
+        	\arrow["{\alpha_{m-1}}", from=1-3, to=1-4]
+        \end{tikzcd}
+    \end{center}
+    é um ciclo.
+
+    A mesma prova acima serve para os vértices com grau de entrada nulo. Basta notar que graus de
+    saída de $G$ são graus de entrada em $\op{G}$, e que $C_n \cong \op{C_n}$.
+\end{proof}
+
+\TODO{definir grafo oposto}
 
 \begin{lemma}
     Sejam $G, H \in \Obj{\Graph}$ grafos. Se $G \encodes H$ e $H$ é uma multi-árvore, então $H$ é
@@ -2135,7 +2367,7 @@ sobre $\mu_r$.
 Para que isso aconteça, no entanto, utilizaremos a seguinte definição que faz a ponte entre os
 grupos e os grafos:
 
-\begin{definition}\mylabel{cayley}
+\begin{definition}
     Seja $G \in \Group$ um grupo e $S \subseteq G$ um subconjunto de $G$. Então o \textbf{grafo de
     Cayley} de $G$ no subconjunto $S$ é o grafo $\Cayley{G}{S}$ que tem como conjunto de vértices
     $G$ e tal que, se $a, b \in G$, existe uma aresta $a \to b$ em $\Cayley{G}{S}$ se, e somente
@@ -2992,7 +3224,7 @@ Por fim, podemos demonstrar o limite assintótico de $\mu_r$.
     \end{equation*}
 \end{theorem}
 
-\begin{proof}
+\begin{proof}\mylabel{r_assymptotic_limit}
     Fixe $\epsilon > 0$. Considere a diferença $\Delta(n, r) \defeq (n+1)^r - n^r$ entre a
     $n$-ésima $r$ potência e a sua sucessora. Pelo Teorema do Valor Médio aplicado à função
     $f(x) = x^r$, sabemos que a diferença
@@ -3104,7 +3336,7 @@ Primeiramente, entendamos como as computações são feitas em CPUs
 \end{definition}
 
 \begin{definition}
-    Um \textbf{diagrama de computação} é um grafo acíclico $G$ tal que
+    Um \textbf{diagrama de computação} é um grafo acíclico, finito e conexo $G$ tal que
     $\Ver{G} \subseteq \mathfrak{A}$ para alguma arquitetura $\mathfrak{A}$ de CPU.
 \end{definition}
 
@@ -3133,7 +3365,8 @@ Para isso, imagine o seguinte cenário, também de \cite{fellows}:
         	\arrow[from=3-3, to=5-3]
         \end{tikzcd}
     \end{center}
-    em que $id$ é a operação que apenas mantém a entrada.
+    em que as flechas indicam o fluxo de informação, isto é, de entradas e saídas das operações, e
+    $id$ é a operação que mantém a entrada.
 
     Digamos que queiramos realizar essa computação em um sistema com duas CPUs dispostas e ligadas
     da seguinte forma:
@@ -3146,6 +3379,8 @@ Para isso, imagine o seguinte cenário, também de \cite{fellows}:
         	\arrow[curve={height=-12pt}, from=1-3, to=1-1]
         \end{tikzcd}
     \end{center}
+    isto é, ligadas de forma que exista um caminho para a informação passar da CPU 1 para a CPU 2,
+    e vice versa.
 
     Podemos imaginar um grafo temporal discreto, em que as linhas simbolizam a transmissão de
     informação de uma CPU para a outra no próximo instante de tempo.
@@ -3203,6 +3438,316 @@ Para isso, imagine o seguinte cenário, também de \cite{fellows}:
 
     Ou seja, dado o diagrama acima, existe uma atribuição possível de operações para cada CPU em
     cada instante de tempo tal que é possível computar a expressão desejada.
+\end{example}
+
+Repare que, para que tenhamos o resultado, precisamos que a seguinte condição seja satisfeita: que
+as operações no último nível do diagrama de computação sejam executadas com as entradas corretas,
+isto é, que os resultados anteriores estejam corretamente computados, e que haja um caminho para a
+informação dos passos anteriores chegue às CPUs corretas que realizarão as operações no último
+nível. Mas, para que essas entradas estejam corretamente computadas, é necessário que as mesmas
+condições sejam satisfeitas para o nível anterior, e assim sucessivamente.
+
+Por indução finita, precisamos, então, que todas as operações (em todos os níveis) sejam
+executadas, e que haja um caminho que conecte a CPU que fez a operação no nível anterior para a CPU
+que vai fazer a próxima operação que dependa da anterior em todos os passos. Em outras palavras,
+precisamos que o grafo acima, que indica os caminhos de informação entre as CPUs, \textit{encode} o
+grafo de computação. Vamos formalizar isso.
+
+\begin{definition}
+    Seja $G$ um grafo. O \textbf{grafo temporal} de $G$ é o grafo, denotado $\temp{G}$, é o grafo:
+
+    \begin{equation*}
+        \temp{G} \defeq G \times L^\rightarrow_\omega
+    \end{equation*}
+    em que $L^\rightarrow_\omega$ é o seguinte grafo:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCIwIl0sWzIsMCwiMSJdLFs0LDAsIjIiXSxbNiwwLCJcXGNkb3RzIl0sWzAsMV0sWzEsMl0sWzIsM11d
+        \begin{tikzcd}
+        	0 && 1 && 2 && \cdots
+        	\arrow[from=1-1, to=1-3]
+        	\arrow[from=1-3, to=1-5]
+        	\arrow[from=1-5, to=1-7]
+        \end{tikzcd}
+    \end{center}
+\end{definition}
+
+Isto nos dá um grafo em que os vértices são pares $(t, v)$, em que $t$ é um instante de tempo e $v$
+um vértice de $G$, e cujas arestas são entre pares $(t, v), (t+1, v')$, em que há uma aresta
+$v \to v'$ em $G$.
+
+Se $G$ representa, então, como as CPUs estão ligadas entre si e os possíveis caminhos de
+transmissão de informação, $\temp{G}$ representa o fluxo de informação nessa disposição ao longo do
+tempo.
+
+\begin{definition}
+    Seja $D$ um diagrama de computação. Dizemos que $D$ pode ser \textbf{assinalado} a um grafo $G$
+    se, e somente se, $\temp{G} \encodes D$.
+\end{definition}
+
+Podemos, então, justificar o uso do termo simulação:
+
+\begin{lemma}
+    Se $A, B$ são dois grafos tais que $A \encodes B$, então $\temp{A} \encodes \temp{B}$
+\end{lemma}
+
+\begin{proof}
+    Provaremos que produtos preservam o enconding em um contexto mais geral no
+    \myref[teorema]{prod_preserves_lp}.
+\end{proof}
+
+\begin{corollary}
+    Se um diagrama de computação $D$ pode ser assinalado a um grafo $B$ e $A \encodes B$, então $D$
+    pode ser assinalado a $A$.
+\end{corollary}
+
+\begin{proof}
+    Basta compor os encodings $A \encodes B \encodes D$.
+\end{proof}
+
+Assim sendo, algo que pode ser computado através de um diagrama de computação $D$ em uma rede de
+CPUs disposta em um grafo $B$, pode ser computado também em $A$, se $A \encodes B$. Isso significa
+que podemos "simular", nesse sentido, a primeira rede de CPUs na segunda.
+
+Outra estratégia para resolver o mesmo problema é conhecida como \textit{graph embedding}, que será
+descrita a seguir\footnote{A definição que usaremos é uma generalização de \autocite{embedding}
+para os multi-digrafos que estamos usando.}:
+
+\begin{definition}\mylabel{embedding}
+    Sejam $G, H$ grafos. Um \textbf{embedding} de $H$ em $G$ é um monomorfismo
+    $F \colon \Free(H) \mono \Free(G)$ em $\Cat$.
+\end{definition}
+
+Como os objetos de $\Free(G)$ e $\Free(H)$ são os vértices desses grafos, e como um funtor em uma
+categoria livre é determinado por sua ação nos geradores, a definição acima nos dá um funtor que
+leva as arestas de $H$ (geradores de $\Free(H)$) em caminhos em $G$ (morfismos em $\Free(G)$). Isso
+significa que arestas de $H$ de comprimento $1$ podem acabar sendo mapeadas para caminhos em $G$ de
+comprimento maior.
+
+Isso motiva a seguinte definição:
+
+\begin{definition}
+    Sejam $G, H$ grafos e $F \colon \Free(H) \to \Free(G)$ um embedding. Seu \textbf{custo de
+    expansão}, denotado $\cost{F}$, é definido da seguinte forma:
+
+    \begin{equation*}
+        \cost{F} \defeq \max_{\alpha \in \Edg{H}}
+            \left( \min_{\gamma \in F^{-1}[\tilde\alpha]} \len{\gamma} \right)
+    \end{equation*}
+    em que $\tilde\alpha$ é o caminho de comprimento $1$ correspondente à aresta $\alpha$ em $H$.
+\end{definition}
+
+\TODO{definir caminhos e comprimento}
+
+Isto posto, nossa noção de encoding é uma generalização da noção de embedding da seguinte forma:
+
+\begin{proposition}\mylabel{encoding_geq_embedding}
+    Sejam $G, H$ dois grafos finitos. Então as seguintes condições são equivalentes:
+
+    \begin{enumerate}
+        \item[(i)]   Há um embedding de $H$ em $G$ com custo de expansão $r$;
+        \item[(ii)]  $G^{(r)}$ tem um subgrafo isomorfo a $H$;
+        \item[(iii)] Existe um encoding injetor de $G^{(r)}$ em $H$.
+    \end{enumerate}
+\end{proposition}
+
+\begin{proof}
+    (i $\Rightarrow$ ii) Se há um embedding $F$ de $H$ em $G$ com custo de expansão $r$, então,
+    para toda aresta $\alpha$ de $H$ (ou gerador $\tilde\alpha$ de $\Free(H)$) existe há um caminho
+    $\gamma$ de comprimento menor ou igual a $r$ tal que $F(\tilde\alpha) = \gamma$. Logo,
+    $\gamma \in \Edg{G^{(r)}}$. Sendo assim, $F$ restrita aos geradores nos dá uma morfismo $f$ de
+    $H$ em $G^{(r)}$, um monomorfismo. Logo, a imagem de $f$ é isomorfa a $H$.
+
+    (ii $\Rightarrow$ iii) Seja $f \colon H \to H'$, com $H' \hookrightarrow G^{(r)}$, o tal
+    isomorfismo, e $g$ sua inversa. Então, como $g$ é epimorfismo por \myref{section_is_mono}, $g$
+    é sobrejetora. Além disso, $g$ tem a propriedade de levantamento porque, se $x \in \Ver{H'}$ e
+    $y \edg[\alpha] g(x)$ é uma aresta de $H$, $f(\alpha)$ é um levantamendo de $\alpha$. Por fim,
+    $g$ é injetora porque é mono.
+
+    (iii $\Rightarrow$ i) Se $G^{(r)} \encodes H$, existe um subgrafo $H'$ de $G$ e um encoding
+    total $g \colon H' \to H$. Como $g$ é injetora e sobrejetora, é isomorfismo. Sendo assim,
+    existe uma inversa $f \colon H \to H'$. Compondo $f$ com a inclusão, obtemos o resultado.
+\end{proof}
+
+A generalização, portanto, é que encodings não precisam ser injetores. E essa diferença nos dará
+encodings mais eficientes do que os conhecidos por meio do embedding. Para provar isso, no entanto,
+precisaremos passar por alguns resultados sobre embedding.
+
+\begin{proposition}[por \autocite{kleitman}]
+    Seja $X \subseteq \Ver{Q_m}$ um subconjunto dos vértices de $Q_m$ com diâmetro menor ou igual a
+    $2r$. Então
+
+    \begin{equation*}
+        \card{X} \leq \sum_{i = 0}^r \binom{m}{i}
+    \end{equation*}
+\end{proposition}
+
+Isso nos dá o seguinte corolário:
+
+\begin{corollary}\mylabel{K_embedding_Q}
+    Se há um embedding de $K_n$ em $Q_m$ com custo de expansão menor ou igual a $2r$, então
+
+    \begin{equation*}
+        n \leq \sum_{i = 0}^r \binom{m}{i}
+    \end{equation*}
+\end{corollary}
+
+\begin{proof}
+    Se há um embedding de $K_n$ em $Q_m$ de custo $k \leq 2r$, então $K_n$ é isomorfo a um subgrafo
+    de $Q_m^{(k)}$. Como $Q_m^{(k)} \hookrightarrow Q_m^{(2r)}$ por definição, compondo as
+    injeções, temos que $K_n$ é isomorfo a um subgrafo de $Q_m^{(2r)}$.
+
+    Mas $K_n$ é completo. Logo, o subgrafo de $Q_m{(2r)}$ é completo. Mas isso só é possível se
+    todos os seus vértices têm distância entre si menor ou igual a $2r$ em $Q_m$. Logo, pelo visto
+    acima, e considerando que um isomorfismo é uma bijeção nos vértices, temos o resultado.
+\end{proof}
+
+Agora, fixe $r \in \N$. Pelo \myref[Teorema]{r_assymptotic_limit}, temos
+
+\begin{equation*}
+    \mu_r(n) \lesssim rn^{1/r}
+\end{equation*}
+assintóticamente.
+
+Seja, porém
+
+\begin{equation*}
+    \mu_r^\mono(n) \defeq \min \left\{
+        m \in \N \colon \exists f \colon Q_m^{(r)} \encodes K_n \logicalAnd \text{$f$ é mono}
+    \right\}
+\end{equation*}
+
+O corolário acima, nos diz que se $m$ está no conjunto acima, então precisamos que
+
+\begin{equation}\label{eq:bin_condition}
+    \sum_{i = 0}^{r/2} \binom{m}{i} \geq n
+\end{equation}
+
+Mas o primeiro termo é:
+
+\begin{align*}
+    \sum_{i = 0}^{r/2} \binom{m}{i} &= \frac{m!}{0!m!} + \frac{m!}{1!(m-1)!} + \frac{m!}{2!(m-2)!}
+        + \cdots + \frac{m!}{(r/2 - 1)!(m + 1 - r/2)!} + \frac{m!}{(r/2)!(m-r/2)!} \\
+                                    &= 1 + \frac{m}{1} + \frac{m \cdot (m-1)}{2} + \cdots
+        + \frac{m \cdot (m-1) \cdots (m - r/2 + 1)}{(r/2)!} \\
+                                    &= 1 + m + \cdots
+        + \frac{m \cdot (m-1) \cdots (m - r/2 + 1)}{(r/2)!} - \frac{m^{r/2}}{(r/2)!}
+        + \frac{m^{r/2}}{(r/2)!}
+\end{align*}
+
+Se olharmos para a diferença no meio, temos:
+
+\begin{align*}
+    \frac{m \cdot (m-1) \cdots (m - r/2 + 1)}{(r/2)!} - \frac{m^{\frac{r}{2}}}{(r/2)!} 
+        &= \frac{m \cdot \left( (m-1) \cdots (m - r/2 + 1) - m^{\frac{r}{2}-1} \right)}{(r/2)!} \\
+        &\leq \frac{m \cdot \left( (m-1)^{\frac{r}{2}-1} - m^{\frac{r}{2}-1} \right)}{(r/2)!} \\
+        &= \frac{
+            m \cdot \left( (m - 1 - m) \cdot \left(
+                    m^{\frac{r}{2} - 2} + m^{\frac{r}{2} - 3} (m - 1) + \cdots
+                    + m (m - 1)^{\frac{r}{2} - 3} + (m - 1)^{\frac{r}{2} - 2}
+            \right) \right)
+        }{
+            (r/2)!
+        } \\
+        &= \frac{
+            -m \cdot \left(
+                    m^{\frac{r}{2} - 2} + m^{\frac{r}{2} - 3} (m - 1) + \cdots
+                    + m (m - 1)^{\frac{r}{2} - 3} + (m - 1)^{\frac{r}{2} - 2}
+            \right)
+        }{
+            (r/2)!
+        }
+\end{align*}
+
+Distribuindo isso para os outros termos da soma na ordem contrária, teremos:
+
+\begin{align*}
+    \sum_{i = 0}^{r/2} \binom{m}{i}
+        &\leq \left( 1 - \frac{m   \cdot (m - 1)^{\frac{r}{2}-2}}{(r/2)!} \right) \\
+        &+    \left( m - \frac{m^2 \cdot (m - 1)^{\frac{r}{2}-3}}{(r/2)!} \right) \\
+        &+    \left( \frac{m \cdot (m-1)}{2!}
+            - \frac{m^3 \cdot (m - 1)^{\frac{r}{2}-4}}{(r/2)!} \right) \\
+        &\vdots \\
+        &+    \left( \frac{m \cdots (m - r/2 + 1)}{(r/2 - 1)!}
+        - \frac{m^{\frac{r}{2}-1}}{(r/2)!} \right) \\
+        &+ \frac{m^{\frac{r}{2}}}{(r/2)!}
+\end{align*}
+
+Agora, é claro que, para $m$ grande o suficiente, temos que todas as diferenças entre parêntesis
+acima dão negativas. Podemos garantir que $m$ seja grande o suficiente nesse caso, porque $r$ está
+fixado e escolhendo $n$. Logo,
+
+\begin{equation*}
+    \sum_{i = 0}^{r/2} \binom{m}{i} \leq \frac{m^{\frac{r}{2}}}{(r/2)!}
+\end{equation*}
+para $n$ grande o suficiente e qualquer $m$ que satisfaça $\eqref{eq:bin_condition}$.
+
+Agora, se $m$ satisfaz \eqref{eq:bin_condition}, então, em particular,
+
+\begin{equation*}
+    \frac{m^{\frac{r}{2}}}{(r/2)!} \geq n.
+\end{equation*}
+o que implica que
+
+\begin{equation*}
+    m \geq \left( n \left[ \frac{r}{2} \right)! \right]^{\frac{2}{r}}
+\end{equation*}
+
+Logo, assintóticamente, temos a seguinte inequação:
+
+\begin{equation*}
+    \mu_r^\mono(n) \gtrsim \left[ n \left( \frac{r}{2} \right)! \right]^{\frac{2}{r}}
+\end{equation*}
+
+Usando, então, a fórmula de Stirling (\autocite{combinatorics}), obtemos, assintóticamente:
+
+\begin{align*}
+    \frac{\mu_r^\mono(n)}{\mu_r(n)} &\gtrsim \frac{
+        n^{2/r} \cdot \left[
+            \sqrt{2 \pi \frac{r}{2}} \left(\frac{r}{2e}\right)^{r/2}
+        \right]^{2/r}
+    }{
+        r n^{1/r}
+    } \\
+        &= \frac{r}{2e} \cdot \frac{
+            n^{2/r} \left[ 2 \pi \frac{r}{2} \right]^{1/r}
+        }{
+            r n^{1/r}
+        } \\
+        &= \frac{r}{2e} \cdot \frac{
+            n^{2/r} \left[ \pi r \right]^{1/r}
+        }{
+            r n^{1/r}
+        } \\
+        &= \frac{\left( \pi r \right)^{1/r}}{2e} \cdot n^{1/r}
+\end{align*}
+
+Ou seja, pelo menos para números grandes, é de se esperar uma grande diferença de eficiência entre
+essas duas abordagens. Mas, acontece que essa diferença já está presente para alguns números
+pequenos.
+
+\begin{example}
+    Tome $Q_{10}^{(4)}$. Pelo \myref[Corolário]{K_embedding_Q}, se tivermos um embedding de $K_n$
+    em $Q_{10}$ com custo de espansão menor ou igual a $4$, então
+
+    \begin{align*}
+        n &\leq \sum_{i = 0}^{2} \binom{10}{i} \\
+          &=    \binom{10}{0} + \binom{10}{1} + \binom{10}{2} \\
+          &=    1 + 10 + 45 \\
+          &=    56
+    \end{align*}
+
+    Por outro lado, o \myref[Lema]{prod_construction} nos dá o encoding
+
+    \begin{align*}
+        \mu_4(2^7) &\leq \mu_1(2^1) + \mu_3(2^6) \\
+                   &\leq \mu_1(2^1) + 3 \mu_1(2^2) \\
+                   &=    1 + 9 & \text{(por \myref{mu_1_2_k_n_minus_1})} \\
+                   &=    10
+    \end{align*}
+
+    Logo, por esse método, encontramos um encoding $Q_{10}^{(4)} \encodes K_{2^7} = K_{128}$,
+    comparado com $K_{56}$ que é o máximo que se pode obter por embedding.
 \end{example}
 
 \chapter{Rumo a uma categorização de encodings}
@@ -3503,6 +4048,46 @@ seguir:
     Considere, então, $\alpha \colon a \to b \to c$ em $\Free(A)$.
 \end{example}
 
+\begin{definition}\mylabel{lifting_property}
+    Seja $\C$ uma categoria, e $i, h \in \Mor{\C}$ dois morfismos de $\C$ quaisquer. Dizemos que
+    $i$ tem a \textbf{propriedade de levantamento à esquerda} com relação a $h$ (ou,
+    equivalentemente, que $h$ tem a \textbf{propriedade de levantamento à direia} com relação a
+    $i$), ou na forma abreviada, PL, que denotamos $i \liftingProperty h$, se, e somente se, para
+    quaisquer $f, g \in \Mor{\C}$ tal que o seguinte diagrama comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJ4Il0sWzAsMiwieSJdLFsyLDAsImEiXSxbMiwyLCJiIl0sWzIsMywiaCJdLFswLDEsImkiLDJdLFswLDIsImYiXSxbMSwzLCJnIiwyXV0=
+        \begin{tikzcd}
+        	x && a \\
+        	\\
+        	y && b
+        	\arrow["f", from=1-1, to=1-3]
+        	\arrow["i"', from=1-1, to=3-1]
+        	\arrow["h", from=1-3, to=3-3]
+        	\arrow["g"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+    existe um morfismo $k \colon y \to a$ tal que os dois triângulos do diagrama abaixo comutam:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJ4Il0sWzAsMiwieSJdLFsyLDAsImEiXSxbMiwyLCJiIl0sWzIsMywiaCJdLFswLDEsImkiLDJdLFswLDIsImYiXSxbMSwzLCJnIiwyXSxbMSwyLCJcXGV4aXN0cyBrIiwxXV0=
+        \begin{tikzcd}
+        	x && a \\
+        	\\
+        	y && b
+        	\arrow["f", from=1-1, to=1-3]
+        	\arrow["i"', from=1-1, to=3-1]
+        	\arrow["h", from=1-3, to=3-3]
+        	\arrow["{\exists k}"{description}, from=3-1, to=1-3]
+        	\arrow["g"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Nas mesmas circunstâncias, dizemos que $i$ tem a \textbf{propriedade de levantamento único à
+    esquerda (direita)}, ou, de forma mais concisa, PLU, se $k$ é o único morfismo que faz tudo
+    comutar.
+\end{definition}
+
 \begin{definition}\mylabel{functor_fibration}
     Seja $F \colon A \to B$ um funtor entre duas categorias $A, B$. Diremos, então, que $F$ é uma
     \textbf{fibração} se, e somente se, para todo $y \in A$ e toda seta $f \colon x \to F(y)$ em
@@ -3798,16 +4383,204 @@ seguir:
     \end{align*}
 \end{proof}
 
-\begin{theorem}
-    Seja $\mathcal{I}$ uma categoria discreta, $\C$ uma categoria $\mathcal{I}$-completa,
-    sejam $F, F' \colon \mathcal{I} \to \C$ dois funtores, $\eta \colon F \Rightarrow F'$ uma
-    transformação natural entre eles. Além disso, seja $i \in \Mor{\C}$. Então, se
-    $i \liftingProperty \eta_a$ para todo $a \in \Obj{\mathcal{I}}$, teremos que existe um morfismo
-    $k \colon \lim F \to \lim F'$ entre os produtos tal que $i \liftingProperty k$.
+\begin{theorem}\mylabel{prod_preserves_lp}
+    Seja $\C$ uma categoria com $\I$-produtos. Sejam, ademais, $F, F' \colon \mathcal{I} \to \C$
+    dois funtores, $\eta \colon F \Rightarrow F'$ uma transformação natural entre eles. Além disso,
+    seja $i \in \Mor{\C}$. Então, se $i \liftingProperty \eta_a$ para todo
+    $a \in \Obj{\mathcal{I}}$, teremos que existe um morfismo $k \colon \lim F \to \lim F'$ entre
+    os produtos tal que $i \liftingProperty k$.
 \end{theorem}
 
 \begin{proof}
-    \def\I{\mathcal{I}}
+    Seja $i \colon x \to y$. Fixaremos um $a, b \in \Obj{\I}$ para ilustração, mas o argumento será
+    feita para toda a imagem de $F$ e $F'$. Tome, ademais, $f \colon x \to \lim F$ e
+    $g \colon y \to \lim F'$. Então temos o seguinte diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsOCxbMCwxLCJ4Il0sWzAsMywieSJdLFsyLDEsIlxcbGltIEYiXSxbMiwzLCJcXGxpbSBGJyJdLFszLDAsIkYoYSkiXSxbMywxLCJGKGIpIl0sWzMsMywiRicoYSkiXSxbMyw0LCJGJyhiKSJdLFswLDEsImkiLDJdLFswLDIsImYiXSxbMSwzLCJnIiwyXSxbMiw0LCJcXHBpX2EiXSxbMiw1LCJcXHBpX2IiLDJdLFszLDYsIlxccGknX2EiXSxbMyw3LCJcXHBpJ19iIiwyXV0=
+        \begin{tikzcd}
+        	&&& {F(a)} \\
+        	x && {\lim F} & {F(b)} \\
+        	\\
+        	y && {\lim F'} & {F'(a)} \\
+        	&&& {F'(b)}
+        	\arrow["f", from=2-1, to=2-3]
+        	\arrow["i"', from=2-1, to=4-1]
+        	\arrow["{\pi_a}", from=2-3, to=1-4]
+        	\arrow["{\pi_b}"', from=2-3, to=2-4]
+        	\arrow["g"', from=4-1, to=4-3]
+        	\arrow["{\pi'_a}", from=4-3, to=4-4]
+        	\arrow["{\pi'_b}"', from=4-3, to=5-4]
+        \end{tikzcd}
+    \end{center}
+    em que $\pi_a$, $\pi_b$ são os morfimos que fazem o cone de cima de vértice $\lim F$ comutar, e
+    da mesma forma com $\pi'_a$ e $\pi'_b$.
+
+    Além disso, como temos a transformação natural $\eta$, podemos desenhar o seguinte diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMSwwLCJcXGxpbSBGIl0sWzAsMiwiRihhKSJdLFsyLDIsIkYoYikiXSxbMCw0LCJGJyhhKSJdLFsyLDQsIkYnKGIpIl0sWzAsMiwicF9iIl0sWzAsMSwicF9hIiwyXSxbMSwzLCJcXGV0YV9hIiwyXSxbMiw0LCJcXGV0YV9iIl1d
+        \begin{tikzcd}
+        	& {\lim F} & \\
+        	\\
+        	{F(a)} && {F(b)} \\
+        	\\
+        	{F'(a)} && {F'(b)}
+        	\arrow["{p_a}"', from=1-2, to=3-1]
+        	\arrow["{p_b}", from=1-2, to=3-3]
+        	\arrow["{\eta_a}"', from=3-1, to=5-1]
+        	\arrow["{\eta_b}", from=3-3, to=5-3]
+        \end{tikzcd}
+    \end{center}
+
+    Temos, então, $(\lim F, (\eta_a \circ \pi_a)_{a \in \Obj{\I}})$ um cone em $\C$ e, portanto,
+    existe um único $k \colon \lim F \to \lim F'$ tal que o seguinte diagrama comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwwLCJcXGxpbSBGIl0sWzIsMCwiXFxsaW0gRiciXSxbMiwyLCJGJyhhKSJdLFswLDEsIlxcZXhpc3RzISBrIl0sWzEsMiwiXFxwaSdfYSJdLFswLDIsIlxcZXRhX2EgXFxjaXJjIFxccGlfYSIsMl1d
+        \begin{tikzcd}
+        	{\lim F} && {\lim F'} \\
+        	\\
+        	&& {F'(a)}
+        	\arrow["{\exists! k}", from=1-1, to=1-3]
+        	\arrow["{\eta_a \circ \pi_a}"', from=1-1, to=3-3]
+        	\arrow["{\pi'_a}", from=1-3, to=3-3]
+        \end{tikzcd}
+    \end{center}
+    para todo $a \in \Obj{\I}$
+    
+    Isto nos dá o morfismo que completa o quadrado no diagrama acima:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsOCxbMCwxLCJ4Il0sWzAsMywieSJdLFsyLDEsIlxcbGltIEYiXSxbMiwzLCJcXGxpbSBGJyJdLFszLDAsIkYoYSkiXSxbMywxLCJGKGIpIl0sWzMsMywiRicoYSkiXSxbMyw0LCJGJyhiKSJdLFswLDEsImkiLDJdLFswLDIsImYiXSxbMSwzLCJnIiwyXSxbMiw0LCJcXHBpX2EiXSxbMiw1LCJcXHBpX2IiLDJdLFszLDYsIlxccGknX2EiXSxbMyw3LCJcXHBpJ19iIiwyXSxbMiwzLCJcXGV4aXN0cyAhayIsMV1d
+        \begin{tikzcd}
+        	&&& {F(a)} \\
+        	x && {\lim F} & {F(b)} \\
+        	\\
+        	y && {\lim F'} & {F'(a)} \\
+        	&&& {F'(b)}
+        	\arrow["f", from=2-1, to=2-3]
+        	\arrow["i"', from=2-1, to=4-1]
+        	\arrow["{\pi_a}", from=2-3, to=1-4]
+        	\arrow["{\pi_b}"', from=2-3, to=2-4]
+        	\arrow["{\exists !k}"{description}, from=2-3, to=4-3]
+        	\arrow["g"', from=4-1, to=4-3]
+        	\arrow["{\pi'_a}", from=4-3, to=4-4]
+        	\arrow["{\pi'_b}"', from=4-3, to=5-4]
+        \end{tikzcd}
+    \end{center}
+
+    Agora resta provar que existe um $h \colon y \to \lim F$ que faz todo o diagrama comutar e,
+    para isso, precisaremos usar a propriedade de levantamento dos $\eta_a$. Considere, então, o
+    seguinte diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJ4Il0sWzIsMCwiRihhKSJdLFswLDIsInkiXSxbMiwyLCJGJyhhKSJdLFswLDIsImkiLDJdLFswLDEsIlxccGlfYSBcXGNpcmMgZiJdLFsyLDMsIlxccGknX2EgXFxjaXJjIGciLDJdLFsxLDMsIlxcZXRhX2EiXSxbMiwxLCJcXGV4aXN0cyBsX2EiLDFdXQ==
+        \begin{tikzcd}
+        	x && {F(a)} \\
+        	\\
+        	y && {F'(a)}
+        	\arrow["{\pi_a \circ f}", from=1-1, to=1-3]
+        	\arrow["i"', from=1-1, to=3-1]
+        	\arrow["{\eta_a}", from=1-3, to=3-3]
+        	\arrow["{\exists l_a}"{description}, from=3-1, to=1-3]
+        	\arrow["{\pi'_a \circ g}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Pela propriedade de levantamento de $\eta_a$, existe esse levantamento $l_a$ que faz com que o
+    diagrama acima comute, para todo $a \in \Obj{\I}$.
+
+    Assim sendo, $(y, (l_a)_{a \in \Obj{\I}})$ é um cone sobre $F$ e, portanto, existe um único
+    morfismo $h$ tal que o seguinte diagrama comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwwLCJ5Il0sWzIsMCwiXFxsaW0gRiJdLFsyLDIsIkYoYSkiXSxbMCwyLCJsX2EiLDJdLFswLDEsIlxcZXhpc3RzISBoIiwwLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzEsMiwiXFxwaV9hIl1d
+        \begin{tikzcd}
+        	y && {\lim F} \\
+        	\\
+        	&& {F(a)}
+        	\arrow["{\exists! h}", dashed, from=1-1, to=1-3]
+        	\arrow["{l_a}"', from=1-1, to=3-3]
+        	\arrow["{\pi_a}", from=1-3, to=3-3]
+        \end{tikzcd}
+    \end{center}
+    para todo $a \in \Obj{\I}$.
+
+    Resta, então, apenas provar que esse $h$ faz o diagrama inicial comutar:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsOCxbMCwxLCJ4Il0sWzAsMywieSJdLFsyLDEsIlxcbGltIEYiXSxbMiwzLCJcXGxpbSBGJyJdLFszLDAsIkYoYSkiXSxbMywxLCJGKGIpIl0sWzMsMywiRicoYSkiXSxbMyw0LCJGJyhiKSJdLFswLDEsImkiLDJdLFswLDIsImYiXSxbMSwzLCJnIiwyXSxbMiw0LCJcXHBpX2EiXSxbMiw1LCJcXHBpX2IiLDJdLFszLDYsIlxccGknX2EiXSxbMyw3LCJcXHBpJ19iIiwyXSxbMiwzLCJrIl0sWzEsMiwiXFxleGlzdHMhIGgiLDFdXQ==
+        \begin{tikzcd}
+        	&&& {F(a)} \\
+        	x && {\lim F} & {F(b)} \\
+        	\\
+        	y && {\lim F'} & {F'(a)} \\
+        	&&& {F'(b)}
+        	\arrow["f", from=2-1, to=2-3]
+        	\arrow["i"', from=2-1, to=4-1]
+        	\arrow["{\pi_a}", from=2-3, to=1-4]
+        	\arrow["{\pi_b}"', from=2-3, to=2-4]
+        	\arrow["k", from=2-3, to=4-3]
+        	\arrow["{\exists! h}"{description}, from=4-1, to=2-3]
+        	\arrow["g"', from=4-1, to=4-3]
+        	\arrow["{\pi'_a}", from=4-3, to=4-4]
+        	\arrow["{\pi'_b}"', from=4-3, to=5-4]
+        \end{tikzcd}
+    \end{center}
+
+    Comecemos pelo triângulo superior. Repare, primeiramente, que a
+    $(x, (\pi_a \circ f)_{a \in \Obj{\I}})$ é uma cone sobre $F$. Logo, pela definição de limite,
+    existe um único morfismo tal que o diagrama
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwwLCJ4Il0sWzIsMCwiXFxsaW0gRiJdLFsyLDIsIkYoYSkiXSxbMCwxLCJcXGV4aXN0cyAhIiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzEsMiwiXFxwaV9hIl0sWzAsMiwiXFxwaV9hIFxcY2lyYyBmIiwyXV0=
+        \begin{tikzcd}
+        	x && {\lim F} \\
+        	\\
+        	&& {F(a)}
+        	\arrow["{\exists !}"{description}, dashed, from=1-1, to=1-3]
+        	\arrow["{\pi_a \circ f}"', from=1-1, to=3-3]
+        	\arrow["{\pi_a}", from=1-3, to=3-3]
+        \end{tikzcd}
+    \end{center}
+    comuta. Mas esse morfismo é $f$, porque $f$ trivialmente faz o diagrama comutar.
+
+    Porém, o morfismo $h \circ i$ também faz o diagrama comutar. Com efeito,
+
+    \begin{align*}
+        \pi_a \circ (h \circ i) &= (\pi_a \circ h) \circ i \\
+                                &= l_a \circ i   & \text{(pela escolha de $h$)} \\
+                                &= \pi_a \circ f & \text{(pela propriedade de levantamento)}
+    \end{align*}
+
+    Logo, $h \circ i = f$, e a parte de cima do diagrama comuta.
+
+    A parte de baixo é análoga: $(y, (\pi'_a \circ g)_{a \in \Obj{\I}})$ é um cone sobre $F'$ e,
+    portanto, $g$ é o único morfismo $y \to \lim F'$ que comuta com as projeções. Mas $k \circ h$
+    também faz o diagrama comutar, porque:
+
+    \begin{align*}
+        \pi'_a \circ (k \circ h) &= (\pi'_a \circ k) \circ h \\
+                                 &= (\eta_a \circ \pi_a) \circ h & \text{(pela escolha de $k$)} \\
+                                 &= \eta_a \circ (\pi_a \circ h) \\
+                                 &= \eta_a \circ l_a             & \text{(pela escolha de $h$)} \\
+                                 &= \pi'_a \circ g               & \text{(pela PL)}
+    \end{align*}
+
+    Logo, o triângulo de baixo também comuta, como queríamos provar.
+\end{proof}
+
+\begin{theorem}
+    Seja $\mathcal{I}$, $\C$ uma categoria $\mathcal{I}$-completa, sejam
+    $F, F' \colon \mathcal{I} \to \C$ dois funtores, $\eta \colon F \Rightarrow F'$ uma
+    transformação natural entre eles. Além disso, seja $i \in \Mor{\C}$. Então, se
+    $\eta_a$ tem a PLU à direita com relação a $i$ para todo $a \in \Obj{\mathcal{I}}$, teremos que
+    existe um morfismo $k \colon \lim F \to \lim F'$ entre os produtos tal que $k$ tem a PLU à
+    direita com relação a $i$.
+\end{theorem}
+
+\begin{proof}
     Seja $i \colon x \to y$. Fixaremos um $a, b \in \Obj{\I}$ para ilustração, mas o argumento será
     feita para toda a imagem de $F$ e $F'$. Tome, ademais, $f \colon x \to \lim F$ e
     $g \colon y \to \lim F'$. Então temos o seguinte diagrama:
@@ -3904,7 +4677,7 @@ seguir:
     seguinte diagrama:
 
     \begin{center}
-        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJ4Il0sWzIsMCwiRihhKSJdLFswLDIsInkiXSxbMiwyLCJGJyhhKSJdLFswLDIsImkiLDJdLFswLDEsInBfYSBcXGNpcmMgZiJdLFsyLDMsInAnX2EgXFxjaXJjIGciLDJdLFsxLDMsIlxcZXRhX2EiXSxbMiwxLCJcXGV4aXN0cyBsX2EiLDFdXQ==
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJ4Il0sWzIsMCwiRihhKSJdLFswLDIsInkiXSxbMiwyLCJGJyhhKSJdLFswLDIsImkiLDJdLFswLDEsInBfYSBcXGNpcmMgZiJdLFsyLDMsInAnX2EgXFxjaXJjIGciLDJdLFsxLDMsIlxcZXRhX2EiXSxbMiwxLCJcXGV4aXN0cyEgbF9hIiwxXV0=
         \begin{tikzcd}
         	x && {F(a)} \\
         	\\
@@ -3912,13 +4685,13 @@ seguir:
         	\arrow["{p_a \circ f}", from=1-1, to=1-3]
         	\arrow["i"', from=1-1, to=3-1]
         	\arrow["{\eta_a}", from=1-3, to=3-3]
-        	\arrow["{\exists l_a}"{description}, from=3-1, to=1-3]
+        	\arrow["{\exists! l_a}"{description}, from=3-1, to=1-3]
         	\arrow["{p'_a \circ g}"', from=3-1, to=3-3]
         \end{tikzcd}
     \end{center}
 
-    Pela propriedade de levantamento de $\eta_a$, existe esse levantamento $l_a$ que faz com que o
-    diagrama acima comute. Da mesma forma, podemos obter um levantamento $l_b$ para $\eta_b$.
+    Pela propriedade de levantamento de $\eta_a$, existe esse único levantamento $l_a$ que faz com
+    que o diagrama acima comute. Da mesma forma, podemos obter um levantamento $l_b$ para $\eta_b$.
     Repare que o seguinte cone comuta
 
     \begin{center}
@@ -3932,15 +4705,124 @@ seguir:
         	\arrow["{F(\alpha)}"', from=3-1, to=3-3]
         \end{tikzcd}
     \end{center}
+    pelo seguinte motivo: porque $F(\alpha) \circ l_a$ também faz o diagrama do levantamento
+    comutar para $b$:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJ4Il0sWzIsMCwiRihiKSJdLFswLDIsInkiXSxbMiwyLCJGJyhiKSJdLFswLDIsImkiLDJdLFswLDEsInBfYiBcXGNpcmMgZiJdLFsyLDMsInAnX2IgXFxjaXJjIGciLDJdLFsxLDMsIlxcZXRhX2IiXSxbMiwxLCJGKFxcYWxwaGEpIFxcY2lyYyBsX2EiLDFdXQ==
+        \begin{tikzcd}
+        	x && {F(b)} \\
+        	\\
+        	y && {F'(b)}
+        	\arrow["{p_b \circ f}", from=1-1, to=1-3]
+        	\arrow["i"', from=1-1, to=3-1]
+        	\arrow["{\eta_b}", from=1-3, to=3-3]
+        	\arrow["{F(\alpha) \circ l_a}"{description}, from=3-1, to=1-3]
+        	\arrow["{p'_b \circ g}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Com efeito, 
 
     \begin{align*}
-        l_a \circ i &= p_a \circ f
+        (F(\alpha) \circ l_a) \circ i &= F(\alpha) \circ (l_a \circ i) \\
+                                      &= F(\alpha) \circ (p_a \circ f) & \text{(pela PL)} \\
+                                      &= (F(\alpha) \circ p_a) \circ f \\
+                                      &= p_b \circ f & \text{(porque $(p_a)_a$ forma um cone)}
     \end{align*}
+
+    E do outro lado, temos
+
     \begin{align*}
-        F(\alpha) \circ l_a \circ i &= F(\alpha) \circ p_a \circ f \\
-                                    &= p_b \circ f \\
-                                    &= l_b \circ i
+        \eta_b \circ (F(\alpha) \circ l_a) &= (\eta_b \circ F(\alpha)) \circ l_a \\
+                                           &= (F'(\alpha) \circ \eta_a) \circ l_a
+                                           & \text{(porque $\eta$ é natural)} \\
+                                           &= F'(\alpha) \circ (\eta_a \circ l_a) \\
+                                           &= F'(\alpha) \circ (p'_a \circ g)
+                                           & \text{(pela PL)} \\
+                                           &= (F'(\alpha) \circ p'_a) \circ g \\
+                                           &= p'_b \circ g
+                                           & \text{(porque $(p_a)_a$ forma um cone)}
     \end{align*}
+
+    Sendo assim, como $l_b$ é o único levantamento para $\eta_b$, temos que
+    $F(\alpha) \circ l_a = l_b$.
+
+    Como isso vale para todos os morfismos na imagem de $F$, $(y, (l_a)_{a \in \Obj{\I}})$ nos dá
+    um cone comutativo sobre $F$. Sendo assim, existe um único $h \colon y \to \lim F$ tal que
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwwLCJ5Il0sWzIsMCwiXFxsaW0gRiJdLFsyLDIsIkYoYSkiXSxbMSwyLCJwX2EiXSxbMCwxLCJcXGV4aXN0cyEgaCIsMSx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFswLDIsImxfYSIsMl1d
+        \begin{tikzcd}
+        	y && {\lim F} \\
+        	\\
+        	&& {F(a)}
+        	\arrow["{\exists! h}"{description}, dashed, from=1-1, to=1-3]
+        	\arrow["{l_a}"', from=1-1, to=3-3]
+        	\arrow["{p_a}", from=1-3, to=3-3]
+        \end{tikzcd}
+    \end{center}
+    comute.
+
+    A prova de que esse $h$ faz o diagrama completo:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsOCxbMCwxLCJ4Il0sWzAsMywieSJdLFsyLDEsIlxcbGltIEYiXSxbMiwzLCJcXGxpbSBGJyJdLFszLDAsIkYoYSkiXSxbMywxLCJGKGIpIl0sWzMsMywiRicoYSkiXSxbMyw0LCJGJyhiKSJdLFswLDEsImkiLDJdLFswLDIsImYiXSxbMSwzLCJnIiwyXSxbNCw1LCJGKFxcYWxwaGEpIl0sWzYsNywiRicoXFxhbHBoYSkiXSxbMiw0LCJwX2EiXSxbMiw1LCJwX2IiLDJdLFszLDYsInAnX2EiXSxbMyw3LCJwJ19iIiwyXSxbMiwzLCJrIl0sWzEsMiwiaCIsMV1d
+        \begin{tikzcd}
+        	&&& {F(a)} \\
+        	x && {\lim F} & {F(b)} \\
+        	\\
+        	y && {\lim F'} & {F'(a)} \\
+        	&&& {F'(b)}
+        	\arrow["{F(\alpha)}", from=1-4, to=2-4]
+        	\arrow["f", from=2-1, to=2-3]
+        	\arrow["i"', from=2-1, to=4-1]
+        	\arrow["{p_a}", from=2-3, to=1-4]
+        	\arrow["{p_b}"', from=2-3, to=2-4]
+        	\arrow["k", from=2-3, to=4-3]
+        	\arrow["h"{description}, from=4-1, to=2-3]
+        	\arrow["g"', from=4-1, to=4-3]
+        	\arrow["{p'_a}", from=4-3, to=4-4]
+        	\arrow["{p'_b}"', from=4-3, to=5-4]
+        	\arrow["{F'(\alpha)}", from=4-4, to=5-4]
+        \end{tikzcd}
+    \end{center}
+    comutar é igual à do \myref[Teorema]{prod_preserves_lp}, e portanto será omitida.
+
+    Resta provar que $h$ é único. Suponha, então, que exista um outro $h'$ que faz o quadrado do
+    diagrama acima comutar. Assim, em particular, $p_a \circ h'$ faz o seguinte diagrama comutar:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJ4Il0sWzIsMCwiRihhKSJdLFswLDIsInkiXSxbMiwyLCJGJyhhKSJdLFswLDIsImkiLDJdLFswLDEsInBfYSBcXGNpcmMgZiJdLFsyLDMsInAnX2EgXFxjaXJjIGciLDJdLFsxLDMsIlxcZXRhX2EiXSxbMiwxLCJwX2EgXFxjaXJjIGgnIiwxXV0=
+        \begin{tikzcd}
+        	x && {F(a)} \\
+        	\\
+        	y && {F'(a)}
+        	\arrow["{p_a \circ f}", from=1-1, to=1-3]
+        	\arrow["i"', from=1-1, to=3-1]
+        	\arrow["{\eta_a}", from=1-3, to=3-3]
+        	\arrow["{p_a \circ h'}"{description}, from=3-1, to=1-3]
+        	\arrow["{p'_a \circ g}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+    para todo $a \in \Obj{\I}$. Isso porque
+
+    \begin{align*}
+        (p_a \circ h') \circ i &= p_a \circ (h' \circ i) \\
+                               &= p_a \circ f & \text{(porque $h'$ é levantamento)}
+    \end{align*}
+    e
+
+    \begin{align*}
+        \eta_a \circ (p_a \circ h') &= (\eta_a \circ p_a) \circ h' \\
+                                    &= (p'_a \circ k) \circ h' & \text{(pela escolha de $k$)} \\
+                                    &= p'_a \circ (k \circ h') \\
+                                    &= p'_a \circ g & \text{(porque $h'$ é levantamento)}
+    \end{align*}
+
+    Logo, como $l_a$ é o único levantamento do diagrama acima, temos que $p_a \circ h' = l_a$, para
+    todo $a \in \Obj{\I}$. Mas, pela propriedade universal do limite de $F$, $h$ é o único morfismo
+    tal que $p_a \circ h = l_a$ para todo $a \in \Obj{\I}$. Logo, $h' = h$.
 \end{proof}
 
 \section{Encoding em outras categorias}
