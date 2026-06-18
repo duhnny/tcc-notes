@@ -43,6 +43,7 @@
 \newcommand{\A}{\mathcal{A}}
 \newcommand{\B}{\mathcal{B}}
 \newcommand{\C}{\mathcal{C}}
+\newcommand{\D}{\mathcal{D}}
 \newcommand{\I}{\mathcal{I}}
 \newcommand{\Cat}{\operatorname{Cat}}
 \newcommand{\Graph}{\operatorname{Graph}}
@@ -73,6 +74,13 @@
         \xrightarrow{#1}
     }
 }
+\NewDocumentCommand{\nat}{o}{
+    \IfNoValueTF{#1}{
+        \Rightarrow
+    }{
+        \xRightarrow{#1}
+    }
+}
 \newcommand{\tg}[1]{\operatorname{tg}\left(#1\right)}
 \newcommand{\defeq}{:=}
 \newcommand{\qefed}{=:}
@@ -96,3 +104,4 @@
 \newcommand{\temp}[1]{\omega #1}
 \newcommand{\cost}[1]{\operatorname{cost}\left( #1 \right)}
 \newcommand{\len}[1]{\operatorname{len}\left( #1 \right)}
+\newcommand{\eval}[1]{\operatorname{eval}_{#1}}
