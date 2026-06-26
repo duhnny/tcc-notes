@@ -170,100 +170,229 @@
 \tableofcontents
 
 \chapter{Introdução}
-    \TODO{Contextualizar introdução}
 
-    Para isso, trataremos aqui da categoria dos grafos $\Graph$, em que os morfismos serão os
-    encodings.
+Uma estratégia que se tornou muito comum hoje em dia por conta de sua eficiência é a de
+paralelização (\autocite{parallel_computing}, \autocite{reevaluating}). Nela, um programa é
+distribuído entre várias CPUs em uma rede para que realizem operações concomitantemente, em
+oposição a um modelo mais simples, em que cada instrução de um programa seria computada
+sequencialmente, isto é, uma de cada vez.
 
-    Bom, o primeiro passo para isso é mostrar que, de fato, está é uma categoria.
+Uma das formas de arranjar CPUs em conjunto que torna isso possível é um \textit{sistema
+distribuído}, isto é, um sistema em que CPUs são conectadas sem compartilhamento de memória, em
+que o compartilhamento de informação se dá diretamente entre as CPUs.
 
-    \begin{theorem}\mylabel{graph_is_a_category}
-        $(\Graph, \Enc)$ é uma categoria
-    \end{theorem}
-    \begin{proof}
-        (Associatividade) Sejam $A, B, C \in \Graph$ e seja $f \in \Hom{A}{B}$ e $g \in \Hom{B}{C}$,
-        então $g \circ f \in \Hom{A}{C}$.
+\begin{example}
+    Por exemplo, suponha que queiramos computar o valor de $(1+2) * (3+4)$. Nesse caso, não há
+    nenhuma razão pela qual uma soma deva ser realizada depois da outra: podemos, então, fazer as
+    duas em paralelo, e depois computar o produto dos resultados. Isso pode ser expresso pelo
+    seguinte diagrama:
 
-        De fato, seja $c_1 c_2$ uma aresta em $C$. Então, pela definição de encoding, existem
-        $b_1 \in g^{-1}(\{c_1\})$ e $b_2 \in g^{-1}(\{c_2\})$ tais que $b_1 b_2 \in \Edg{C}$.
-
-        Repetindo o argumento para $A$, encontramos dois vértices $a_1, a_2 \in \Ver{A}$ tais que
-        $f(a_1) = b_1$, $f(a_2) = b_2$ e $a_1 a_2 \in \Edg{A}$. Logo, $a_1 a_2$ é uma aresta em
-        $A$ tal que
-
-        \[(g \circ f) (a_1) = g(f(a_1)) = g(b_1) = c_1\]
-
-        e analogamente para $C$.
-    \end{proof}
-
-    Munidos do conhecimento de que o nosso objeto de estudo é uma categoria, podemos também definir
-    um produto, que nos será muito útil mais afrente.
-
-    \begin{definition}
-        Sejam $A, B \in \Graph$ grafos. Definimos então o grafo produto $A \times B$ como sendo o
-        grafo com vértices $\Ver{A} \times \Ver{B}$ e em que, se $(a, b)$ e $(a', b')$ são
-        dois vértices de $A \times B$, há uma aresta entre os dois se, e somente se,
-        $a = a' \wedge b b' \in \Edg{B}$ ou $a a' \in \Edg{A} \wedge b = b'$.
-
-        De forma mais geral, sejam $A_1, A_2, \cdots A_n \in \Graph$, então o grafo produto
-        $\prod_{i} A_i$ é o grafo no conjunto de vértices $\prod_i A_i$ definido da seguinte forma:
-
-        \begin{equation*}
-            (a_1, a_2, \cdots a_n) (a_1', a_2', \cdots a_n') \in \Edg{\prod_i A_i} \iff
-            \exists i \in \{1, \cdots n\}
-            \left( a_i a_i' \in \Edg{A_i} \wedge a_j = a_j', \forall j \neq i \right)
-        \end{equation*}
-        ou seja, se os vértices diferem em no máximo uma coordenada, e, nessa coordenada, há uma
-        aresta entre os dois vértices.
-    \end{definition}
-
-    Basta mostrar que esse produto realmente é um produto de categorias.
-
-    Lembre que, em uma categoria $(C, Hom)$, um produto $X \defeq \prod_i X_i$ é definido como um
-    elemento de $C$, munido de morfismos $\pi_i: X \to X_i$ tais que, dada uma família de
-    morfismos $f_i: Y \to X_i$, há um único morfismo $f: Y \to X$ tal que o seguinte diagrama
-    comuta:
-
-    \[
-        \begin{tikzcd}
-            Y \\
-            \\
-            \\
-            {\prod_i X_i} && {X_i}
-            \arrow["f"', dashed, from=1-1, to=4-1]
-            \arrow["{f_i}", from=1-1, to=4-3]
-            \arrow["{\pi_i}"', from=4-1, to=4-3]
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCIxKzIiXSxbMiwwLCIzKzQiXSxbMCwyLCIzKjciXSxbMCw0LCIyMSJdLFswLDJdLFsxLDJdLFsyLDNdXQ==
+        \begin{tikzcd}[ampersand replacement=\&]
+        	{1+2} \&\& {3+4} \\
+        	\\
+        	{3*7} \\
+        	\\
+        	21
+        	\arrow[from=1-1, to=3-1]
+        	\arrow[from=1-3, to=3-1]
+        	\arrow[from=3-1, to=5-1]
         \end{tikzcd}
-    \]
+    \end{center}
+    em que temos, em cada vértice, uma operação sendo realizada, e cujas arestas indicam o fluxo de
+    informação indo de uma etapa da computação para a próxima.
 
-    \begin{lemma}\mylabel{prod_is_prod}
-        A operação definida na \myref[Definição]{product} é de fato um produto na categoria
-        $(\Graph, \Enc)$.
-    \end{lemma}
-    \begin{proof}
-        Sejam $A_i \in \Graph$ uma família de grafos e $B$ um outro grafo tal que $B \encodes A_i$
-        por $f_i, \forall i$. Tome, então, a função $f: B \to \prod_i A_i$ dada por:
+    Digamos que queiramos realizar essa computação em um sistema com duas CPUs dispostas e ligadas
+    da seguinte forma:
 
-        \begin{equation*}
-            f(b) = (f_1(b), f_2(b), \cdots) \in \prod_i A_i
-        \end{equation*}
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXGJveGVke0NQVVxcLCAxfSJdLFsyLDAsIlxcYm94ZWR7Q1BVXFwsIDJ9Il0sWzAsMSwiIiwyLHsiY3VydmUiOi0yfV0sWzEsMCwiIiwyLHsiY3VydmUiOi0yfV1d
+        \begin{tikzcd}
+        	{\boxed{CPU\, 1}} && {\boxed{CPU\, 2}}
+        	\arrow[curve={height=-12pt}, from=1-1, to=1-3]
+        	\arrow[curve={height=-12pt}, from=1-3, to=1-1]
+        \end{tikzcd}
+    \end{center}
+    isto é, ligadas de forma que exista um caminho para a informação passar da CPU 1 para a CPU 2,
+    e vice versa.
 
-        Provaremos que $f$ é o único encoding tal que o diagrama acima comuta.
+    Então é claro que podemos realizar a computação acima nesse sistema. De fato, basta, num
+    primeiro instante, cada uma das CPUs realizar uma das somas, passar o resuldados resultados
+    para uma delas, e esta então realiza a multiplicação em um segundo instante.
 
-        De fato, escreva $A \defeq \prod_i A_i$ seja
-        $(a_1, \cdots a_n)(a_1', \cdots a_n') \in \Edg{A}$. Então existe $i$ tal que
-        $a_i a_i' \in \Edg{A_i}$ e $a_j = a_j', \forall j \neq i$. Como $f_i$ é encoding,
-        existem $b_i, b_i' \in B$ tais que $b_i b_i' \in \Edg{B}$,
-        $f_i(b_i) = a_i$ e $f_i(b_i') = a_i'$. Logo,
-    \end{proof}
+    Agora, imagine um grafo temporal discreto, em que as linhas simbolizam as transmissões de
+    informação possíveis de uma CPU para a outra no próximo instante de tempo.
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMTIsWzIsMCwiXFxib3hlZHtDUFVcXCwgMX0iXSxbNCwwLCJcXGJveGVke0NQVVxcLCAyfSJdLFswLDAsInQ9MCJdLFsyLDIsIlxcYm94ZWR7Q1BVXFwsMX0iXSxbNCwyLCJcXGJveGVke0NQVVxcLDJ9Il0sWzAsMiwidD0xIl0sWzAsNCwidD0yIl0sWzAsNiwiXFx2ZG90cyJdLFsyLDQsIlxcYm94ZWR7Q1BVXFwsMX0iXSxbNCw0LCJcXGJveGVke0NQVVxcLDJ9Il0sWzIsNiwiXFx2ZG90cyJdLFs0LDYsIlxcdmRvdHMiXSxbMCwzLCIiLDIseyJjb2xvdXIiOlswLDAsNDBdfV0sWzAsNCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFsxLDQsIiIsMix7ImNvbG91ciI6WzAsMCw0MF19XSxbMSwzLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV0sWzMsOSwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFszLDgsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF19XSxbNCw5LCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV0sWzQsOCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFs4LDEwLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV0sWzgsMTEsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF19XSxbOSwxMSwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFs5LDEwLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV1d
+        \begin{tikzcd}
+        	{t=0} && {\boxed{CPU\, 1}} && {\boxed{CPU\, 2}} \\
+        	\\
+        	{t=1} && {\boxed{CPU\,1}} && {\boxed{CPU\,2}} \\
+        	\\
+        	{t=2} && {\boxed{CPU\,1}} && {\boxed{CPU\,2}} \\
+        	\\
+        	\vdots && \vdots && \vdots
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-3, to=3-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-3, to=3-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-5, to=3-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-5, to=3-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-3, to=5-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-3, to=5-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-5, to=5-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-5, to=5-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-3, to=7-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-3, to=7-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-5, to=7-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-5, to=7-5]
+        \end{tikzcd}
+    \end{center}
+
+    Observe que nós podemos imbutir o diagrama da computação acima nesse grafo:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMTIsWzIsMCwiXFxib3hlZHsxKzJ9Il0sWzQsMCwiXFxib3hlZHszKzR9Il0sWzAsMCwidD0wIl0sWzIsMiwiXFxib3hlZHszKjd9Il0sWzQsMl0sWzAsMiwidD0xIl0sWzAsNCwidD0yIl0sWzIsNCwiXFxib3hlZHsyMX0iXSxbMCw2LCJcXHZkb3RzIl0sWzIsNiwiXFx2ZG90cyJdLFs0LDYsIlxcdmRvdHMiXSxbNCw0XSxbMCwzXSxbMCw0LCIiLDAseyJjb2xvdXIiOlswLDAsNDBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbMSw0LCIiLDAseyJjb2xvdXIiOlswLDAsNDBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbMSwzXSxbMyw3XSxbNCw3LCIiLDAseyJjb2xvdXIiOlswLDAsNDBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbMywxMSwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzQsMTEsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF0sInN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFsxMSw5LCIiLDAseyJjb2xvdXIiOlswLDAsNDBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbNyw5LCIiLDAseyJjb2xvdXIiOlswLDAsNDBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbNywxMCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzExLDEwLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XV0=
+        \begin{tikzcd}
+        	{t=0} && {\boxed{1+2}} && {\boxed{3+4}} \\
+        	\\
+        	{t=1} && {\boxed{3*7}} && {} \\
+        	\\
+        	{t=2} && {\boxed{21}} && {} \\
+        	\\
+        	\vdots && \vdots && \vdots
+        	\arrow[from=1-3, to=3-3]
+        	\arrow[draw={rgb,255:red,102;green,102;blue,102}, dashed, from=1-3, to=3-5]
+        	\arrow[from=1-5, to=3-3]
+        	\arrow[draw={rgb,255:red,102;green,102;blue,102}, dashed, from=1-5, to=3-5]
+        	\arrow[from=3-3, to=5-3]
+        	\arrow[draw={rgb,255:red,102;green,102;blue,102}, dashed, from=3-3, to=5-5]
+        	\arrow[draw={rgb,255:red,102;green,102;blue,102}, dashed, from=3-5, to=5-3]
+        	\arrow[draw={rgb,255:red,102;green,102;blue,102}, dashed, from=3-5, to=5-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-3, to=7-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-3, to=7-5]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-5, to=7-3]
+        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-5, to=7-5]
+        \end{tikzcd}
+    \end{center}
+
+    Ou seja, dado o diagrama acima, existe uma atribuição possível de operações para cada CPU em
+    cada instante de tempo tal que é possível computar a expressão desejada.
+\end{example}
+
+Repare que, para que tenhamos o resultado, precisamos que a seguinte condição seja satisfeita: que
+as operações no último nível do diagrama de computação sejam executadas com as entradas corretas,
+isto é, que os resultados anteriores estejam corretamente computados, e que haja um caminho para a
+informação dos passos anteriores chegue às CPUs corretas que realizarão as operações no último
+nível. Mas, para que essas entradas estejam corretamente computadas, é necessário que as mesmas
+condições sejam satisfeitas para o nível anterior, e assim sucessivamente.
+
+Por indução finita, precisamos, então, que todas as operações (em todos os níveis) sejam
+executadas, e que haja um caminho que conecte a CPU que fez a operação no nível anterior para a CPU
+que vai fazer a próxima operação que dependa da anterior em todos os passos. Em outras palavras,
+precisamos que a função que assinala a cada CPU em um instante de tempo uma operação do diagrama da
+computação assinale todas as operações a pelo menos uma CPU em um instante de tempo e que, quando
+tenhamos uma operação que depende de outra anterior, tenhamos o mesmo fluxo de informação entre as
+CPUs que realizam essas operações. Vamos formalizar isso.
+
+\begin{definition}\mylabel{computation_diagram}
+    Um \textbf{diagrama de computação} é um grafo acíclico, finito e conexo $G$ tal que cada
+    vértice de $G$ represente uma operação a ser realizada por uma CPU e as arestas de $G$
+    simbolizem o fluxo de informação entre as operações.
+\end{definition}
+
+Agora, descreveremos o grafo temporal do fluxo de informações entre as CPUs:
+
+\begin{definition}\mylabel{temporal_graph}
+    Seja $G$ um grafo. O \textbf{grafo temporal} de $G$ é o grafo, denotado $\temp{G}$, é o grafo:
+
+    \begin{equation*}
+        \temp{G} \defeq G \times L^\rightarrow_\omega
+    \end{equation*}
+    em que $L^\rightarrow_\omega$ é o seguinte grafo:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCIwIl0sWzIsMCwiMSJdLFs0LDAsIjIiXSxbNiwwLCJcXGNkb3RzIl0sWzAsMV0sWzEsMl0sWzIsM11d
+        \begin{tikzcd}
+        	0 && 1 && 2 && \cdots
+        	\arrow[from=1-1, to=1-3]
+        	\arrow[from=1-3, to=1-5]
+        	\arrow[from=1-5, to=1-7]
+        \end{tikzcd}
+    \end{center}
+\end{definition}
+
+Isto nos dá um grafo em que os vértices são pares $(t, v)$, em que $t$ é um instante de tempo e $v$
+um vértice de $G$, e cujas arestas são entre pares $(t, v), (t+1, v')$, em que há uma aresta
+$v \to v'$ em $G$.
+
+Se $G$ representa, então, como as CPUs estão ligadas entre si e os possíveis caminhos de
+transmissão de informação, $\temp{G}$ representa o fluxo de informação nessa disposição ao longo do
+tempo.
+
+\begin{definition}\mylabel{encoding}
+    Sejam $A, B \in \Obj{\Graph}$ grafos e $f \colon A \to B$ um homomorfismo parcial de grafos.
+    Dizemos que $f$ é um \textbf{encoding} se, e somente se, $f$ é sobrejetor sobre os vértices de
+    $B$ e se, para todo $a \in \Ver{A}$ e aresta $b \edg[\alpha] f(a)$ em $B$, existe uma aresta
+    $a' \edg[\alpha'] b$ em $A$ tal que $f(\alpha') = \alpha$. Nesse caso, denotamos
+    $f \colon A \encodes B$.
+\end{definition}
+
+\TODO{definir homomorfismo parcial}
+
+Com isso, podemos afirmar, o seguinte, pela argumentação acima:
+
+\begin{proposition}
+    Um processo representado por um diagrama de computação $D$ pode ser computado em um sistema
+    distrubuído de CPUs arranjadas em um grafo $G$ se, e somente se, existe um
+    $f \colon \temp{G} \to D$.
+\end{proposition}
+
+\TODO{colocar provinha simples}
+
+Nesse caso, dizemos o seguinte.
+
+\begin{definition}\mylabel{assigning}
+    Um diagrama de computação $D$ pode ser \textbf{assinalado} a um grafo $G$ se existe um encoding
+    $f \colon \temp{G} \to D$.
+\end{definition}
+
+Agora, imagine que tenhamos um tal diagrama de computação $D$ que saibamos assinalar a um grafo $G$
+que representa uma forma de arranjar um sistema distribuído de CPUs, ou, equivalentemente, que
+tenhamos um encoding $f \colon \temp{G} \encodes D$. Sabemos, então, que essa maneira de assinalar
+operações para CPUs depende muito da forma como essas CPUs estão arranjadas, e dos caminhos pelos
+quais a informação pode ser trocada entre elas.
+
+Suponhamos, então, que queiramos "adaptar" esse \textit{escalonamento} de operações de $G$ para um
+outro grafo $G'$, isto é, para uma outra \textit{topologia} do nosso sistema distribuído. Como
+poderíamos fazer isso?
+
+Chamamos esse problema de \textbf{simulação} entre os dois sistemas distribuídos. Uma das
+estratégias utilizadas para resolvê-lo é via \textit{graph embedding} (\autocite{embedding}) e
+outra, desenvolvida por Fellows, é feita via a noção de encoding. Provaremos que, para o caso
+particular de uma simulação de grafos completos em cubos, a segunda estratégia nos dá um resultado
+consideravelmente melhor.
+
+\TODO{explorar artigos que citam o fellows, pode ser superficial}
+\TODO{só para dar uma ideia dos trabalhos na área}
+
+Em seguida, buscaremos encontrar os princípios \TODO{por que?} pelos quais os cálculos de Fellows funcionam, usando
+a Teoria de Categorias para trazê-los para um contexto mais geral, e obter algumas generalizações
+dos resultados de Fellows.
+
+\TODO{reescrever dizendo sobre levantar o conceito de encoding, mais específico}
 
 \chapter{Teoria de Categorias}
 
 Neste capítulo, trataremos dos conceitos básicos de Teoria de Categorias, de que precisaremos para
 trazermos os resultados de Fellows para esse contexto mais geral de categorias. Nosso objetivo
-principal com isto é tornar a tese auto-contida.
+principal com isto é tornar a tese auto-contida. Durante este capítulo, seguiremos principalmente
+\cite{awodey} para as definições e resultados.
 
-Durante este capítulo, seguiremos principalmente \cite{awodey} para as definições e resultados.
+Não nos preocuparemos aqui com os fundamentos conjuntistas da teoria, nem com questões de tamanho.
+Basta dizer que todas as noções aqui utilizadas são muito frequentes na literatura, e sua
+fundamentação pode ser encontrada em \autocite{working_mathmatician} e
+\autocite{category_theory_foundations}, por exemplo. Assuma, portanto, no que segue, que estejamos
+trabalhando em um universo de tamanho adequado.
 
 Comecemos com a definição do que é uma categoria:
 
@@ -1215,15 +1344,6 @@ identidade é, de fato uma transformação natural -- porque o seguinte diagrama
 \end{center}
 --, garante que o que foi definido acima tem, de fato, estrutura de categoria.
 
-Mais uma construção sobre categorias será necessária antes de definirmos limites e colimites. É a
-seguinte:
-
-\begin{definition}
-    Seja $\C$ uma categoria e $c$ um objeto de 
-\end{definition}
-
-\TODO{terminar slice categories}
-
 \section{Limites e colimites}
 
 A noção de \textit{produto}, bem como algumas outras noções categóricas como \textit{pullbacks} e
@@ -1467,11 +1587,369 @@ E semelhantemente para o colimite de uma família. Vejamos um exemplo mais famil
     coproduto de $\Set$.
 \end{example}
 
-\TODO{explicar equalizador}
-\TODO{explicar pullback}
-\TODO{lema: produto+equalizador=pullback}
+Outro tipo de limite importante são os \textit{equalizadores} e \textit{coequalizadores}. Eles
+generalizam, para categorias, as noções de subconjunto e quociente, respectivamente.
 
-Agora, vejamos um fato sobre limites que nos será muito útil:
+\begin{definition}\mylabel{equalizer}
+    Seja $\C$ uma categoria e $f, g \colon a \to b$ dois morfismos em $\C$. O \textit{equalizador}
+    dessas flechas é um objeto $x$ e uma flecha $m \colon x \to a$ tal que $f \circ m = g \circ m$.
+
+    Mais geralmente, o equalizador de uma família de flechas $(f_i)_{i \in I}$ em $\Hom[\C]{a}{b}$
+    é um objeto $x \in \Obj{\C}$ e uma flecha $m \colon x \to a$ tais que
+
+    \begin{equation*}
+        f_i \circ m = f_j \circ m
+    \end{equation*}
+    para quaisquer $i, j \in I$.
+
+    Mais ainda, essa flecha $m$ tem de satisfazer a seguinte condição: para qualquer flecha
+    $h \colon y \to a$ que iguale as compostas acima, existe um único $h' \colon y \to x$ tal que o
+    seguinte diagrama comute:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwyLCJ4Il0sWzIsMiwiYSJdLFswLDAsInkiXSxbMiwxLCJcXGZvcmFsbCBoIl0sWzIsMCwiXFxleGlzdHMhaCciLDIseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbMCwxLCJtIiwyXV0=
+        \begin{tikzcd}
+        	y && \\
+        	\\
+        	x && a
+        	\arrow["{\exists!h'}"', dashed, from=1-1, to=3-1]
+        	\arrow["{\forall h}", from=1-1, to=3-3]
+        	\arrow["m"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Dualmente, para uma família $(f_i)_{i \in I}$ de morfismos em $\Hom[\C]{a}{b}$, um
+    \textbf{coequalizador} é um objeto $x$ e uma flecha $e \colon b \to x$ tal que:
+
+    \begin{equation*}
+        e \circ f_i = e \circ f_j
+    \end{equation*}
+    para todos $i, j \in I$.
+
+    Ademais, se existe um $y \in \Obj{\C}$ e uma flecha $h \colon b \to y$ que equalize a família
+    de morfismos acima, existe um único morfismo $h' \colon x \to y$ que faz o diagrama abaixo
+    comutar:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwyLCJiIl0sWzIsMiwieCJdLFsyLDAsInkiXSxbMCwxLCJoIiwyXSxbMSwyLCJcXGV4aXN0cyEgaCciLDIseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbMCwyLCJcXGZvcmFsbCBoIl1d
+        \begin{tikzcd}
+        	&& y \\
+        	\\
+        	b && x
+        	\arrow["{\forall h}", from=3-1, to=1-3]
+        	\arrow["h"', from=3-1, to=3-3]
+        	\arrow["{\exists! h'}"', dashed, from=3-3, to=1-3]
+        \end{tikzcd}
+    \end{center}
+
+    Equivalentemente, um coequalizador é um equalizador na categoria oposta.
+\end{definition}
+
+Repare que equalizadores são limites. De fato, se tomarmos $\I$ como a subcategoria de $\C$:
+
+\begin{center}
+    % https://q.uiver.app/#q=WzAsMixbMCwwLCJhIl0sWzIsMCwiYiJdLFswLDEsImZfMCIsMCx7ImN1cnZlIjotM31dLFswLDEsImZfMSIsMix7ImN1cnZlIjotMn1dLFswLDEsIlxcdmRvdHMiLDEseyJjdXJ2ZSI6MSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoibm9uZSJ9LCJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzAsMSwiIiwxLHsiY3VydmUiOjN9XV0=
+    \begin{tikzcd}
+    	a && b
+    	\arrow["{f_0}", curve={height=-18pt}, from=1-1, to=1-3]
+    	\arrow["{f_1}"', curve={height=-12pt}, from=1-1, to=1-3]
+    	\arrow["\vdots"{description}, curve={height=6pt}, draw=none, from=1-1, to=1-3]
+    	\arrow[curve={height=18pt}, from=1-1, to=1-3]
+    \end{tikzcd}
+\end{center}
+
+Então o diagrama $D \colon \I \hookrightarrow \C$ dado pela inclusão determina a família
+$(f_i)_{i \in I}$ de flechas. O seu limite é um cone
+
+\begin{equation*}
+    (x, (p_i)_{j \in \Obj{\I}}) = (x, (p_j)_{j \in \{a, b\}})
+\end{equation*}
+
+Mas, pela definição de cone, $p_b = f_i \circ p_a$, para qualquer $i \in I$. Ou seja, $p_b$ é
+determinada por $p_a$, e dar o cone $(x, (p_j)_{j \in \Obj{\I}})$ é essencialmente dar $x$ e $p_a$.
+Por fim, a propriedade universal do produto nos dá a segunda parte da definição acima. Da mesma
+forma, coequalizadores são colimites.
+
+\begin{example}
+    Em $\Set$, equalizadores são subconjuntos, e coequalizadores são quocientes. Com efeito, sejam
+    $f, g \colon a \to b$ duas funções. Então o equalizador dessas flechas é o subconjunto:
+
+    \begin{equation*}
+        x \defeq \{c \in a \colon f(c) = g(c)\}
+    \end{equation*}
+    junto da inclusão $i \colon x \inclusion a$.
+
+    Com efeito, é claro que $f \circ i = g \circ i$ por definição. Suponha, no entanto, que haja um
+    $y \in \Obj{\Set}$ e uma flecha $h \colon y \to a$ que equalize $f$ e $g$. Então, em
+    particular, $h(y) \subseteq x \subseteq a$. Logo, existe uma flecha $h' \colon y \to x$ que
+    fatora $h$, a saber, a própria $h$. Ademais, é claro que essa $h'$ é única, por ser a prórpia
+    $h$.
+
+    Por outro lado, nas mesmas condições, tome a seguinte relação de equivalência:
+
+    \begin{align*}
+        b_1 \sim b_2 \iff \exists a_1 \in a &\colon b_1 = b_2 \\
+                                            &\logicalOr (b_1 = f(a_1) \logicalAnd b_2 = g(b_2)) \\
+                                            &\logicalOr (b_1 = g(a_1) \logicalAnd b_2 = f(a_1))
+    \end{align*}
+    ou seja, dois elementos de $b$ são equivalentes quando são iguais ou quando são imagens do
+    mesmo elemento $a_1$ por $f$ ou $g$. Nesse caso, o mapa canônico
+
+    \begin{equation*}
+        q \colon b \to b/\sim
+    \end{equation*}
+    do quociente nos dá um coequalizador.
+
+    De fato, por conta da relação de equivalência identificar as imagens de $f$ e $g$, teremos que
+    $q \circ f = q \circ g$. Ademais, suponha que haja um $y \in \Obj{\Set}$ e uma flecha
+    $h \colon b \to y$ que equalize $f$ e $g$. Então, em particular, se $b_1 \sim b_2$, teremos que
+    $h(b_1) = h(b_2)$. Logo, podemos montar uma função $h' \colon b/\sim \to y$ que leva cada
+    classe de equivalência em $b/\sim$ para a imagem de um de seus elementos por $h$. Essa $h'$
+    fará o diagrama externo do cone comutar, e é única, porque é determinada por $h$.
+\end{example}
+
+Por fim, temos definições mais puramente categóricas, mas que nos serão úteis para definir produtos
+nos grafos: os \textit{pullbacks} e \textit{pushouts}.
+
+\begin{definition}\mylabel{pullback}
+    Seja $\C$ uma categoria, e $f \colon a \to c$ e $g \colon b \to c$ duas flechas em $\C$ com o
+    mesmo codomínio. Então o \textbf{pullback} dessas duas flechas é um objeto $a \times_c b$
+    dotado de duas flechas $f' \colon a \times_c b \to b$, e $g' \colon a \times_c b \to a$ tais
+    que o seguinte diagrama comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJhIFxcdGltZXNfYyBiIl0sWzAsMiwiYiJdLFsyLDAsImEiXSxbMiwyLCJjIl0sWzIsMywiZiJdLFsxLDMsImciLDJdLFswLDIsImcnIl0sWzAsMSwiZiciLDJdLFswLDMsIiIsMSx7InN0eWxlIjp7Im5hbWUiOiJjb3JuZXIifX1dXQ==
+        \begin{tikzcd}
+        	{a \times_c b} && a \\
+        	\\
+        	b && c
+        	\arrow["{g'}", from=1-1, to=1-3]
+        	\arrow["{f'}"', from=1-1, to=3-1]
+        	\arrow["\lrcorner"{anchor=center, pos=0.125}, draw=none, from=1-1, to=3-3]
+        	\arrow["f", from=1-3, to=3-3]
+        	\arrow["g"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+    e tal que, se $x$ é um objeto e $h, k$ são morfismos de $\C$ tal que o seguinte diagrama comuta
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMSwxLCJhIFxcdGltZXNfYyBiIl0sWzEsMywiYiJdLFszLDEsImEiXSxbMywzLCJjIl0sWzAsMCwieCJdLFsyLDMsImYiXSxbMSwzLCJnIiwyXSxbMCwyLCJnJyJdLFswLDEsImYnIiwyXSxbNCwyLCJoIiwwLHsiY3VydmUiOi0yfV0sWzQsMSwiayIsMix7ImN1cnZlIjoyfV1d
+        \begin{tikzcd}
+        	x &&& \\
+        	& {a \times_c b} && a \\
+        	\\
+        	& b && c
+        	\arrow["h", curve={height=-12pt}, from=1-1, to=2-4]
+        	\arrow["k"', curve={height=12pt}, from=1-1, to=4-2]
+        	\arrow["{g'}", from=2-2, to=2-4]
+        	\arrow["{f'}"', from=2-2, to=4-2]
+        	\arrow["f", from=2-4, to=4-4]
+        	\arrow["g"', from=4-2, to=4-4]
+        \end{tikzcd}
+    \end{center}
+    existe um único morfismo $l \colon x \to a \times_c b$ que faz tudo comutar:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMSwxLCJhIFxcdGltZXNfYyBiIl0sWzEsMywiYiJdLFszLDEsImEiXSxbMywzLCJjIl0sWzAsMCwieCJdLFsyLDMsImYiXSxbMSwzLCJnIiwyXSxbMCwyLCJnJyJdLFswLDEsImYnIiwyXSxbNCwyLCJoIiwwLHsiY3VydmUiOi0yfV0sWzQsMSwiayIsMix7ImN1cnZlIjoyfV0sWzQsMCwiXFxleGlzdHMhIGwiLDEseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XV0=
+        \begin{tikzcd}
+        	x &&& \\
+        	& {a \times_c b} && a \\
+        	\\
+        	& b && c
+        	\arrow["{\exists! l}"{description}, dashed, from=1-1, to=2-2]
+        	\arrow["h", curve={height=-12pt}, from=1-1, to=2-4]
+        	\arrow["k"', curve={height=12pt}, from=1-1, to=4-2]
+        	\arrow["{g'}", from=2-2, to=2-4]
+        	\arrow["{f'}"', from=2-2, to=4-2]
+        	\arrow["f", from=2-4, to=4-4]
+        	\arrow["g"', from=4-2, to=4-4]
+        \end{tikzcd}
+    \end{center}
+
+    Caso esse seja o caso, denotamos que um diagrama é pullback com a marcação no canto superior
+    direito no primeiro diagrama acima.
+
+    Dualmente, dadas duas flechas $f \colon c \to a$ e $g \colon c \to b$, o \textbf{pushout} é o
+    completamento do diagrama
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJjIl0sWzIsMCwiYiJdLFswLDIsImEiXSxbMiwyLCJhIFxcdGltZXNeYyBiIl0sWzAsMiwiZiIsMl0sWzAsMSwiZyJdLFsyLDMsImcnIiwyXSxbMSwzLCJmJyJdLFszLDAsIiIsMSx7InN0eWxlIjp7Im5hbWUiOiJjb3JuZXIifX1dXQ==
+        \begin{tikzcd}
+        	c && b \\
+        	\\
+        	a && {a \times^c b}
+        	\arrow["g", from=1-1, to=1-3]
+        	\arrow["f"', from=1-1, to=3-1]
+        	\arrow["{f'}", from=1-3, to=3-3]
+        	\arrow["{g'}"', from=3-1, to=3-3]
+        	\arrow["\lrcorner"{anchor=center, pos=0.125, rotate=180}, draw=none, from=3-3, to=1-1]
+        \end{tikzcd}
+    \end{center}
+    tal que, para qualquer $x$ e $h, k$ tais que o diagrama abaixo comute
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMCwwLCJjIl0sWzIsMCwiYiJdLFswLDIsImEiXSxbMiwyLCJhIFxcdGltZXNeYyBiIl0sWzMsMywieCJdLFswLDIsImYiLDJdLFswLDEsImciXSxbMiwzLCJnJyIsMl0sWzEsMywiZiciXSxbMywwLCIiLDEseyJzdHlsZSI6eyJuYW1lIjoiY29ybmVyIn19XSxbMSw0LCJrIiwwLHsiY3VydmUiOi0yfV0sWzIsNCwiaCIsMix7ImN1cnZlIjoyfV1d
+        \begin{tikzcd}
+        	c && b & \\
+        	\\
+        	a && {a \times^c b} \\
+        	&&& x
+        	\arrow["g", from=1-1, to=1-3]
+        	\arrow["f"', from=1-1, to=3-1]
+        	\arrow["{f'}", from=1-3, to=3-3]
+        	\arrow["k", curve={height=-12pt}, from=1-3, to=4-4]
+        	\arrow["{g'}"', from=3-1, to=3-3]
+        	\arrow["h"', curve={height=12pt}, from=3-1, to=4-4]
+        	\arrow["\lrcorner"{anchor=center, pos=0.125, rotate=180}, draw=none, from=3-3, to=1-1]
+        \end{tikzcd}
+    \end{center}
+    existe um único $l \colon a \times^c b \to x$ tal que o diagrama
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMCwwLCJjIl0sWzIsMCwiYiJdLFswLDIsImEiXSxbMiwyLCJhIFxcdGltZXNeYyBiIl0sWzMsMywieCJdLFswLDIsImYiLDJdLFswLDEsImciXSxbMiwzLCJnJyIsMl0sWzEsMywiZiciXSxbMywwLCIiLDEseyJzdHlsZSI6eyJuYW1lIjoiY29ybmVyIn19XSxbMSw0LCJrIiwwLHsiY3VydmUiOi0yfV0sWzIsNCwiaCIsMix7ImN1cnZlIjoyfV0sWzMsNCwiXFxleGlzdHMhIGwiLDEseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XV0=
+        \begin{tikzcd}
+        	c && b & \\
+        	\\
+        	a && {a \times^c b} \\
+        	&&& x
+        	\arrow["g", from=1-1, to=1-3]
+        	\arrow["f"', from=1-1, to=3-1]
+        	\arrow["{f'}", from=1-3, to=3-3]
+        	\arrow["k", curve={height=-12pt}, from=1-3, to=4-4]
+        	\arrow["{g'}"', from=3-1, to=3-3]
+        	\arrow["h"', curve={height=12pt}, from=3-1, to=4-4]
+        	\arrow["\lrcorner"{anchor=center, pos=0.125, rotate=180}, draw=none, from=3-3, to=1-1]
+        	\arrow["{\exists! l}"{description}, dashed, from=3-3, to=4-4]
+        \end{tikzcd}
+    \end{center}
+    comute.
+
+    Equivalentemente, o pushout é um pullback na categoria oposta.
+\end{definition}
+
+\begin{lemma}
+    Seja $\C$ uma categoria com produtos e equalizadores, e sejam $f \colon a \to c$ e
+    $g \colon b \to c$ duas flechas em $\C$. Então, se o pullback dessas duas flechas existe, ele é
+    o equalizador de $f \circ \pi_a$ e $g \circ \pi_b$, sendo $\pi_a$ e $\pi_b$ as projeções
+    canônicas do produto $a \times b$.
+\end{lemma}
+
+\begin{proof}
+    Temos o seguinte diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNSxbMSwxLCJhIFxcdGltZXMgYiJdLFszLDEsImEiXSxbMSwzLCJiIl0sWzMsMywiYyJdLFswLDAsIngiXSxbMSwzLCJmIl0sWzIsMywiZyIsMl0sWzAsMiwiXFxwaV9iIiwyXSxbMCwxLCJcXHBpX2EiXSxbNCwxLCJcXHBpX2EgXFxjaXJjIGkiLDAseyJjdXJ2ZSI6LTJ9XSxbNCwyLCJcXHBpX2IgXFxjaXJjIGkiLDIseyJjdXJ2ZSI6Mn1dLFs0LDAsImkiLDEseyJzdHlsZSI6eyJ0YWlsIjp7Im5hbWUiOiJob29rIiwic2lkZSI6InRvcCJ9fX1dXQ==
+        \begin{tikzcd}
+        	x &&& \\
+        	& {a \times b} && a \\
+        	\\
+        	& b && c
+        	\arrow["i"{description}, hook, from=1-1, to=2-2]
+        	\arrow["{\pi_a \circ i}", curve={height=-12pt}, from=1-1, to=2-4]
+        	\arrow["{\pi_b \circ i}"', curve={height=12pt}, from=1-1, to=4-2]
+        	\arrow["{\pi_a}", from=2-2, to=2-4]
+        	\arrow["{\pi_b}"', from=2-2, to=4-2]
+        	\arrow["f", from=2-4, to=4-4]
+        	\arrow["g"', from=4-2, to=4-4]
+        \end{tikzcd}
+    \end{center}
+    para o equalizador de $f \circ \pi_a$ e $g \circ \pi_b$. Então é claro que o cone externo, com
+    $\pi_a \circ i$ e $\pi_b \circ i$ fazem o quadrado com $f$ e $g$ comutarem, pela definição de
+    equalizador. Portanto, temos a primeira metade da definição. Basta provar a propriedade
+    universal.
+
+    Sejam $y \in \Obj{\C}$ e $h, k$ duas flechas em $\C$ tais que o seguinte diagrama comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNixbMiwyLCJhIFxcdGltZXMgYiJdLFs0LDIsImEiXSxbMiw0LCJiIl0sWzQsNCwiYyJdLFsxLDEsIngiXSxbMCwwLCJ5Il0sWzEsMywiZiJdLFsyLDMsImciLDJdLFswLDIsIlxccGlfYiIsMl0sWzAsMSwiXFxwaV9hIl0sWzQsMSwiXFxwaV9hIFxcY2lyYyBpIiwxLHsiY3VydmUiOi0yfV0sWzQsMiwiXFxwaV9iIFxcY2lyYyBpIiwxLHsiY3VydmUiOjJ9XSxbNCwwLCJpIiwxLHsic3R5bGUiOnsidGFpbCI6eyJuYW1lIjoiaG9vayIsInNpZGUiOiJ0b3AifX19XSxbNSwxLCJoIiwwLHsiY3VydmUiOi01fV0sWzUsMiwiayIsMix7ImN1cnZlIjo1fV1d
+        \begin{tikzcd}
+        	y &&&& \\
+        	& x \\
+        	&& {a \times b} && a \\
+        	\\
+        	&& b && c
+        	\arrow["h", curve={height=-30pt}, from=1-1, to=3-5]
+        	\arrow["k"', curve={height=30pt}, from=1-1, to=5-3]
+        	\arrow["i"{description}, hook, from=2-2, to=3-3]
+        	\arrow["{\pi_a \circ i}"{description}, curve={height=-12pt}, from=2-2, to=3-5]
+        	\arrow["{\pi_b \circ i}"{description}, curve={height=12pt}, from=2-2, to=5-3]
+        	\arrow["{\pi_a}", from=3-3, to=3-5]
+        	\arrow["{\pi_b}"', from=3-3, to=5-3]
+        	\arrow["f", from=3-5, to=5-5]
+        	\arrow["g"', from=5-3, to=5-5]
+        \end{tikzcd}
+    \end{center}
+
+    Então, em particular, como temos flechas $h$ e $k$ para $a$ e $b$, respectivamente, teremos uma
+    única flecha $h \times k \colon y \to a \times b$ que faz o seguinte diagrama comutar:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMSwwLCJ5Il0sWzEsMiwiYSBcXHRpbWVzIGIiXSxbMCwzLCJhIl0sWzIsMywiYiJdLFsxLDIsIlxccGlfYSIsMl0sWzEsMywiXFxwaV9iIl0sWzAsMSwiXFxleGlzdHMhXFwsIGggXFx0aW1lcyB0IiwxXSxbMCwzLCJrIiwwLHsiY3VydmUiOi0yfV0sWzAsMiwiaCIsMix7ImN1cnZlIjoyfV1d
+        \begin{tikzcd}
+        	& y & \\
+        	\\
+        	& {a \times b} \\
+        	a && b
+        	\arrow["{\exists!\, h \times t}"{description}, from=1-2, to=3-2]
+        	\arrow["h"', curve={height=12pt}, from=1-2, to=4-1]
+        	\arrow["k", curve={height=-12pt}, from=1-2, to=4-3]
+        	\arrow["{\pi_a}"', from=3-2, to=4-1]
+        	\arrow["{\pi_b}", from=3-2, to=4-3]
+        \end{tikzcd}
+    \end{center}
+
+    Assim sendo, temos:
+
+    \begin{align*}
+        (f \circ \pi_a) \circ (h \times k) &= f \circ (\pi_a \circ (h \times k)) \\
+                                           &= f \circ h
+                                           &\text{(pela escolha de $h \times k$)} \\
+                                           &= g \circ k
+                                           &\text{(por hipótese)} \\
+                                           &= g \circ (\pi_b \circ (h \times k))
+                                           &\text{(pela escolha de $h \times k$)} \\
+                                           &= (g \circ \pi_b) \circ (h \times k)
+    \end{align*}
+
+    Logo, $h \times k$ também equaliza $f \circ \pi_a$ e $g \circ \pi_b$. Portanto, pela definição
+    de equalizador, existe um único morfismo $l \colon y \to x$ que faz o seguinte diagrama
+    comutar:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNixbMiwyLCJhIFxcdGltZXMgYiJdLFs0LDIsImEiXSxbMiw0LCJiIl0sWzQsNCwiYyJdLFsxLDEsIngiXSxbMCwwLCJ5Il0sWzEsMywiZiJdLFsyLDMsImciLDJdLFswLDIsIlxccGlfYiIsMl0sWzAsMSwiXFxwaV9hIl0sWzQsMSwiXFxwaV9hIFxcY2lyYyBpIiwxLHsiY3VydmUiOi0yfV0sWzQsMiwiXFxwaV9iIFxcY2lyYyBpIiwxLHsiY3VydmUiOjJ9XSxbNCwwLCJpIiwxLHsic3R5bGUiOnsidGFpbCI6eyJuYW1lIjoiaG9vayIsInNpZGUiOiJ0b3AifX19XSxbNSwxLCJoIiwwLHsiY3VydmUiOi01fV0sWzUsMiwiayIsMix7ImN1cnZlIjo1fV0sWzUsNCwiXFxleGlzdHMhIGwiLDEseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XV0=
+        \begin{tikzcd}
+        	y &&&& \\
+        	& x \\
+        	&& {a \times b} && a \\
+        	\\
+        	&& b && c
+        	\arrow["{\exists! l}"{description}, dashed, from=1-1, to=2-2]
+        	\arrow["h", curve={height=-30pt}, from=1-1, to=3-5]
+        	\arrow["k"', curve={height=30pt}, from=1-1, to=5-3]
+        	\arrow["i"{description}, hook, from=2-2, to=3-3]
+        	\arrow["{\pi_a \circ i}"{description}, curve={height=-12pt}, from=2-2, to=3-5]
+        	\arrow["{\pi_b \circ i}"{description}, curve={height=12pt}, from=2-2, to=5-3]
+        	\arrow["{\pi_a}", from=3-3, to=3-5]
+        	\arrow["{\pi_b}"', from=3-3, to=5-3]
+        	\arrow["f", from=3-5, to=5-5]
+        	\arrow["g"', from=5-3, to=5-5]
+        \end{tikzcd}
+    \end{center}
+\end{proof}
+
+Isso caracteriza os pullbacks em categorias com produtos e equalizadores. Em $\Set$, por exemplo, o
+lema acima nos diz que os pullbacks serão os subconjuntos do produto onde duas funções coincidem, e
+os pushouts serão o quociente de uniões disjuntas pela imagem das funções em questão.
+
+Agora, nós sabemos que se temos conjuntos $A, B, C, D$ e funções $f \colon A \to C$ e
+$g \colon B \to D$, podemos "concatená-las" no produto
+
+\begin{equation*}
+    f \times g \colon A \times B \to C \times D.
+\end{equation*}
+
+Algo semelhante pode ser feito para o caso dos limites e colimites, que nos será últil ao lidar com
+as setas entre os produtos de grafos, por exemplo. O seguinte lema nos dá esse resultado.
 
 \begin{proposition}\mylabel{lim_canonical_arrow}
     Sejam $\C$ uma categoria, $D, D' \colon \I \to \C$ dois diagramas nessa categoria e
@@ -1650,14 +2128,17 @@ Um exemplo importantíssimo de categorias de funtores são as categorias de funt
 conta de algumas "boas propriedades" que a categoria $\Set$ tem, categorias desse tipo também a
 possuem. Descreveremos algumas delas a seguir.
 
-\begin{proposition}
+O seguinte resultado é mencionado nas páginas 22 e 31 de \autocite{working_mathmatician}, mas não é
+provado.
+
+\begin{proposition}\mylabel{pointwise_limits}
     Seja $\C$ uma categoria pequena. Então $\Set^{\op{\C}}$ tem todos os limites pequenos, e esses
     limites são calculados ponto a ponto. Isso quer dizer que, se $D \colon \I \to \Set^{\op{\C}}$
     é um diagrama indexado por uma categoria pequena $\I$, então o limite de $D$ existe e é um cone
 
-    \begin{equation*}
-        \left( \lim D, (\eta^i)_{i \in \I} \right)
-    \end{equation*}
+    \begin{equation}\label{eq:lim_D_ponto_a_ponto}
+        \left( \lim D, (\eta^i)_{i \in \Obj{\I}} \right)
+    \end{equation}
     em que $\lim D$ é o funtor definido ponto a ponto:
 
     \begin{equation*}
@@ -1772,26 +2253,209 @@ possuem. Descreveremos algumas delas a seguir.
     para todo $\alpha \colon i \to j$ em $\I$.
 
     De fato, como estamos tratando de transformações naturais, basta testar componente a
-    componente.
+    componente. Seja, então, $c \in \Obj{\op{\C}}$. Então o diagrama acima é
 
-    \TODO{terminar limites ponto a ponto}
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMSwwLCJcXGxpbSBEKGMpIl0sWzAsMiwiRChpKShjKSJdLFsyLDIsIkQoaikoYykiXSxbMCwxLCJcXGV0YV5pX2MiLDJdLFsxLDIsIihEKFxcYWxwaGEpKV9jIiwyXSxbMCwyLCJcXGV0YV5qX2MiXV0=
+        \begin{tikzcd}
+        	& {\lim D(c)} & \\
+        	\\
+        	{D(i)(c)} && {D(j)(c)}
+        	\arrow["{\eta^i_c}"', from=1-2, to=3-1]
+        	\arrow["{\eta^j_c}", from=1-2, to=3-3]
+        	\arrow["{(D(\alpha))_c}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+    que podemos reescrever, usando nossas escolhas para $\lim D$ e $\eta^i$:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMSwwLCJcXGxpbSBcXGxlZnQoIFxcZXZhbHtjfSBcXGNpcmMgRCBcXHJpZ2h0KSJdLFswLDIsIlxcbGVmdCggXFxldmFse2N9IFxcY2lyYyBEIFxccmlnaHQpKGkpIl0sWzIsMiwiXFxsZWZ0KCBcXGV2YWx7Y30gXFxjaXJjIEQgXFxyaWdodCkoaikiXSxbMCwxLCJwXmNfaSIsMl0sWzEsMiwiXFxsZWZ0KCBcXGV2YWx7Y30gXFxjaXJjIEQgXFxyaWdodCkoXFxhbHBoYSkiLDJdLFswLDIsInBeY19qIl1d
+        \begin{tikzcd}
+        	& {\lim \left( \eval{c} \circ D \right)} & \\
+        	\\
+        	{\left( \eval{c} \circ D \right)(i)} && {\left( \eval{c} \circ D \right)(j)}
+        	\arrow["{p^c_i}"', from=1-2, to=3-1]
+        	\arrow["{p^c_j}", from=1-2, to=3-3]
+        	\arrow["{\left( \eval{c} \circ D \right)(\alpha)}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+    que comuta, porque as projeções canônicas formam um cone.
+
+    Resta apenas provar que o cone em \eqref{eq:lim_D_ponto_a_ponto} é cone limite, isto é, para
+    qualquer cone $\left( F, (\tau^i)_{i \in \Obj{\I}} \right)$ comutativo sobre $D$, existe um
+    único $\xi \colon F \nat \lim D$ tal que
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwwLCJGIl0sWzAsMiwiXFxsaW0gRCJdLFsxLDMsIkQoaSkiXSxbMCwxLCJcXGV4aXN0cyEgXFx4aSIsMix7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFsxLDIsIlxcZXRhXmkiLDJdLFswLDIsIlxcdGF1XmkiLDAseyJjdXJ2ZSI6LTJ9XV0=
+        \begin{tikzcd}
+        	F & \\
+        	\\
+        	{\lim D} \\
+        	& {D(i)}
+        	\arrow["{\exists! \xi}"', dashed, from=1-1, to=3-1]
+        	\arrow["{\tau^i}", curve={height=-12pt}, from=1-1, to=4-2]
+        	\arrow["{\eta^i}"', from=3-1, to=4-2]
+        \end{tikzcd}
+    \end{center}
+    comuta.
+
+    De fato, suponha que um tal cone exista. Então, componente a componente, temos que
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMSwwLCJGKGMpIl0sWzAsNCwiRChpKShjKSJdLFsxLDIsIlxcbGltIEQoYykiXSxbMiw0LCJEKGopKGMpIl0sWzEsMywiKEQoXFxhbHBoYSkpX2MiLDJdLFsyLDEsIlxcZXRhXmlfYyIsMV0sWzIsMywiXFxldGFeal9jIiwxXSxbMCwxLCJcXHRhdV5pX2MiLDIseyJjdXJ2ZSI6Mn1dLFswLDMsIlxcdGF1XmpfYyIsMCx7ImN1cnZlIjotMn1dXQ==
+        \begin{tikzcd}
+        	& {F(c)} & \\
+        	\\
+        	& {\lim D(c)} \\
+        	\\
+        	{D(i)(c)} && {D(j)(c)}
+        	\arrow["{\tau^i_c}"', curve={height=12pt}, from=1-2, to=5-1]
+        	\arrow["{\tau^j_c}", curve={height=-12pt}, from=1-2, to=5-3]
+        	\arrow["{\eta^i_c}"{description}, from=3-2, to=5-1]
+        	\arrow["{\eta^j_c}"{description}, from=3-2, to=5-3]
+        	\arrow["{(D(\alpha))_c}"', from=5-1, to=5-3]
+        \end{tikzcd}
+    \end{center}
+    comuta. Mas, novamente, podemos escrever o diagrama acima da seguinte forma:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMSwwLCJGKGMpIl0sWzAsNCwiXFxsZWZ0KCBcXGV2YWx7Y30gXFxjaXJjIEQgXFxyaWdodCkoaSkiXSxbMSwyLCJcXGxpbSBcXGxlZnQoIFxcZXZhbHtjfSBcXGNpcmMgRCBcXHJpZ2h0KSJdLFsyLDQsIlxcbGVmdCggXFxldmFse2N9IFxcY2lyYyBEIFxccmlnaHQpKGopIl0sWzEsMywiXFxsZWZ0KCBcXGV2YWx7Y30gXFxjaXJjIEQgXFxyaWdodCkoXFxhbHBoYSkiLDJdLFsyLDEsInBeY19pIiwxXSxbMiwzLCJwXmNfaiIsMV0sWzAsMSwiXFx0YXVeaV9jIiwyLHsiY3VydmUiOjJ9XSxbMCwzLCJcXHRhdV5qX2MiLDAseyJjdXJ2ZSI6LTJ9XV0=
+        \begin{tikzcd}
+        	& {F(c)} & \\
+        	\\
+        	& {\lim \left( \eval{c} \circ D \right)} \\
+        	\\
+        	{\left( \eval{c} \circ D \right)(i)} && {\left( \eval{c} \circ D \right)(j)}
+        	\arrow["{\tau^i_c}"', curve={height=12pt}, from=1-2, to=5-1]
+        	\arrow["{\tau^j_c}", curve={height=-12pt}, from=1-2, to=5-3]
+        	\arrow["{p^c_i}"{description}, from=3-2, to=5-1]
+        	\arrow["{p^c_j}"{description}, from=3-2, to=5-3]
+        	\arrow["{\left( \eval{c} \circ D \right)(\alpha)}"', from=5-1, to=5-3]
+        \end{tikzcd}
+    \end{center}
+
+    Logo, dado que as projeções formam um cone limite, existe um único morfismo $\xi_c$ tal que o
+    seguinte diagrama comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwwLCJGKGMpIl0sWzAsMiwiXFxsaW0gRChjKSJdLFsxLDMsIkQoaSkoYykiXSxbMCwxLCJcXGV4aXN0cyEgXFx4aV9jIiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzEsMiwiXFxldGFeaV9jIiwyXSxbMCwyLCJcXHRhdV5pX2MiLDAseyJjdXJ2ZSI6LTJ9XV0=
+        \begin{tikzcd}
+        	{F(c)} & \\
+        	\\
+        	{\lim D(c)} \\
+        	& {D(i)(c)}
+        	\arrow["{\exists! \xi_c}"', dashed, from=1-1, to=3-1]
+        	\arrow["{\tau^i_c}", curve={height=-12pt}, from=1-1, to=4-2]
+        	\arrow["{\eta^i_c}"', from=3-1, to=4-2]
+        \end{tikzcd}
+    \end{center}
+
+    Isto nos dá uma transformação $\xi$. Falta provar que é natural.
+
+    Com efeito, tome $f \colon c \to c'$ em $\op{\C}$. Então temos
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJGKGMpIl0sWzAsMiwiRihjJykiXSxbMiwwLCJcXGxpbSBEKGMpIl0sWzIsMiwiXFxsaW0gRChjJykiXSxbMCwxLCJGKGYpIiwyXSxbMiwzLCJcXGxpbSBEKGYpIl0sWzAsMiwiXFx4aV9jIl0sWzEsMywiXFx4aV97Yyd9IiwyXV0=
+        \begin{tikzcd}
+        	{F(c)} && {\lim D(c)} \\
+        	\\
+        	{F(c')} && {\lim D(c')}
+        	\arrow["{\xi_c}", from=1-1, to=1-3]
+        	\arrow["{F(f)}"', from=1-1, to=3-1]
+        	\arrow["{\lim D(f)}", from=1-3, to=3-3]
+        	\arrow["{\xi_{c'}}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+    que podemos reescrever da seguinte forma:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwwLCJGKGMpIl0sWzAsMiwiRihjJykiXSxbMiwwLCJcXGxpbSBcXGxlZnQoIFxcZXZhbHtjfSBcXGNpcmMgRCBcXHJpZ2h0KSJdLFsyLDIsIlxcbGltIFxcbGVmdCggXFxldmFse2MnfSBcXGNpcmMgRCBcXHJpZ2h0KSJdLFswLDEsIkYoZikiLDJdLFsyLDMsImgiXSxbMCwyLCJcXHhpX2MiXSxbMSwzLCJcXHhpX3tjJ30iLDJdXQ==
+        \begin{tikzcd}
+        	{F(c)} && {\lim \left( \eval{c} \circ D \right)} \\
+        	\\
+        	{F(c')} && {\lim \left( \eval{c'} \circ D \right)}
+        	\arrow["{\xi_c}", from=1-1, to=1-3]
+        	\arrow["{F(f)}"', from=1-1, to=3-1]
+        	\arrow["h", from=1-3, to=3-3]
+        	\arrow["{\xi_{c'}}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Temos de provar que o diagrama acima comuta. Para isso, repare que podemos formar o seguinte
+    diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMSwwLCJGKGMpIl0sWzEsMiwiXFxsaW0gXFxsZWZ0KCBcXGV2YWx7Yyd9IFxcY2lyYyBEIFxccmlnaHQpIl0sWzAsNCwiXFxsZWZ0KCBcXGV2YWx7Yyd9IFxcY2lyYyBEIFxccmlnaHQpKGkpIl0sWzEsMiwicF57Yyd9X2kiLDFdLFswLDEsIlxceGlfe2MnfSBcXGNpcmMgRihmKSJdLFswLDIsInBee2MnfV9pIFxcY2lyYyBcXHhpX3tjJ30gXFxjaXJjIEYoZikiLDIseyJjdXJ2ZSI6M31dXQ==
+        \begin{tikzcd}
+        	& {F(c)} \\
+        	\\
+        	& {\lim \left( \eval{c'} \circ D \right)} \\
+        	\\
+        	{\left( \eval{c'} \circ D \right)(i)}
+        	\arrow["{\xi_{c'} \circ F(f)}", from=1-2, to=3-2]
+        	\arrow["{p^{c'}_i \circ \xi_{c'} \circ F(f)}"', curve={height=18pt}, from=1-2, to=5-1]
+        	\arrow["{p^{c'}_i}"{description}, from=3-2, to=5-1]
+        \end{tikzcd}
+    \end{center}
+    que claramente comuta, e que $(F, (p^{c'}_i \circ \xi_{c'} \circ F(f))_{i \in \Obj{\I}})$ forma
+    um cone comutativo sobre $D$. Mas
+
+    \begin{align*}
+        p^{c'}_i \circ (h \circ \xi_c) &= (p^{c'}_i \circ h) \circ \xi_c \\
+                                       &= (\sigma(f)_i \circ p^c_i) \circ \xi_c
+                                       &\text{(por \myref{lim_canonical_arrow})} \\
+                                       &= (D(i)(f) \circ p^c_i) \circ \xi_c
+                                       &\text{(pela escolha de $\sigma(f)$)} \\
+                                       &= D(i)(f) \circ (p^c_i \circ \xi_c) \\
+                                       &= D(i)(f) \circ \tau^i_c
+                                       &\text{(pela escolha de $\xi_c$)} \\
+                                       &= \tau^i_{c'} \circ F(f)
+                                       &\text{(porque $\tau^i \colon F \nat D(i)$ é natural)} \\
+                                       &= (p^{c'}_i \circ \xi_c') \circ F(f)
+                                       &\text{(pela escolha de $\xi_{c'}$)} \\
+                                       &= p^{c'}_i \circ (\xi_{c'} \circ F(f))
+    \end{align*}
+
+    Logo, $h \circ \xi_c$ no diagrama acima em vez de $\xi_{c'} \circ F(f)$ também faz o diagrama
+    comutar. Como o limite é terminal, existe só um morfismo que faz o diagrama comutar. Assim
+    sendo,
+
+    \begin{equation*}
+        h \circ \xi_c = \xi_{c'} \circ F(f)
+    \end{equation*}
+    o que prova que $\xi$ é natural. Mais ainda, nossas escolhas das componentes de $\xi$ são
+    únicas pelas propriedades dos limites. Logo, $\xi$ é a única transformação natural que faz o
+    cone exterior entre $F$ e $\lim D$ comutar, como queríamos demonstrar.
 \end{proof}
 
-\begin{example}\mylabel{topos}
-    Seja $\I$ uma categoria qualquer. Considere, então, a categoria $\C \defeq \Set^\I$.
+Agora, exploremos algumas boas propriedades dos pré-feixes.
 
-    (i) Os monomorfismos em $\C$ são famílias de funções injetoras. Com efeito, sejam
-    $F, F', F'' \colon \I \to \C$ três funtores e $f, g \colon F \Rightarrow F'$ e
+\begin{example}\mylabel{presheaves}
+    Seja $\C$ uma categoria pequena qualquer. Considere, então, a categoria $\Set^{\op{\C}}$.
+
+    (i) Os monomorfismos em $\Set^{\op{\C}}$ são famílias de funções injetoras. Com efeito, sejam
+    $F, F', F'' \colon \op{\C} \to \Set$ três funtores e $, g \colon F \Rightarrow F'$ e
     $h \colon F \Rightarrow F'$ transformações naturais. Pela definição de transfromação natural,
-    $f$, $g$ e $h$ são famílias $(f_i)_{i \in \Obj{\I}}$ indexada pelos objetos de $\I$ de
-    morfismos em $\Set$, ou seja, de funções. Suponha que $h$ seja um monomorfismo em $\C$. Então,
-    se $h \circ f = h \circ g$, teremos que $f = g$. Mas $h \circ f$ é a família
-    $(h_i \circ f_i)_{i \in \Obj{\I}}$, e duas famílias dessa forma são iguais se, e somente se,
-    todas as suas componentes são iguais.
+    $f$, $g$ e $h$ são famílias $(f_c)_{c \in \Obj{\op{\C}}}$ indexada pelos objetos de $\op{\C}$
+    de morfismos em $\Set$, ou seja, de funções. Suponha que $h$ seja um monomorfismo em
+    $\Set^{\op{\C}}$. Então, se $h \circ f = h \circ g$, teremos que $f = g$. Mas $h \circ f$ é a
+    família $(h_i \circ f_i)_{i \in \Obj{\I}}$, e duas famílias dessa forma são iguais se, e
+    somente se, todas as suas componentes são iguais.
 
-    \TODO{terminar propriedades de topos}
+    (ii) Da mesma forma, epimorfismos em $\Set^{\op{\C}}$ são famílias de epimorfismos em $\Set$,
+    isto é, sobrejeções.
+
+    (iii) Como provado acima, limites e colimites são feitos ponto a ponto. Então, por exemplo,
+    dados dois funtores $F, G \colon \op{\C} \to \Set$, podemos obter o produto $F \times G$
+    fazendo o produto componente a componente de $F$ e $G$:
+
+    \begin{equation*}
+        (F \times G)(c) = F(c) \times G(c), \hspace{10pt} \forall c \in \Obj{\op{\C}}
+    \end{equation*}
 \end{example}
 
+As propriedades acima nos serão úteis para descrever os grafos, pois, como veremos a seguir, a
+categoria dos grafos pode ser descrita como uma categoria de pré-feixes.
 
 \chapter{Grafos: um ponto de vista categórico}\label{graph_theory}
 
@@ -1808,20 +2472,20 @@ Tendo tudo isso em vista, comecemos com a definição do que é um grafo:
     Considere a categoria formal $\Gamma$, com dois objetos e duas flechas paralelas seguinte:
 
     \begin{center}
-        % https://q.uiver.app/#q=WzAsMixbMCwwLCJFIl0sWzIsMCwiViJdLFswLDEsInMiLDAseyJvZmZzZXQiOi0yfV0sWzAsMSwidCIsMix7Im9mZnNldCI6Mn1dXQ==
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJFIl0sWzIsMCwiViJdLFsxLDAsInMiLDIseyJvZmZzZXQiOjJ9XSxbMSwwLCJ0IiwwLHsib2Zmc2V0IjotMn1dXQ==
         \begin{tikzcd}
         	E && V
-        	\arrow["s", shift left=2, from=1-1, to=1-3]
-        	\arrow["t"', shift right=2, from=1-1, to=1-3]
+        	\arrow["s"', shift right=2, from=1-3, to=1-1]
+        	\arrow["t", shift left=2, from=1-3, to=1-1]
         \end{tikzcd}
     \end{center}
 
     A \textbf{categoria dos grafos} é a categoria de funtores
 
     \begin{equation*}
-        \Graph \defeq \Set^\Gamma
+        \Graph \defeq \Set^{\op{\Gamma}}
     \end{equation*}
-    ou seja, um \textbf{grafo} $G \in \Obj{\Graph}$ é um funtor $G \colon \Gamma \to \Set$.
+    ou seja, um \textbf{grafo} $G \in \Obj{\Graph}$ é um funtor $G \colon \op{\Gamma} \to \Set$.
 
     Da mesma forma, um \textbf{homomorfismo de grafos} $h$ é uma transformação natural entre dois
     desses funtores.
@@ -1829,9 +2493,9 @@ Tendo tudo isso em vista, comecemos com a definição do que é um grafo:
     \TODO{deixar mais perto da abertura lá embaixo}
 
     \begin{center}
-        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXEdhbW1hIl0sWzQsMCwiU2V0Il0sWzAsMSwiRyIsMCx7ImN1cnZlIjotNH1dLFswLDEsIkgiLDIseyJjdXJ2ZSI6NH1dLFsyLDMsImgiLDIseyJzaG9ydGVuIjp7InNvdXJjZSI6MjAsInRhcmdldCI6MjB9fV1d
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXG9we1xcR2FtbWF9Il0sWzQsMCwiXFxTZXQiXSxbMCwxLCJHIiwwLHsiY3VydmUiOi00fV0sWzAsMSwiSCIsMix7ImN1cnZlIjo0fV0sWzIsMywiaCIsMix7InNob3J0ZW4iOnsic291cmNlIjoyMCwidGFyZ2V0IjoyMH19XV0=
         \begin{tikzcd}
-        	\Gamma &&&& Set
+        	{\op{\Gamma}} &&&& \Set
         	\arrow[""{name=0, anchor=center, inner sep=0}, "G", curve={height=-24pt}, from=1-1, to=1-5]
         	\arrow[""{name=1, anchor=center, inner sep=0}, "H"', curve={height=24pt}, from=1-1, to=1-5]
         	\arrow["h"', between={0.2}{0.8}, Rightarrow, from=0, to=1]
@@ -1839,10 +2503,10 @@ Tendo tudo isso em vista, comecemos com a definição do que é um grafo:
     \end{center}
 \end{definition}
 
-Vejamos o que isso significa. Tome $G \colon \Gamma \to \Set$ um grafo. Como $\Gamma$ tem dois
-objetos, o funtor nos dá dois conjuntos associados a eles: $G(E)$ e $G(V)$. Além disso, há duas
-setas paralelas em $\Gamma$ --- $s, t \colon E \to V$. Isso, através de $G$, nos dará duas funções
-paralelas
+Vejamos o que isso significa. Tome $G \colon \op{\Gamma} \to \Set$ um grafo. Como $\op{\Gamma}$ tem
+dois objetos, o funtor nos dá dois conjuntos associados a eles: $G(E)$ e $G(V)$. Além disso, há
+duas setas paralelas em $\op{\Gamma}$ --- $s, t \colon E \to V$. Isso, através de $G$, nos dará
+duas funções paralelas
 
 \begin{center}
     % https://q.uiver.app/#q=WzAsMixbMCwwLCJHKEUpIl0sWzIsMCwiRyhWKSJdLFswLDEsIkcocykiLDAseyJvZmZzZXQiOi0yfV0sWzAsMSwiRyh0KSIsMix7Im9mZnNldCI6Mn1dXQ==
@@ -1995,8 +2659,8 @@ Só nos resta uma coisa para entender os grafos: como eles se relacionam, isto �
 $h \colon G \to H$ é uma transformação natural entre eles enquanto funtores. Mas o que isso
 significa?
 
-$h$ ser uma transformação natural, significa que para cada objeto $a \in \Obj{\Gamma}$, existe um
-$h_a \colon G(a) \to H(a)$ tal que, para qualquer flecha $f \colon a \to b$ em $\Gamma$, o
+$h$ ser uma transformação natural, significa que para cada objeto $a \in \Obj{\op{\Gamma}}$, existe
+um $h_a \colon G(a) \to H(a)$ tal que, para qualquer flecha $f \colon a \to b$ em $\op{\Gamma}$, o
 seguinte diagrama comuta:
 
 \begin{center}
@@ -2012,7 +2676,7 @@ seguinte diagrama comuta:
     \end{tikzcd}
 \end{center}
 
-Como $\Gamma$ só tem dois objetos e dois morfismos, podemos representar isso da com o seguinte
+Como $\op{\Gamma}$ só tem dois objetos e dois morfismos, podemos representar isso da com o seguinte
 diagrama:
 
 \begin{center}
@@ -2281,8 +2945,8 @@ posteriormente, definiremos o oposto de um grafo:
     semelhantemente à \myref[Definição]{opposite_category}, como o grafo com os mesmos vértices e
     arestas de $G$, mas com a direção das arestas invertida.
 
-    Explicitamente, seja $S \colon \Gamma \to \Gamma$ o funtor que mantém $V, E \in \Obj{\Gamma}$ e
-    tal que $S(s) = t$ e $S(t) = s$. Então
+    Explicitamente, seja $S \colon \op{\Gamma} \to \op{\Gamma}$ o funtor que mantém
+    $V, E \in \Obj{\op{\Gamma}}$ e tal que $S(s) = t$ e $S(t) = s$. Então
 
     \begin{equation*}
         \op{G} = G \circ S.
@@ -2324,76 +2988,7 @@ Isto posto, podemos definir as operações que nos servirão daqui para frente.
 \end{proposition}
 
 \begin{proof}
-    Para isso, basta mostrar que o produto acima, junto das projeções canônicas, formam um cone
-    comutativo $\Graph$, e que esse cone é objeto final de $\Cone{D}$, onde
-    $D \colon \D(I) \to \Graph$ é o diagrama que nos dá as componentes do produto. Ou seja, basta
-    mostrar que as projeções canônicas definidas acima são, de fato, morfismos em $\Graph$, isto é,
-    que são transformações naturais. Como definidas, elas são transformações, seguindo a
-    \myref[Definição]{transformation}. Basta provar que vale a condição de naturalidade.
-
-    Tome, pois,
-
-    \begin{equation*}
-        (e_j)_{j \in I} \in \Edg{\prod_{j \in I} A_j}
-    \end{equation*}
-
-    Então teremos:
-
-    \begin{align*}
-        \left( \pi_i \circ s_{\prod A_j} \right) \left( (\alpha_j)_{j \in I} \right)
-            &= \pi_i \left( s_{\prod A_j}\left( (\alpha_j)_{j \in I} \right) \right) \\
-            &= \pi_i \left( \left( s_{A_j}(\alpha_j) \right)_{j \in I} \right) \\
-            &= s_{A_i}(\alpha_i) \\
-            &= s_{A_i}\left( \pi_i \left( (\alpha_j)_{j \in I} \right) \right) \\
-            &= \left( s_{A_i} \circ \pi_i \right) \left( (\alpha_j)_{j \in I} \right)
-    \end{align*}
-    e da mesma forma para as funções de destino.
-
-    Como isso vale para todas as arestas de $\prod_j A_j$, e todo $i \in I$, as projeções são
-    transformações naturais em $\Graph$, e, portanto, o produto, junto das transformações naturais
-    é um cone sobre $D$. Falta provar que é terminal.
-
-    Tome, então, $X \in \Obj{\Graph}$ um grafo e $\left(f_j \colon X \to A_j \right)_{j \in I}$ uma
-    família de homomorfismos de grafo. Temos de provar que há um único morfismo
-    $h \colon X \to \prod_j A_j$ tal que o seguinte diagrama comuta
-
-    \begin{center}
-        % https://q.uiver.app/#q=WzAsMyxbMCw0LCJBX2kiXSxbMSwyLCJcXHByb2Rfe2ogXFxpbiBJfSBBX2oiXSxbMSwwLCJYIl0sWzIsMCwiZl9pIiwyLHsiY3VydmUiOjJ9XSxbMiwxLCJcXGV4aXN0cyEgaCIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFsxLDAsIlxccGlfaSJdXQ==
-        \begin{tikzcd}
-        	& X \\
-        	\\
-        	& {\prod_{j \in I} A_j} \\
-        	\\
-        	{A_i}
-        	\arrow["{\exists! h}", dashed, from=1-2, to=3-2]
-        	\arrow["{f_i}"', curve={height=12pt}, from=1-2, to=5-1]
-        	\arrow["{\pi_i}", from=3-2, to=5-1]
-        \end{tikzcd}
-    \end{center}
-
-    (Existência) Provaremos que tal $h$ existe. Tome $h = \prod_j f_j$ definido da seguinte forma:
-
-    \begin{align*}
-        \prod_{j \in I} f_j \defeq X    &\to     \prod_{j \in I} A_j \\
-                                   \chi &\mapsto (f_j(\chi))_{j \in I},
-                                       \hspace{10pt} \forall \chi \in \Edg{X} \\
-                                   x    &\mapsto (f_j(x))_{j \in I},
-                                       \hspace{10pt} \forall x \in \Ver{X} \\
-    \end{align*}
-
-    Então é claro que $\pi_i \circ h = f_i$ para todo $i \in I$.
-
-    (Unicidade) Por outro lado, suponha que tenhamos $h'$ tal que o diagrama acima comuta. Tome,
-    então, $\chi \in \Edg{X}$. Então $h'(\chi) \in \Edg{\prod_j A_j}$ é uma família de arestas,
-    digamos, $(\alpha_j)_{j \in I}$. Então temos:
-
-    \begin{align*}
-        \alpha_i &= \pi_i\left( (\alpha_j)_{j \in I} \right) \\
-                 &= \pi_i\left( h'(\chi) \right) \\
-                 &= f_i(\chi)
-    \end{align*}
-    para todo $i \in I$. Logo, $h'(\chi) = h(\chi)$ para todo $\chi \in \Edg{X}$ e semelhantemente
-    para os vértices. Logo, $h = h'$.
+    Basta notar que o produto acima é o mesmo obtido pela \myref[Proposição]{pointwise_limits}.
 \end{proof}
 
 Outra operação que usaremos entre grafos é o \textit{produto caixa}, que passamos a definir a
@@ -2668,23 +3263,36 @@ saída igual a 0.
     saída de $G$ são graus de entrada em $\op{G}$, e que $C_n \cong \op{C_n}$.
 \end{proof}
 
-\begin{lemma}
-    Sejam $G, H \in \Obj{\Graph}$ grafos. Se $G \encodes H$ e $H$ é uma multi-árvore, então $H$ é
-    uma retração de $G$.
-\end{lemma}
-
 \chapter{Encoding e simulações}\label{fellows_results}
 
-Nesta seção, desenvolveremos uma aplicação específica do conceito de encoding, com vistas a motivar
-o leitor quanto à sua utilidade.
+Nesta seção, descreveremos o conceito de encoding para grafos e trataremos de alguns resultados
+específicos de uma aplicação desse conceito para a simulação entre redes de CPUs com diferentes
+topologias, com vistas a motivar o leitor quanto à sua utilidade.
 
 Os resultados abaixo se devem, quase em sua totalidade, a \autocite{fellows}. Nosso trabalho, nesta
-seção, é o de destrinchar esses resultados, e fazer pequenas correções à tese original.
+seção, é o de destrinchar esses resultados, e aproximá-los da linguagem categórica. Ademais,
+fizemos algumas correções pontuais à tese original, que, quando forem necessárias, serão
+mencionadas explicitamente. Por fim, resultados puramente algébricos e da Teoria de Números não
+serão provados, por se distanciarem muito do escopo da tese. Apenas uma citação será feita ao
+resultado na tese de Fellows, que na maioria das vezes tampouco lá é provado.
 
-\TODO{Dizer que estamos já mudando a linguagem para mais geral}
+Isto posto, considere o seguinte problema que nos motivará os resultados pelo resto do capítulo.
 
-Para tanto, nos faremos uma pequena pergunta, a resposta da qual nos guiará pelo resto da
-seção:
+\section{O problema da simulação}
+
+
+Para isso, defina:
+
+\begin{definition}\mylabel{mu}
+    Sejam $n, r \in \N$, $n, r \geq 1$. Então definimos $\mu_r(n)$ como o menor número $k$ tal que
+    $Q_k^{(r)}$ encoda $K_n$, isto é
+
+    \begin{equation*}
+        \mu_r(n) \defeq \min \left\{ k \in \N \colon Q_k^{(r)} \encodes K_n \right\}
+    \end{equation*}
+\end{definition}
+
+\TODO{definir grafo com comprimento r}
 
 \begin{example}
     Suponha que você tenha uma rede de processadores todos ligados entre si:
@@ -2737,14 +3345,6 @@ seção:
     a $r$ que liga os processadores que precisamos, qual seria esse número?
 \end{example}
 
-\begin{definition}\mylabel{mu}
-    Sejam $n, r \in \N$, $n, r \geq 1$. Então definimos $\mu_r(n)$ como o menor número $k$ tal que
-    $Q_k^{(r)}$ encoda $K_n$, isto é
-
-    \begin{equation*}
-        \mu_r(n) \defeq \min \left\{ k \in \N \colon Q_k^{(n)} \encodes K_n \right\}
-    \end{equation*}
-\end{definition}
 
 \section{Resultados algébricos}
 
@@ -2890,12 +3490,12 @@ provar que esse encoding de Hamming é, de fato, o menor encoding possível:
 
 Agora estamos prontos para iniciar a busca pelo melhor encoding $Q_k^{(r)} \encodes K_n$.
 
-\section{Encontrando encodings para o grafo Kn: caso r = 1}
+\section{Encontrando encodings para o grafo completo: caso r = 1}
 
 Comecemos com o caso $r = 1$, isto é, queremos encontrar o menor $k \in \N$ tal que
 $Q_k \encodes K_n$, para um $n \in \N$ qualquer.
 
-\begin{proposition}\mylabel{mu_1_n_geq_n_minus_1}
+\begin{proposition}[\autocite{fellows}, Proposition 2.1]\mylabel{mu_1_n_geq_n_minus_1}
     $\mu_1(n) \geq n - 1$
 \end{proposition}
 
@@ -2911,7 +3511,7 @@ $Q_k \encodes K_n$, para um $n \in \N$ qualquer.
 De fato, na desigualdade do lema acima vale a igualdade no caso $n = 2^k$, e esse é o caso que nos
 dá o encoding de Hamming. Vejamos a sua construção abaixo.
 
-\begin{theorem}\mylabel{mu_1_2_k_n_minus_1}
+\begin{theorem}[\autocite{fellows}, Theorem 2.2]\mylabel{mu_1_2_k_n_minus_1}
     $\mu_1(2^k) = 2^k - 1$
 \end{theorem}
 
@@ -2937,7 +3537,7 @@ De fato, veremos que $\mu_1$ não desvia muito dessa tendência. De forma mais p
 $\mu_1$ é assintóticamente equivalente a $n$. Para demonstrar isso, no entanto, vamos precisar de
 mais alguns teoremas.
 
-\begin{theorem}\mylabel{normal_enc_cayley}
+\begin{theorem}[\autocite{fellows}, Theorem 2.8]\mylabel{normal_enc_cayley}
     Seja $G$ um grupo, $N_i$ uma família de subgrupos normais de $G$ tais que $G = \prod_i N_i$ e
     $S \subseteq G$ um subconjunto de $G$ qualquer tal que para todo $s \in S$, existe $i$ tal que
     $s \in N_i$.
@@ -3026,7 +3626,7 @@ mais alguns teoremas.
 Além do teorema acima, precisaremos de mais um teorema essencial para entender a ligação do
 conceito de encoding com o de produto caixa.
 
-\begin{theorem}\mylabel{prod_enc_prod}
+\begin{theorem}[\autocite{fellows}, Theorem 1.2(a)]\mylabel{prod_enc_prod}
     Sejam $A, B, C, D \in \Graph$ grafos tais que $A \encodes B$ e $C \encodes D$. Então
 
     \begin{equation*}
@@ -3036,7 +3636,7 @@ conceito de encoding com o de produto caixa.
 
 \begin{proof}
     Sejam $f \colon A \to B$ e $g \colon C \to D$ encodings. Além disso, tome
-    $(a_2, c_2) \in \Obj{A \boxProduct C}$.
+    $(a_2, c_2) \in \Ver{A \boxProduct C}$.
 
     Seja, além disso, $(b_2, d_2) \defeq (f(a_2), g(c_2))$.
 
@@ -3047,7 +3647,7 @@ conceito de encoding com o de produto caixa.
     \end{equation*}
     seja umama aresta de $B \boxProduct D$. Então $b_1 = b_2$ ou $d_1 = d_2$. Escolha, sem perda de
     generalidade, $b_1 = b_2$. Então, pela construção de $B \boxProduct D$, existe uma aresta
-    $d_1 \to d_2 = g(d_1)$ em $D$. Logo, pela definição de encoding, existe um $c_1 \in \Obj{C}$
+    $d_1 \to d_2 = g(d_1)$ em $D$. Logo, pela definição de encoding, existe um $c_1 \in \Ver{C}$
     e uma aresta $c_1 \to c_2$ em $C$ levada em $d_1 \to d_2$ em $D$.
 
     Além disso, como $f$ é sobrejetora, temos que existe $a_1 \in f^{-1}(\{b_1\})$. Logo,
@@ -3070,11 +3670,11 @@ Agora, para a próxima etapa da nossa demonstração, tomaremos emprestado algun
 \end{definition}
 
 É fato conhecido que, se dois corpos finitos têm o mesmo número de elementos, então eles são
-isomorfos. Isso justifica a definição acima.
+isomorfos (\autocite{finite_fields}). Isso justifica a definição acima.
 
 Podemos usar a decomposição desses corpos para obter o seguinte lema:
 
-\begin{lemma}\mylabel{li_finite_field}
+\begin{lemma}[\autocite{fellows}, Theorem 2.9]\mylabel{li_finite_field}
     Seja $p$ um primo. Se $t$ é um elemento primitivo do corpo finito $\Field{p^r}$, então $t^a$ e
     $t^b$ são linearmente independentes em um subcorpo $\Field{p^s}$ sse.
 
@@ -3084,7 +3684,7 @@ Podemos usar a decomposição desses corpos para obter o seguinte lema:
 \end{lemma}
 
 
-\begin{theorem}\mylabel{factor_mu_1}
+\begin{theorem}[\autocite{fellows}, Theorem 2.10]\mylabel{factor_mu_1}
     Seja $n = p_1^{r_1} \cdots p_k^{r_k}$ e suponha que $s_1, \cdots, s_k \in \N$ sejam tais que
     $s_i | r_i, \forall i$. Então, tomando $m = p_1^{s_1} \cdots p_k^{s_k}$, temos que
 
@@ -3160,7 +3760,7 @@ O lema acima nos dá uma estimativa do crescimento de $\mu_1$ com relação a di
 $n$ usando alguns fatos sobre corpos finitos e primos. Usando os fatos seguintes sobre a
 distribuição dos números primos, obteremos finalmente uma estimativa para $\mu_1$ não recursiva.
 
-\begin{lemma}\mylabel{m_prox_n}
+\begin{lemma}[\autocite{fellows}, prova do Theorem 2.11]\mylabel{m_prox_n}
     Seja $\epsilon > 0$ e $p, q \in \N$ primos. Então existe um $n_0 \in \N$ tal que, para todo
     $n \in \N$, $n \geq n_0$, existem $a, b \in \N$ tais que $p^a q^b \geq n$ e
 
@@ -3169,11 +3769,7 @@ distribuição dos números primos, obteremos finalmente uma estimativa para $\m
     \end{equation}
 \end{lemma}
 
-\begin{proof}
-    \TODO{Inserir prova do lema sobre densidade dos primos}.
-\end{proof}
-
-\begin{lemma}\mylabel{dist_primos}
+\begin{lemma}[\autocite{fellows}, prova do Theorem 2.11]\mylabel{dist_primos}
     Seja $0 < \epsilon < 1$. Então existem $p, q \in \N$ primos e $s, t \in \N$ tais que
     $p < 2^s$, $q < 2^t$ e
 
@@ -3190,14 +3786,10 @@ distribuição dos números primos, obteremos finalmente uma estimativa para $\m
     \end{center}
 \end{lemma}
 
-\begin{proof}
-    \TODO{Inserir prova do lema com o Teorema dos Números Primos?}
-\end{proof}
-
 Agora temos tudo o que precisamos para provar que $\mu_1$ é assintóticamente equivalente a $n$.
 Basta demonstrar esse fato.
 
-\begin{theorem}\mylabel{lim_assintotico_mu_1}
+\begin{theorem}[\autocite{fellows}, Theorem 2.11]\mylabel{lim_assintotico_mu_1}
     $\mu_1(n) \sim n$
 \end{theorem}
 
@@ -3351,7 +3943,7 @@ Veja o exemplo a seguir:
 
     Equivalentemente, poderíamos considerar $Q_3^{(2)}$, ou seja, o grafo dos caminhos em $Q_3$ de
     comprimento menor ou igual a $2$. Mas isso ainda não é suficiente para um encoding. Para isso,
-    precisaríamos de $Q_3^{(3)}$. Nesse caso, teríamos $K_8 \hookrightarrow Q_3^{(3)}$ e é claro
+    precisaríamos de $Q_3^{(3)}$. Nesse caso, teríamos $K_8 \mono Q_3^{(3)}$ e é claro
     que $K_8 \encodes K_5$, ou visualmente:
 
     % https://q.uiver.app/#q=WzAsOCxbMCwzLCIoMCwwLDApIl0sWzIsMywiKDEsIDAsIDApIl0sWzAsMSwiKDAsIDEsIDApIixbMCw2MCw2MCwxXV0sWzIsMSwiKDEsMSwwKSIsWzAsNjAsNjAsMV1dLFsxLDAsIigwLCAxLCAxKSIsWzAsNjAsNjAsMV1dLFsxLDIsIigwLCAwLCAxKSJdLFszLDIsIigxLCAwLCAxKSIsWzAsNjAsNjAsMV1dLFszLDAsIigxLCAxLCAxKSIsWzAsNjAsNjAsMV1dLFswLDUsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMiw0LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMCwiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs0LDUsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMCwxLCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMywiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFszLDEsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbNyw2LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsNywiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs1LDYsIiIsMSx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMSw2LCIiLDEseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzMsNywiIiwxLHsic3R5bGUiOnsiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFsyLDcsIiIsMSx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9LCJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzQsMywiIiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZG90dGVkIn0sImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbNiwyLCIiLDEseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifSwiaGVhZCI6eyJuYW1lIjoibm9uZSJ9fX1dLFs2LDQsIiIsMSx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9LCJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzYsMywiIiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn0sImhlYWQiOnsibmFtZSI6Im5vbmUifX19XV0=
@@ -3389,7 +3981,7 @@ Como se comporta esse número, no entanto, admitindo um custo de retransmissão 
 Para responder a essa pergunta, primeiramente provaremos um resuldado que nos permita reduzir o
 problema recursivamente.
 
-\begin{lemma}\mylabel{prod_construction}
+\begin{lemma}[\autocite{fellows}, Lemma 2.12]\mylabel{prod_construction}
     Seja $r = r_1 + r_2$ e $n = n_1 \cdot n_2$. Então
 
     \begin{equation}
@@ -3503,9 +4095,10 @@ ajudará logo em seguida.
     \end{equation*}
 \end{proof}
 
-Agora já temos o suficiente para fazer uma estimativa do crescimento de $\mu_r$.
+Agora já temos o suficiente para fazer uma estimativa do crescimento de $\mu_r$. Aqui fazemos uma
+pequena correção no fator $\alpha$ com relação à tese original.
 
-\begin{lemma}[Um limite exponencial]\mylabel{r_exp_limit}
+\begin{lemma}[\autocite{fellows}, Theorem 2.13, Um limite exponencial]\mylabel{r_exp_limit}
     Sejam $n, r \geq 1$ inteiros. Então
 
     \begin{equation}
@@ -3603,7 +4196,7 @@ Agora já temos o suficiente para fazer uma estimativa do crescimento de $\mu_r$
 
 Por fim, podemos demonstrar o limite assintótico de $\mu_r$.
 
-\begin{theorem}
+\begin{theorem}[\autocite{fellows}, Theorem 2.14]
     Para todos $\epsilon > 0$ e $r \in \N$, $r \geq 1$, existe um número $N \in \N$ tal que
 
     \begin{equation*}
@@ -3707,7 +4300,7 @@ Por fim, podemos demonstrar o limite assintótico de $\mu_r$.
     Escolhendo $N = N_4$, temos, portanto, o resultado.
 \end{proof}
 
-\section{Simulação}
+\section{Encoding vs. graph embedding}
 
 \TODO{colocar resultados sobre simulação no começo}
 
@@ -3724,150 +4317,11 @@ Primeiramente, entendamos como as computações são feitas em CPUs
     fazer.
 \end{definition}
 
-\begin{definition}
-    Um \textbf{diagrama de computação} é um grafo acíclico, finito e conexo $G$ tal que
-    $\Ver{G} \subseteq \mathfrak{A}$ para alguma arquitetura $\mathfrak{A}$ de CPU.
-\end{definition}
 
 Para isso, imagine o seguinte cenário, também de \cite{fellows}:
 
-\begin{example}
-    Suponha que queiramos computar o valor de $x + xy$, dados $x, y$ são números inteiros
-    quaisquer, em uma arquitetura que contenha as operações "soma de inteiros" $+$ e multiplicação
-    de inteiros $*$. Nesse caso, precisaremos que se compute uma multiplicação, $x * y$ e uma soma,
-    entre o resultado dessa computação e $x$.
 
-    Um diagrama possível que realiza a computação acima seria o seguinte:
 
-    \begin{center}
-        % https://q.uiver.app/#q=WzAsNSxbMCwwLCJ4Il0sWzIsMCwieSJdLFswLDIsImlkIl0sWzIsMiwiKiJdLFsyLDQsIisiXSxbMCwzXSxbMSwzXSxbMCwyXSxbMiw0XSxbMyw0XV0=
-        \begin{tikzcd}
-        	x && y \\
-        	\\
-        	id && {*} \\
-        	\\
-        	&& {+}
-        	\arrow[from=1-1, to=3-1]
-        	\arrow[from=1-1, to=3-3]
-        	\arrow[from=1-3, to=3-3]
-        	\arrow[from=3-1, to=5-3]
-        	\arrow[from=3-3, to=5-3]
-        \end{tikzcd}
-    \end{center}
-    em que as flechas indicam o fluxo de informação, isto é, de entradas e saídas das operações, e
-    $id$ é a operação que mantém a entrada.
-
-    Digamos que queiramos realizar essa computação em um sistema com duas CPUs dispostas e ligadas
-    da seguinte forma:
-
-    \begin{center}
-        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXGJveGVke0NQVVxcLCAxfSJdLFsyLDAsIlxcYm94ZWR7Q1BVXFwsIDJ9Il0sWzAsMSwiIiwyLHsiY3VydmUiOi0yfV0sWzEsMCwiIiwyLHsiY3VydmUiOi0yfV1d
-        \begin{tikzcd}
-        	{\boxed{CPU\, 1}} && {\boxed{CPU\, 2}}
-        	\arrow[curve={height=-12pt}, from=1-1, to=1-3]
-        	\arrow[curve={height=-12pt}, from=1-3, to=1-1]
-        \end{tikzcd}
-    \end{center}
-    isto é, ligadas de forma que exista um caminho para a informação passar da CPU 1 para a CPU 2,
-    e vice versa.
-
-    Podemos imaginar um grafo temporal discreto, em que as linhas simbolizam a transmissão de
-    informação de uma CPU para a outra no próximo instante de tempo.
-    \begin{center}
-        % https://q.uiver.app/#q=WzAsMTIsWzIsMCwiXFxib3hlZHtDUFVcXCwgMX0iXSxbNCwwLCJcXGJveGVke0NQVVxcLCAyfSJdLFswLDAsInQ9MCJdLFsyLDIsIlxcYm94ZWR7Q1BVXFwsMX0iXSxbNCwyLCJcXGJveGVke0NQVVxcLDJ9Il0sWzAsMiwidD0xIl0sWzAsNCwidD0yIl0sWzAsNiwiXFx2ZG90cyJdLFsyLDQsIlxcYm94ZWR7Q1BVXFwsMX0iXSxbNCw0LCJcXGJveGVke0NQVVxcLDJ9Il0sWzIsNiwiXFx2ZG90cyJdLFs0LDYsIlxcdmRvdHMiXSxbMCwzLCIiLDIseyJjb2xvdXIiOlswLDAsNDBdfV0sWzAsNCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFsxLDQsIiIsMix7ImNvbG91ciI6WzAsMCw0MF19XSxbMSwzLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV0sWzMsOSwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFszLDgsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF19XSxbNCw5LCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV0sWzQsOCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFs4LDEwLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV0sWzgsMTEsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF19XSxbOSwxMSwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXX1dLFs5LDEwLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdfV1d
-        \begin{tikzcd}
-        	{t=0} && {\boxed{CPU\, 1}} && {\boxed{CPU\, 2}} \\
-        	\\
-        	{t=1} && {\boxed{CPU\,1}} && {\boxed{CPU\,2}} \\
-        	\\
-        	{t=2} && {\boxed{CPU\,1}} && {\boxed{CPU\,2}} \\
-        	\\
-        	\vdots && \vdots && \vdots
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-3, to=3-3]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-3, to=3-5]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-5, to=3-3]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=1-5, to=3-5]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-3, to=5-3]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-3, to=5-5]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-5, to=5-3]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=3-5, to=5-5]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-3, to=7-3]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-3, to=7-5]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-5, to=7-3]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, from=5-5, to=7-5]
-        \end{tikzcd}
-    \end{center}
-
-    Observe que nós podemos imbutir o diagrama de computação acima nesse grafo:
-
-    \begin{center}
-        % https://q.uiver.app/#q=WzAsMTIsWzIsMCwiXFxib3hlZHt4fSJdLFs0LDAsIlxcYm94ZWR7eX0iXSxbMCwwLCJ0PTAiXSxbMiwyLCJcXGJveGVke2lkfSJdLFs0LDIsIlxcYm94ZWR7Kn0iXSxbMCwyLCJ0PTEiXSxbMCw0LCJ0PTIiXSxbMCw2LCJcXHZkb3RzIl0sWzIsNF0sWzQsNCwiXFxib3hlZHsrfSJdLFsyLDYsIlxcdmRvdHMiXSxbNCw2LCJcXHZkb3RzIl0sWzAsM10sWzAsNF0sWzEsNF0sWzEsMywiIiwwLHsiY29sb3VyIjpbMCwwLDQwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzMsOV0sWzMsOCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzQsOV0sWzQsOCwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzgsMTAsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF0sInN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFs4LDExLCIiLDAseyJjb2xvdXIiOlswLDAsNDBdLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbOSwxMSwiIiwwLHsiY29sb3VyIjpbMCwwLDQwXSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzksMTAsIiIsMCx7ImNvbG91ciI6WzAsMCw0MF0sInN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dXQ==
-        \begin{tikzcd}
-        	{t=0} && {\boxed{x}} && {\boxed{y}} \\
-        	\\
-        	{t=1} && {\boxed{id}} && {\boxed{*}} \\
-        	\\
-        	{t=2} && {} && {\boxed{+}} \\
-        	\\
-        	\vdots && \vdots && \vdots
-        	\arrow[from=1-3, to=3-3]
-        	\arrow[from=1-3, to=3-5]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=1-5, to=3-3]
-        	\arrow[from=1-5, to=3-5]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=3-3, to=5-3]
-        	\arrow[from=3-3, to=5-5]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=3-5, to=5-3]
-        	\arrow[from=3-5, to=5-5]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-3, to=7-3]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-3, to=7-5]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-5, to=7-3]
-        	\arrow[color={rgb,255:red,102;green,102;blue,102}, dashed, from=5-5, to=7-5]
-        \end{tikzcd}
-    \end{center}
-
-    Ou seja, dado o diagrama acima, existe uma atribuição possível de operações para cada CPU em
-    cada instante de tempo tal que é possível computar a expressão desejada.
-\end{example}
-
-Repare que, para que tenhamos o resultado, precisamos que a seguinte condição seja satisfeita: que
-as operações no último nível do diagrama de computação sejam executadas com as entradas corretas,
-isto é, que os resultados anteriores estejam corretamente computados, e que haja um caminho para a
-informação dos passos anteriores chegue às CPUs corretas que realizarão as operações no último
-nível. Mas, para que essas entradas estejam corretamente computadas, é necessário que as mesmas
-condições sejam satisfeitas para o nível anterior, e assim sucessivamente.
-
-Por indução finita, precisamos, então, que todas as operações (em todos os níveis) sejam
-executadas, e que haja um caminho que conecte a CPU que fez a operação no nível anterior para a CPU
-que vai fazer a próxima operação que dependa da anterior em todos os passos. Em outras palavras,
-precisamos que o grafo acima, que indica os caminhos de informação entre as CPUs, \textit{encode} o
-grafo de computação. Vamos formalizar isso.
-
-\begin{definition}
-    Seja $G$ um grafo. O \textbf{grafo temporal} de $G$ é o grafo, denotado $\temp{G}$, é o grafo:
-
-    \begin{equation*}
-        \temp{G} \defeq G \times L^\rightarrow_\omega
-    \end{equation*}
-    em que $L^\rightarrow_\omega$ é o seguinte grafo:
-
-    \begin{center}
-        % https://q.uiver.app/#q=WzAsNCxbMCwwLCIwIl0sWzIsMCwiMSJdLFs0LDAsIjIiXSxbNiwwLCJcXGNkb3RzIl0sWzAsMV0sWzEsMl0sWzIsM11d
-        \begin{tikzcd}
-        	0 && 1 && 2 && \cdots
-        	\arrow[from=1-1, to=1-3]
-        	\arrow[from=1-3, to=1-5]
-        	\arrow[from=1-5, to=1-7]
-        \end{tikzcd}
-    \end{center}
-\end{definition}
-
-Isto nos dá um grafo em que os vértices são pares $(t, v)$, em que $t$ é um instante de tempo e $v$
-um vértice de $G$, e cujas arestas são entre pares $(t, v), (t+1, v')$, em que há uma aresta
-$v \to v'$ em $G$.
-
-Se $G$ representa, então, como as CPUs estão ligadas entre si e os possíveis caminhos de
-transmissão de informação, $\temp{G}$ representa o fluxo de informação nessa disposição ao longo do
-tempo.
 
 \begin{definition}
     Seja $D$ um diagrama de computação. Dizemos que $D$ pode ser \textbf{assinalado} a um grafo $G$
@@ -4184,7 +4638,7 @@ nos dão uma descrição de uma categoria.
 
 Sabendo disso, olhemos de novo para a definição de encoding:
 
-\begin{definition}\mylabel{encoding}
+\begin{definition}
     Sejam $A, B \in \Graph$ grafos e $f \colon A \to B$ uma flecha, isto é, um homomorfismo entre
     eles. Então dizemos que $f$ é um \textbf{encoding} se, e somente se, $f$ é um epimorfismo e,
     para todo $b \in \Ver{A}$, e toda aresta $a \to_\alpha f(b)$ em $B$, existe um levantamento
@@ -4194,12 +4648,10 @@ Sabendo disso, olhemos de novo para a definição de encoding:
 Tomemos um momento para apreciar essa definição.
 
 A princípio, parece que esta definição trata da mesma coisa duas vezes: a primeira dizendo que $f$
-é um epimorfismo. No contexto de um topos, como a categoria que estamos lidando, isto é, $\Graph$,
-dizer que temos um epimorfismo é equivalente a dizer que existe uma sobrejeção sobre os conjuntos
-correspondentes -- no caso, $\Ver{A} \to \Ver{B}$ e $\Edg{A} \to \Edg{B}$ --, que respeita as
-devidas relações.
-
-\TODO{trocar "topos" por "copresheaves"}
+é um epimorfismo. No contexto de um pré-feixe, como a categoria que estamos lidando, isto é,
+$\Graph$, dizer que temos um epimorfismo é equivalente a dizer que existe uma sobrejeção sobre os
+conjuntos correspondentes -- no caso, $\Ver{A} \to \Ver{B}$ e $\Edg{A} \to \Edg{B}$ --, que
+respeita as devidas relações.
 
 Ora, se a segunda condição diz que há um levantamento para qualquer aresta do codomínio, isso não é
 o mesmo que reafirmar o caráter de epimorfismo de $f$? Não, e justamente porque a segunda condição
@@ -4315,10 +4767,11 @@ algumas boas propriedades. Por exemplo, adjuntos à esquerda preservam colimites
 (\autocite{awodey}). Podemos usá-lo, então, para fazer uma ponte entre a definição para categorias
 e a definição para grafos.
 
-Isto posto, comecemos com a definição do que é uma fibração de Grothendieck.
+Isto posto, comecemos com a definição do que é uma fibração de Grothendieck
+(\autocite{fibrations}).
 
 \begin{definition}\mylabel{cartesian_morphism}
-    Sejam $A, B$ categorias e $F \colon A \to B$ um funtor entre elas. Um morfismo
+    Sejam $\A, \B$ categorias e $F \colon \A \to \B$ um funtor entre elas. Um morfismo
     $f \colon x \to y$ é dito \textbf{cartesiano} se, e somente se, para todo morfismo
     $g \colon z \to y$ em $A$ e todo morfismo $w \colon F(z) \to F(x)$ tal que o seguinte diagrama
     comuta
@@ -4332,7 +4785,7 @@ Isto posto, comecemos com a definição do que é uma fibração de Grothendieck
         \arrow["{F(g)}", curve={height=-6pt}, from=1-1, to=3-4]
         \arrow["{F(f)}", from=3-2, to=3-4]
     \end{tikzcd}\]
-    existe um único $w' \colon z \to x$ morfismo em $A$ tal que o seguinte diagrama comuta:
+    existe um único $w' \colon z \to x$ morfismo em $\A$ tal que o seguinte diagrama comuta:
 
     % https://q.uiver.app/#q=WzAsMyxbMCwwLCJjIl0sWzEsMiwiYSJdLFszLDIsImIiXSxbMSwyLCJmIl0sWzAsMiwiZyIsMCx7ImN1cnZlIjotMX1dLFswLDEsIncnIiwyXV0=
     \[\begin{tikzcd}
@@ -4373,13 +4826,15 @@ Isto posto, comecemos com a definição do que é uma fibração de Grothendieck
 \end{definition}
 
 \begin{definition}\mylabel{grothendieck_fibration}
-    Sejam $A, B$ categorias e $F \colon A \to B$ um funtor entre elas. Nós dizemos que $F$ é uma
-    \textbf{fibração de Grothendieck} se todo morfismo em $A$ é cartesiano com relação a $F$.
+    Sejam $\A, \B$ categorias e $F \colon \A \to \B$ um funtor entre elas. Nós dizemos que $F$ é
+    uma \textbf{fibração de Grothendieck} se, para todo $a \in \Obj{\A}$, e todo morfismo
+    $f \colon b \to F(a)$ em $\B$, existe um levantamento $f' \colon a' \to b$ morfismo em $\A$
+    cartesiano com relação a $F$ e tal que $F(f') = f$.
 \end{definition}
 
 Provaremos que a noção de fibração de Grothendieck não é equivalente à nossa definição de encoding.
 
-\begin{example}\mylabel{grothendieck_not_encoding}
+\begin{example}\mylabel{encoding_not_grothendieck}
     Considere o seguinte homomorfismo de grafos:
 
     \begin{center}
@@ -4478,54 +4933,518 @@ Provaremos que a noção de fibração de Grothendieck não é equivalente à no
 \end{example}
 
 É claro, então, que a noção de fibração de Grothendieck não captura exatamente o que queremos com
-a nossa noção de encoding. Na verdade, ela é muito forte: se $f \colon A \to B$ é uma função tal
-que $\Free(f)$ é uma fibração de Grothendieck, então $f$ é um encoding.
+a nossa noção de encoding. Na verdade, nem a volta vale. Mas, para mostrar isso, provaremos um
+pequeno resultado primeiro.
 
-De fato, se tomarmos 
+\begin{lemma}\mylabel{cartesian_factor_cartesian}
+    Sejam $\A, \B$ categorias e $F \colon \A \to \B$ um funtor entre elas. Então, se
+    $f \colon x \to y$ é um morfismo cartesiano com relação a $F$ e $f = \beta \circ \alpha$, para
+    algum $\beta$ mono, então $\alpha$ também é cartesiano com relação a $F$.
+\end{lemma}
 
-\TODO{terminar de descrever Grothendieck}
+\begin{proof}
+    Seja $t \defeq \cod{\alpha}$. Então, dado um $g \colon z \to t$ e um $w \colon F(z) \to F(x)$
+    tal que o seguinte diagrama comute:
 
-Agora, uma noção que, a princípio, teria potencial de fazer a ponte
-dessa noção para as categorias, é a noção de um funtor exponencial, ou uma fibração de Conduché,
-porque ela remove o problema da fatorização de caminhos na categoria livre. Veja a definição a
-seguir:
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwyLCJGKHgpIl0sWzIsMiwiRih0KSJdLFswLDAsIkYoeikiXSxbMCwxLCJGKFxcYWxwaGEpIiwyXSxbMiwxLCJGKGcpIiwwLHsiY3VydmUiOi0xfV0sWzIsMCwidyIsMl1d
+        \begin{tikzcd}
+        	{F(z)} && \\
+        	\\
+        	{F(x)} && {F(t)}
+        	\arrow["w"', from=1-1, to=3-1]
+        	\arrow["{F(g)}", curve={height=-6pt}, from=1-1, to=3-3]
+        	\arrow["{F(\alpha)}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
 
-\begin{definition}\mylabel{conduche_fibration}
-    Sejam $A, B$ categorias e $F \colon A \to B$ um funtor entre elas. Dizemos, então, que o funtor
-    $F$ é \textbf{exponencial}, ou uma \textbf{fibração de Conduché} se, se somente se, para todo
-    morfismo $\alpha \colon x \to y$ em $A$ e toda fatoração $F(x) \to_\beta z \to_\gamma F(y)$ de
-    $F \alpha$, valem as seguintes condições:
+    Então, em particular, o seguinte diagrama também comuta:
 
-    \begin{enumerate}
-        \item Existe uma fatoração $x \to_{\tilde{\beta}} \tilde{z} \to_{\tilde{\gamma}} y$ em $A$
-            de $\alpha$ tal que $F \tilde{\beta} = \beta$ e $F \tilde{\gamma} = \gamma$; \\
-        \item Para quaisquer duas fatorações $x \to_{\tilde{\beta}} \tilde{z} \to_{\tilde{\gamma}} y$
-            e $x \to_{\tilde{\beta}'} \tilde{z}' \to_{\tilde{\gamma}'} y$ de $\alpha$, existe um
-            morfismo $\delta \colon \tilde{z} \to \tilde{z}'$ tal que $F \delta = \id{z}$ e o
-            seguinte diagrama comuta:
-    \end{enumerate}
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMCwyLCJGKHgpIl0sWzIsMiwiRih0KSJdLFswLDAsIkYoeikiXSxbNCwyLCJGKHkpIl0sWzAsMSwiRihcXGFscGhhKSIsMl0sWzIsMSwiRihnKSIsMSx7ImN1cnZlIjotMX1dLFsyLDAsInciLDJdLFsxLDMsIkYoXFxiZXRhKSIsMl0sWzIsMywiRihcXGJldGEpIFxcY2lyYyBGKGcpIiwwLHsiY3VydmUiOi0yfV1d
+        \begin{tikzcd}
+        	{F(z)} &&&& \\
+        	\\
+        	{F(x)} && {F(t)} && {F(y)}
+        	\arrow["w"', from=1-1, to=3-1]
+        	\arrow["{F(g)}"{description}, curve={height=-6pt}, from=1-1, to=3-3]
+        	\arrow["{F(\beta) \circ F(g)}", curve={height=-12pt}, from=1-1, to=3-5]
+        	\arrow["{F(\alpha)}"', from=3-1, to=3-3]
+        	\arrow["{F(\beta)}"', from=3-3, to=3-5]
+        \end{tikzcd}
+    \end{center}
 
-    % https://q.uiver.app/#q=WzAsNCxbMCwxLCJ4Il0sWzEsMCwiXFx0aWxkZXt6fSJdLFsxLDIsIlxcdGlsZGV7en0nIl0sWzIsMSwieSJdLFswLDEsIlxcdGlsZGV7XFxiZXRhfSJdLFswLDIsIlxcdGlsZGV7XFxiZXRhfSciLDJdLFsyLDMsIlxcdGlsZGV7XFxnYW1tYX0nIiwyXSxbMSwzLCJcXHRpbGRle1xcZ2FtbWF9Il0sWzEsMiwiXFxkZWx0YSIsMV1d
-    \[\begin{tikzcd}
-        & {\tilde{z}} & \\
-        x && y \\
-        & {\tilde{z}'}
-        \arrow["{\tilde{\gamma}}", from=1-2, to=2-3]
-        \arrow["\delta"{description}, from=1-2, to=3-2]
-        \arrow["{\tilde{\beta}}", from=2-1, to=1-2]
-        \arrow["{\tilde{\beta}'}"', from=2-1, to=3-2]
-        \arrow["{\tilde{\gamma}'}"', from=3-2, to=2-3]
-    \end{tikzcd}\]
+    Agora, como $f$ é cartesiano por hipótese, existe um $w'$ que faz o seguinte diagrama comutar:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwwLCJ6Il0sWzAsMiwieCJdLFsyLDIsInkiXSxbMCwyLCJcXGJldGEgXFxjaXJjIGciLDAseyJjdXJ2ZSI6LTF9XSxbMCwxLCJ3JyIsMl0sWzEsMiwiXFxiZXRhIFxcY2lyYyBcXGFscGhhIiwyXV0=
+        \begin{tikzcd}
+        	z && \\
+        	\\
+        	x && y
+        	\arrow["{w'}"', from=1-1, to=3-1]
+        	\arrow["{\beta \circ g}", curve={height=-6pt}, from=1-1, to=3-3]
+        	\arrow["{\beta \circ \alpha}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Mas $\beta$, por hipótese, é mono, ou seja, cancelável à esquerda. Logo, o seguinte diagrama
+    também comuta:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsMyxbMCwwLCJ6Il0sWzAsMiwieCJdLFsyLDIsInQiXSxbMCwyLCJnIiwwLHsiY3VydmUiOi0xfV0sWzAsMSwidyciLDJdLFsxLDIsIlxcYWxwaGEiLDJdXQ==
+        \begin{tikzcd}
+        	z && \\
+        	\\
+        	x && t
+        	\arrow["{w'}"', from=1-1, to=3-1]
+        	\arrow["g", curve={height=-6pt}, from=1-1, to=3-3]
+        	\arrow["\alpha"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Por fim, esse $w'$ é úncio porque, se houvesse $w''$ que também faz o diagrama comutar, esse
+    $w''$ também faria o diagrama com $f$ comutar. Logo, dado que $f$ é cartesiano, $w'' = w'$.
+\end{proof}
+
+\begin{example}\mylabel{grothendieck_not_encoding}
+    Considere o seguinte funtor entre duas categorias livres.
+
+    \begin{center}
+        \begin{minipage}{.4\linewidth}
+            \begin{center}
+                % https://q.uiver.app/#q=WzAsMyxbMCwwLCJhIl0sWzIsMCwiYiJdLFs0LDAsImMiXSxbMCwxLCJcXGFscGhhIiwyLHsiY29sb3VyIjpbMCw2MCw2MF19LFswLDYwLDYwLDFdXSxbMSwyLCJcXGJldGEiLDIseyJjb2xvdXIiOlsxMjAsNjAsNjBdfSxbMTIwLDYwLDYwLDFdXSxbMCwwXSxbMSwxXSxbMiwyXV0=
+                \begin{tikzcd}
+                	a && b && c
+                	\arrow[from=1-1, to=1-1, loop, in=55, out=125, distance=10mm]
+                	\arrow["\alpha"', color={rgb,255:red,214;green,92;blue,92}, from=1-1, to=1-3]
+                	\arrow[from=1-3, to=1-3, loop, in=55, out=125, distance=10mm]
+                	\arrow["\beta"', color={rgb,255:red,92;green,214;blue,92}, from=1-3, to=1-5]
+                	\arrow[from=1-5, to=1-5, loop, in=55, out=125, distance=10mm]
+                \end{tikzcd}
+            \end{center}
+        \end{minipage}
+        \begin{minipage}{.05\linewidth}
+            \begin{equation*}
+                \implies[F]
+            \end{equation*}
+        \end{minipage}
+        \begin{minipage}{.3\linewidth}
+            \begin{center}
+                % https://q.uiver.app/#q=WzAsMixbMCwwLCIxIl0sWzIsMCwiMiJdLFswLDEsIlxcZ2FtbWEiLDIseyJjb2xvdXIiOlswLDYwLDYwXX0sWzAsNjAsNjAsMV1dLFsxLDEsIiIsMix7ImNvbG91ciI6WzEyMCw2MCw2MF19XSxbMCwwXV0=
+                \begin{tikzcd}
+                	1 && 2
+                	\arrow[from=1-1, to=1-1, loop, in=55, out=125, distance=10mm]
+                	\arrow["\gamma"', color={rgb,255:red,214;green,92;blue,92}, from=1-1, to=1-3]
+                	\arrow[draw={rgb,255:red,92;green,214;blue,92}, from=1-3, to=1-3, loop, in=55, out=125, distance=10mm]
+                \end{tikzcd}
+            \end{center}
+        \end{minipage}
+    \end{center}
+    em que os loops são as identidades, as compostas são omitidas, e as flechas coloridas são
+    levadas na flecha no segundo grafo de mesma cor.
+
+    Primeiro, devemos provar que $F$ é uma fibração de Grothendieck. Para isso, escolha um ponto
+    base: $a$, $b$ ou $c$.
+
+    Comecemos com $a$. A única flecha que temos com codomínio em $F(a) = 1$ é $\id{1}$. Afirmamos
+    que $\id{a}$ é um levantamento cartesiano de $\id{1}$. Com efeito, é um levantamento, e dado
+    $g = \id{a}$ (que é nossa única opção), e $w = \id{1}$ (novamente, a única opção), fazendo
+    $w' = \id{a}$, satisfazemos a \myref[Definição]{grothendieck_fibration}.
+
+    Agora, tome $c$. Há dois morfismos que terminam em $F(c) = 2$: $\gamma$ e $\id{2}$. Provaremos
+    que $\beta \circ \alpha$ e $\id{c}$ são levantamentos cartesianos para esses morfismos,
+    respectivamente.
+
+    Tome $\beta \circ \alpha$. Há três morfismos possíveis que terminam em $c$: $\id{c}$, $\beta$ e
+    $\beta \circ \alpha$. Porém, não há nenhum morfismo $w$ entre $F(c) = 2$ e $F(a) = 1$, nem para
+    $F(b) = 2$. Logo, nossa única escolha possível na definição de morfismo cartesiano é
+    $g = \beta \circ \alpha$. Nesse caso, nossa única escolha para $w$ é $\id{1}$, e, nesse caso,
+    podemos escolher $w' = \id{a}$, satisfazendo a definição.
+
+    Tome, agora, $\id{c}$. Nesse caso, temos três escolhas para $g$: $\id{c}$, $\beta$ e
+    $\beta \circ \alpha$. Para $\id{c}$, teremos $F(\id{c}) = \id{2}$, então nossa única escolha de
+    $w$ é $\id{2}$ e, nesse caso, $w' = \id{c}$ faz o que precisamos. Para $\beta$, nossa única
+    escolha para $w$ é $\id{2}$. Nesse caso, temos $w' = \beta$ que faz o serviço. Por fim, se
+    $g = \beta \circ \alpha$, então $F(g) = \gamma$ e, portanto, nossa única escolha para $w$ é
+    $\gamma$. Nesse caso, $w' = \beta \circ \alpha$ faz o serviço.
+
+    O último ponto base que temos de verificar é $b$. Assim como $c$, há dois morfismos que
+    terminam em $F(b)$: $\gamma$ e $\id{2}$. Temos de provar, então, que $\alpha$ e $\id{b}$ são,
+    respectivamente, levantamentos cartesianos para esses dois morfismos.
+
+    Bom, o \myref[Lema]{cartesian_factor_cartesian} já nos dá que $\alpha$ é cartesiano, porque
+    $\beta \circ \alpha$ é cartesiano e $\beta$, como qualquer morfismo em uma categoria livre, é
+    mono. Basta verificar, pois, para $\id{b}$.
+
+    Para $\id{b}$, temos duas possibilidades para $g$: $\id{b}$ ou $\alpha$. Para o primeiro, nossa
+    única escolha de $w$ será $\id{2}$ e, portanto, $w' = \id{b}$ nos dá o resuldado. Por fim, se
+    $g = \alpha$, então a única escolha é $w = \gamma$ e, nesse caso, $w' = \alpha$ basta.
+
+    Logo, $F$ é uma fibração de Grothendieck, mas não é equivalente a um encoding. De fato, $F$
+    restrito aos geradores da primeira categoria não dá nem um homomorfismo de grafos, porque $F$
+    leva um gerador em uma identidade.
+\end{example}
+
+Repare que o que nos dá problema na definição acima é que geradores, ou, mais geralmente, flechas
+que não são a identidade podem ser levados na identidade. E isso é o único problema, pois, de fato,
+a noção de fibração de Grothendieck já carrega em si uma propriedade de levantamento exatamente
+como a que pedimos para a noção de encoding.
+
+Portanto, para obtermos algo equivalente a um encoding, precisamos garantir que flechas que não
+sejam a identidade não sejam levadas na identidade.
+
+\begin{definition}
+    Sejam $\A, \B$ categorias e $F \colon \A \to \B$ um funtor entre elas. Dizemos que $F$
+    \textbf{reflete identidades} se, e somente se, sempre que $f \in \Mor{\A}$ é tal que $F(f)$ é
+    identidade, então $f$ é identidade.
 \end{definition}
 
-\begin{example}\mylabel{conduche_not_encoding}
-    Para mostrar que a definição acima não equivale à definição de encoding que desejamos, usaremos
-    o mesmo exemplo de encoding $f$ do \myref[exemplo]{grothendieck_not_encoding}.
+% Agora, uma noção que, a princípio, teria potencial de fazer a ponte
+% dessa noção para as categorias, é a noção de um funtor exponencial, ou uma fibração de Conduché,
+% porque ela remove o problema da fatorização de caminhos na categoria livre. Veja a definição a
+% seguir:
+% 
+% \begin{definition}\mylabel{conduche_fibration}
+%     Sejam $A, B$ categorias e $F \colon A \to B$ um funtor entre elas. Dizemos, então, que o funtor
+%     $F$ é \textbf{exponencial}, ou uma \textbf{fibração de Conduché} se, se somente se, para todo
+%     morfismo $\alpha \colon x \to y$ em $A$ e toda fatoração $F(x) \to_\beta z \to_\gamma F(y)$ de
+%     $F \alpha$, valem as seguintes condições:
+% 
+%     \begin{enumerate}
+%         \item Existe uma fatoração $x \to_{\tilde{\beta}} \tilde{z} \to_{\tilde{\gamma}} y$ em $A$
+%             de $\alpha$ tal que $F \tilde{\beta} = \beta$ e $F \tilde{\gamma} = \gamma$; \\
+%         \item Para quaisquer duas fatorações $x \to_{\tilde{\beta}} \tilde{z} \to_{\tilde{\gamma}} y$
+%             e $x \to_{\tilde{\beta}'} \tilde{z}' \to_{\tilde{\gamma}'} y$ de $\alpha$, existe um
+%             morfismo $\delta \colon \tilde{z} \to \tilde{z}'$ tal que $F \delta = \id{z}$ e o
+%             seguinte diagrama comuta:
+%     \end{enumerate}
+% 
+%     % https://q.uiver.app/#q=WzAsNCxbMCwxLCJ4Il0sWzEsMCwiXFx0aWxkZXt6fSJdLFsxLDIsIlxcdGlsZGV7en0nIl0sWzIsMSwieSJdLFswLDEsIlxcdGlsZGV7XFxiZXRhfSJdLFswLDIsIlxcdGlsZGV7XFxiZXRhfSciLDJdLFsyLDMsIlxcdGlsZGV7XFxnYW1tYX0nIiwyXSxbMSwzLCJcXHRpbGRle1xcZ2FtbWF9Il0sWzEsMiwiXFxkZWx0YSIsMV1d
+%     \[\begin{tikzcd}
+%         & {\tilde{z}} & \\
+%         x && y \\
+%         & {\tilde{z}'}
+%         \arrow["{\tilde{\gamma}}", from=1-2, to=2-3]
+%         \arrow["\delta"{description}, from=1-2, to=3-2]
+%         \arrow["{\tilde{\beta}}", from=2-1, to=1-2]
+%         \arrow["{\tilde{\beta}'}"', from=2-1, to=3-2]
+%         \arrow["{\tilde{\gamma}'}"', from=3-2, to=2-3]
+%     \end{tikzcd}\]
+% \end{definition}
+% 
+% \begin{example}\mylabel{conduche_not_encoding}
+%     Para mostrar que a definição acima não equivale à definição de encoding que desejamos, usaremos
+%     o mesmo exemplo de encoding $f$ do \myref[exemplo]{grothendieck_not_encoding}.
+% 
+%     Considere, então, $\alpha \colon a \to b \to c$ em $\Free(A)$.
+% 
+%     \TODO{terminar conduche}
+% \end{example}
 
-    Considere, então, $\alpha \colon a \to b \to c$ em $\Free(A)$.
+Agora podemos definir o que seria o equivalente para categorias de encoding.
 
-    \TODO{terminar conduche}
-\end{example}
+\begin{definition}\mylabel{cat_encoding}
+    Sejam $\A, \B$ categorias, e $F \colon \A \to \B$ um funtor parcial entre elas. Dizemos que $F$
+    é um \textbf{encoding de categorias} se, e somente se
+
+    \begin{enumerate}
+        \item[(i)]   $F$ é sobrejetor sobre os objetos de $\B$;
+        \item[(ii)]  $F$ reflete identidades;
+        \item[(iii)] $F$ tem a propriedade de levantamento: se $y \in \A$ é um objeto em $\A$ no
+            domínio de $F$ e $f \colon x \to F(y)$ é uma flecha em $\B$, então existe um
+            levantamento $f' \colon x' \to y$ em $\A$ tal que $F(f') = f$.
+    \end{enumerate}
+
+    Nesse caso, denotaremos $F \colon \A \encodes \B$ para dizer que $F$ é um encoding de
+    categorias, ou $\A \encodes \B$ para dizer que há um encoding de categorias entre $\A$ e $\B$.
+\end{definition}
+
+Antes de provar a equivalência desse conceito com o de encoding original, precisaremos de um lema:
+
+\begin{lemma}\mylabel{reflects_generators}
+    Sejam $\A, \B$ categorias, e $F \colon \A \to \B$ um funtor que reflete identidades. Ademais,
+    seja $f \colon b_1 \to b_2$ uma flecha de $\B$ na imagem de $F$ que não tem decomposição não
+    trivial.
+
+    Então qualquer flecha $f'$ de $\A$ tal que $F(f') = f$ não tem decomposição não trivial.
+\end{lemma}
+
+\begin{proof}
+    Com efeito, suponha que $f' \colon a_1 \to a_2$ tenha uma decomposição:
+
+    % https://q.uiver.app/#q=WzAsMyxbMCwwLCJhXzEiXSxbMiwwLCJhIl0sWzQsMCwiYV8yIl0sWzAsMSwiZyJdLFsxLDIsImgiXSxbMCwyLCJmJyIsMix7ImN1cnZlIjozfV1d
+    \[\begin{tikzcd}
+        {a_1} && a && {a_2}
+        \arrow["g", from=1-1, to=1-3]
+        \arrow["{f'}"', curve={height=18pt}, from=1-1, to=1-5]
+        \arrow["h", from=1-3, to=1-5]
+    \end{tikzcd}\]
+
+    Então, como $F$ é funtor, sabemos que $F(f') = f = F(g) \circ F(h)$. Logo, como $f$ não tem
+    decomposição não trivial, é necessário que $F(g)$ ou $F(h)$ sejam a uma identidade. Como $F$
+    reflete identidades, então $g$ ou $h$ são identidades.
+\end{proof}
+
+Agora estamos prontos para provar a equivalência dessas duas definições:
+
+\begin{theorem}\mylabel{graph_encoding_iff_cat_encoding}
+    Sejam $A, B \in \Obj{\Graph}$, e $f \colon A \to B$ um encoding total de grafos. Então
+
+    \begin{equation*}
+        \Free f \colon \Free(A) \to \Free(B)
+    \end{equation*}
+    é um encoding de categorias.
+
+    Por outro lado, se $F \colon \Free(C) \to \Free(B)$ é um encoding de categorias, existe
+    um subgrafo $A \inclusion C$ e um $f \colon A \to B$ encoding total tal que o seguinte
+    diagrama comuta
+
+    \[\begin{tikzcd}
+        {\Free(A)} && {\Free(C)} \\
+        \\
+        && {\Free(B)}
+        \arrow["{\Free i}", hook, from=1-1, to=1-3]
+        \arrow["{\Free f}"', from=1-1, to=3-3]
+        \arrow["F", from=1-3, to=3-3]
+    \end{tikzcd}\]
+\end{theorem}
+
+\begin{proof}
+    ($\implies$) Seja $f \colon A \to B$ um encoding total. Primeiramente, provarenos que $\Free f$
+    é um encoding.
+
+    Seja, então, $p \colon \Free (y_0) \leadsto \Free \left( f (b) \right)$ um caminho em
+    $\Free(B)$. Sabemos que $p$ é uma palavra formada pela composição de arestas de $B$ da seguinte
+    forma:
+
+    \begin{equation*}
+        y_0 \to y_1 \to y_2 \to \cdots \to y_{n-1} \to f(b)
+    \end{equation*}
+
+    Do fato de que $f$ é encoding, tira-se que existe $x_{n-1} \in A$ tal que existe aresta
+    $x_{n-1} \to b$ que é levada em $y_{n-1} \to f(b)$. Seguindo indutivamente, obtemos um caminho
+    em $A$
+
+    \begin{equation*}
+        p' \colon x_0 \to x_1 \to \cdots \to x_{n-1} \to b
+    \end{equation*}
+    que é mapeado por $\Free f$ para $p$.
+
+    Além disso, suponha que $p \colon a \to b$ em $\Free(A)$ seja tal que $\Free(f)(p)$ seja
+    isomorfismo. Então, como $\Free(B)$ é categoria livre, sabemos que $\Free(f)(p)$ é uma
+    identidade. Logo, pela própria construção de $\Free(f)$, $p$ também é identidade; ou seja,
+    também é isomorfismo. Logo, o funtor $\Free(f)$ é conservativo.
+
+    ($\Longleftarrow$) Seja $F \colon \Free(C) \to \Free(B)$ uma fibração. Além disso, seja
+    $a \to b$ uma aresta em $B$ ou, equivalentemente, um gerador em $\Free(B)$. Então, como $F$ é
+    sobrejetor sobre os objetos, sabemos que existe $b' \in \Ver{C}$ tal que $b = F(b')$. Assim
+    sendo, dado que $F$ é encoding, existe $a' \in \Ver{C}$ e flecha $a' \to b'$ que é mapeada por
+    $F$ em $a \to b$. Pelo \myref[Lema]{reflects_generators}, $a' \to b'$ não é decomponível. Sendo
+    assim, $a' \to b'$ é um gerador em $\Free(C)$, ou, equivalentemente, uma aresta em $C$.
+
+    Logo, podemos definir o seguinte grafo $A$:
+
+    \begin{align*}
+        \Ver{A} &\defeq \Ver{C} \\
+        \Edg{A} &\defeq \left\{
+            \alpha \in \Edg{C} \colon \tilde{\alpha} \in F^{-1} \left[ \gen \Free(B) \right]
+        \right\}
+    \end{align*}
+
+    Como $F^{-1} \left[ \gen \Free(B) \right] \subseteq \gen{\Free(C)}$, teremos um subgrafo
+    $i \colon A \hookrightarrow C$.
+
+    Defina, então, $f \colon A \to B$ de forma que $f(a) = F(a)$, para todo
+    $a \in \Ver{A} = \Obj{\Free(A)}$, e $f(\alpha)$ é a aresta correspondente ao gerador
+    $F(\tilde\alpha)$, que está em $\gen{\Free(B)}$ pela escolha de $A$. Como definimos $f$ para
+    todo $A$, resta provar que $f$ é encoding.
+
+    Sabemos que $f$ é sobrejetor nos objetos, porque $F$ também é. Basta provar que $f$ tem a
+    propriedade de levantamento.
+
+    Seja, então, $y \in \Ver{A} = \Obj{\Free(A)}$ um vértice, e seja $\alpha \colon x \to f(y)$ uma
+    aresta em $B$. Sabemos, então, que $\tilde\alpha$ é um gerador de $\Free(B)$ e, pela
+    propriedade de levantamento de $F$, existe um objeto $x' \in \Obj{\Free(C)} = \Ver{C}$ e uma
+    caminho $\gamma \colon x' \leadsto y$ em $C$ tal que $F(\gamma) = \alpha$. Mas, como provamos
+    acima, $\gamma$ é gerador de $C$, então existe uma aresta $\alpha'$ em $C$ e, pela escolha de
+    $A$, também em $A$, tal que $\tilde{\alpha'} = \gamma$. Logo,
+
+    \begin{align*}
+        f(\alpha') &= U(F(\tilde{\alpha'})) \\
+                   &= U(F(\gamma)) \\
+                   &= U(\tilde\alpha) \\
+                   &= \alpha
+    \end{align*}
+    em que $U$ é o funtor esquecimento, que leva a categoria no grafo subjascente.
+\end{proof}
+
+Podemos encontrar uma relação entre essa nossa definição de encoding de categorias e o produto
+caixa que Fellows utiliza.
+
+\begin{theorem}
+    Sejam $A, B, C, D \in \Obj{\Graph}$ grafos. Então vale a seguinte equivalência
+
+    \begin{alignat*}{3}
+        A \boxProduct B \encodes C \boxProduct D \quad
+            && \iff \quad
+            && \Free(A) \,\times\, \Free(B) \encodes
+                    \Free(C) \,\times\, \Free(D)
+    \end{alignat*}
+\end{theorem}
+
+\begin{proof}
+    ($\Longleftarrow$) A volta desse teorema é fácil. Seja
+
+    \begin{equation*}
+        F \colon \Free(A) \,\times\, \Free(B) \to \Free(C) \,\times\, \Free(D)
+    \end{equation*}
+    um encoding de categorias. Basta notar que, se $(a, b)$ é um
+    vértice de $A \boxProduct B$, e existe uma aresta
+
+    \begin{equation*}
+        \gamma \colon (c', d') \to (c, d) \defeq F(a, b)
+    \end{equation*}
+
+    Sem perda de generalidade, assuma $d' = d$. Então existe uma seta em
+    $\Free(C) \,\times\, \Free(D)$ na forma $(\tilde{\gamma}, \id{d})$, em que $\tilde\gamma$ é o
+    caminho de comprimento $1$ que leva $c'$ até $c$ em $C$ correspondente à aresta $\gamma$.
+
+    Agora, é claro que $(\tilde\gamma, \id{d})$ não tem decomposição não trivial. Além disso,
+    repare que, como os únicos isomorfismos de $\Free(A) \,\times\, \Free(B)$ e
+    $\Free(C) \,\times\, \Free(D)$ são as identidades, $F$ ser conservativo implica que reflete
+    identidades. Assim sendo, pelo \myref[Lema]{reflects_generators}, sabemos que qualquer
+    pré-imagem de $(\tilde\gamma, \id{d})$ não tem decomposição não trivial.
+
+    Em segundo lugar, pela definição de encoding de categorias, existe um objeto
+    $(a', b') \in \Free(A) \,\times\, \Free(B)$ e um morfismo
+
+    \begin{equation*}
+        (\alpha, \beta) \colon (a', b') \to (a, b)
+    \end{equation*}
+    (lembre que os morfismos de $\Free(A) \,\times\, \Free(B)$ são pares de morfismos de $\Free(A)$
+    e $\Free(B)$), tal que $F(\alpha, \beta) = (\tilde\gamma, \id{d})$. Agora, como
+    $(\alpha, \beta)$ não tem decomposição não trivial, isso significa que $\alpha$ é identidade ou
+    $\beta$ é uma identidade; caso contrário, poderíamos escrever
+
+    \begin{equation*}
+        (\alpha, \beta) = (\alpha, \id{b}) \circ (\id{a'}, \beta)
+    \end{equation*}
+
+    Agora, $\alpha$ não pode ser uma identidade, porque, caso fosse, $\tilde\gamma$ seria uma
+    identidade, o que não pode acontecer pela escolha de $\gamma$. Assim sendo, $b' = b$ e
+    $\beta = \id{b}$. Agora, $\alpha$ não tem decomposição não trivial, e não é uma identidade.
+    Logo, $\alpha$ é um gerador de $\Free(A)$. Assim sendo, existe uma aresta $\bar{\alpha}$
+    correspondente a $\alpha$ em $A$:
+
+    \begin{equation*}
+        \bar\alpha \colon a' \to a
+    \end{equation*}
+    que, pela definição de produto caixa, nos dá uma aresta $(a', b) \to (a, b)$.
+
+    ($\Longrightarrow$) Seja
+
+    \begin{equation*}
+        f \colon A \boxProduct B \to C \boxProduct D
+    \end{equation*}
+    um encoding.
+
+    O \myref[Teorema]{graph_encoding_iff_cat_encoding} nos diz, então, que o funtor parcial
+
+    \begin{equation*}
+        \Free f \colon \Free(A \boxProduct B) \to \Free(C \boxProduct D)
+    \end{equation*}
+    é um encoding de categorias.
+
+    Defina um funtor (provaremos que, de fato, é um funtor mais abaixo) parcialmente de
+    $\Free(A) \,\times\, \Free(B)$ a $\Free(C) \,\times\, \Free(D)$ da seguinte forma:
+
+    \begin{equation*}
+        F(a, b) = f(a, b), \hspace{5pt} \forall a \in \Ver{A}, \forall b \in \Ver{B}
+    \end{equation*}
+    pois os objetos de $\Free(A)$ são justamente os vértices de $A$, e da mesma forma com $B$.
+
+    Agora, para definir $F$ sobre as setas, tome, por exemplo,
+
+    \begin{equation*}
+        (\alpha, \beta) \in \Hom[\Free(A) \times \Free(B)]{(a, b)}{(a_0, b_0)}
+    \end{equation*}
+    e decomponha esses caminhos nos geradores:
+
+    \begin{align*}
+        \alpha &\colon a \to a_n \to \cdots \to a_1 \to a_0 \\
+        \beta  &\colon b \to b_m \to \cdots \to b_1 \to b_0
+    \end{align*}
+
+    Por fim, seguiremos o seguinte processo indutivamente para definir a que seta o par acima será
+    mapeado: definimos $(\gamma, \delta) \defeq F(\alpha, \beta)$ e começaremos tomando o caminho
+    $\beta$, do fim para o começo. Se $f$ estiver definido sobre a aresta
+
+    \begin{equation*}
+        (a_0, b_1) \to (a_0, b_0)
+    \end{equation*}
+    correspondente à aresta $b_1 \to b_0$ de $\beta$, tome a imagem dessa aresta
+
+    \begin{equation*}
+        (c', d') \to (c_0, d_0)
+    \end{equation*}
+
+    Se essa aresta corresponder a uma aresta em $D$, tomamos $d_1 \to d_0$ a aresta correspondente,
+    em que $d_0$ é a imagem de $b_0$ por $f$, e esse será o final do caminho $\delta$. Caso
+    contrário, tomamos a aresta $c_1 \to c_0$ correspondente em $C$ e esse será o final de
+    $\gamma$.
+
+    \TODO{Provar que é funtor}
+
+    Agora, sejam $a_0 \in \Ver{A}$ e $b_0 \in \Ver{B}$. Além disso, escreva
+    $(c_0, d_0) \defeq f(a_0, b_0)$. Esses serão os nossos pontos iniciais para a prova recursiva a
+    seguir. Seja, ademais, $\gamma \colon c \leadsto c_0$ um caminho em $C$ e
+    $\delta \colon d \leadsto d_0$ um caminho em $D$. Para provar que $F$ é funtor, temos de provar
+    que existem dois caminhos $\alpha \in \Hom[\Free(A)]{a}{a_0}$ e
+    $\beta \in \Hom[\Free(B)]{b}{b_0}$ tais que $F(\alpha, \beta) = (\gamma, \delta)$.
+
+    Com efeito, decomponha $\gamma$ e $\delta$:
+
+    \begin{align*}
+        \gamma &\colon c \to c_n \to c_{n-1} \to \cdots \to c_1 \to c_0 \\
+        \delta &\colon d \to d_m \to d_{m-1} \to \cdots \to d_1 \to d_0
+    \end{align*}
+
+    Agora, tome a aresta $d_1 \to d_0$. Sabemos que em $C \boxProduct D$, existe uma aresta
+
+    \begin{equation*}
+        (c_0, d_1) \to (c_0, d_0)
+    \end{equation*}
+    correspondente a ela. Sabemos, então, do fato de $f$ ser encoding, que existe uma aresta em
+    $A \boxProduct B$
+
+    \begin{equation*}
+        (a', b') \to (a_0, b_0)
+    \end{equation*}
+    que é levada em na aresta acima por $f$. Agora, essa aresta pode corresponder a uma aresta em
+    $A$ ou em $B$. Se existir aresta $b_1 \to b_0$ em $B$ tal que
+
+    \begin{equation*}
+        f\left( (a_0, b_1) \to (a_0, b_0) \right) = d_1 \to d_0
+    \end{equation*}
+    tomamos essa aresta $b_1 \to b_0$ para compor o final do nosso caminho $\beta$, e $a_0$, $b_1$,
+    $c_0$ e $d_1$ serão os nossos novos pontos iniciais. Caso contrário, então
+    $(a', b') \to (a_0, b_0)$ corresponde a uma aresta em $A$, isto é, uma aresta $a_1 \to a_0$ e
+    $b' = b_0$. Nesse caso, $\alpha$ terminará com $a_1 \to a_0$ e $a_1$, $b_0$, $c_0$ e $d_1$
+    serão os nossos novos pontos iniciais. Seguindo esse processo até o fim, obtemos caminhos
+    $\alpha \colon a \leadsto a_0$ e $\beta \colon b \leadsto b_0$. Resta provar que, de fato,
+
+    \begin{equation*}
+        F(\alpha, \beta) = (\gamma, \delta)
+    \end{equation*}
+
+    Escreva, para isso,
+
+    \begin{align*}
+        \alpha &\colon a \to a_k \to \cdots \to a_1 \to a_0 \\
+        \beta  &\colon b \to b_l \to \cdots \to b_1 \to b_0
+    \end{align*}
+\end{proof}
 
 De fato, não foi antes de encontrar o tópico de \textit{categorias modelo} que encontramos uma
 definição que satisfaça tudo o que é pedido e nada mais. E essa definição é uma generalização da
@@ -5015,8 +5934,98 @@ exercício proposto em \autocite{quasicats}.
     Logo, o triângulo de baixo também comuta, como queríamos provar.
 \end{proof}
 
-Isso prova que produtos preservam a PL. Isso, junto ao fato de que em topos os produtos preservam
-epimorfismo (\TODO{adicionar citação de prod em topos preserva epi}) nos dá o seguinte resultado:
+Isso prova que produtos preservam a PL. Para que os produtos preservem encodings, pois, precisamos
+somente que produtos preservem epimorfismos. Mas isso não é verdade em geral. Em alguns contextos,
+porém, como o de topos, isso vale.
+
+De fato, em topos, epimorfismos são estáveis por pullbacks (\autocite{sheaves}, Proposition
+IV.7.3). Agora, podemos provar o lema:
+
+\begin{lemma}\mylabel{prod_in_topos_preserves_epi}
+    Sejam $\C$ um topos, e $f \colon a \epi c$ e $g \colon b \epi d$ epimorfismos. Então a flecha
+    canônica $h \colon a \times b \to c \times d$ é um epimorfismo.
+\end{lemma}
+
+\begin{proof}
+    Considere o seguinte pullback (que existe, porque $\C$ é topos):
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNCxbMiwwLCJhIl0sWzIsMiwiYyJdLFswLDIsImMgXFx0aW1lcyBiIl0sWzAsMCwieCJdLFswLDEsImYiLDAseyJzdHlsZSI6eyJoZWFkIjp7Im5hbWUiOiJlcGkifX19XSxbMiwxLCJcXHBpX2MiLDJdLFszLDAsInBfYSJdLFszLDIsInBfe2NcXHRpbWVzIGJ9IiwyXSxbMywxLCIiLDEseyJzdHlsZSI6eyJuYW1lIjoiY29ybmVyIn19XV0=
+        \begin{tikzcd}
+        	x && a \\
+        	\\
+        	{c \times b} && c
+        	\arrow["{p_a}", from=1-1, to=1-3]
+        	\arrow["{p_{c\times b}}"', from=1-1, to=3-1]
+        	\arrow["\lrcorner"{anchor=center, pos=0.125}, draw=none, from=1-1, to=3-3]
+        	\arrow["f", two heads, from=1-3, to=3-3]
+        	\arrow["{\pi_c}"', from=3-1, to=3-3]
+        \end{tikzcd}
+    \end{center}
+
+    Provaremos, em primeiro lugar, que $x$ com as projeções $\chi_a \defeq p_a$ e
+    $\chi_b \defeq \pi_b \circ p_{c \times b}$ é, a menos de isomorfismo, o produto entre $a$ e
+    $b$. Para isso, testaremos a propriedade universal do produto.
+
+    Sejam $y \in \Obj{\C}$ e $k_a \colon y \to a$ e $k_b \colon y \to b$ duas flechas. Então
+    teremos o seguinte diagrama:
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNixbMywxLCJhIl0sWzMsMywiYyJdLFsxLDMsImMgXFx0aW1lcyBiIl0sWzEsMSwieCJdLFswLDAsInkiXSxbMCw0LCJiIl0sWzAsMSwiZiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6ImVwaSJ9fX1dLFsyLDEsIlxccGlfYyIsMl0sWzMsMCwicF9hIl0sWzMsMiwicF97Y1xcdGltZXMgYn0iLDJdLFszLDEsIiIsMSx7InN0eWxlIjp7Im5hbWUiOiJjb3JuZXIifX1dLFs0LDAsImtfYSIsMCx7ImN1cnZlIjotMn1dLFsyLDUsIlxccGlfYiJdLFs0LDUsImtfYiIsMix7ImN1cnZlIjoyfV1d
+        \begin{tikzcd}
+        	y &&& \\
+        	& x && a \\
+        	\\
+        	& {c \times b} && c \\
+        	b
+        	\arrow["{k_a}", curve={height=-12pt}, from=1-1, to=2-4]
+        	\arrow["{k_b}"', curve={height=12pt}, from=1-1, to=5-1]
+        	\arrow["{p_a}", from=2-2, to=2-4]
+        	\arrow["{p_{c\times b}}"', from=2-2, to=4-2]
+        	\arrow["\lrcorner"{anchor=center, pos=0.125}, draw=none, from=2-2, to=4-4]
+        	\arrow["f", two heads, from=2-4, to=4-4]
+        	\arrow["{\pi_c}"', from=4-2, to=4-4]
+        	\arrow["{\pi_b}", from=4-2, to=5-1]
+        \end{tikzcd}
+    \end{center}
+
+    Vemos então que temos uma flecha de $y$ para $c$, a saber, $f \circ k_a$, além da flecha que já
+    tínhamos para $b$, $k_b$. Pela definição de produto, isso nos dá uma única flecha
+    $k_{c \times b}$ que comuta com as projeções.
+
+    \begin{center}
+        % https://q.uiver.app/#q=WzAsNixbMywxLCJhIl0sWzMsMywiYyJdLFsxLDMsImMgXFx0aW1lcyBiIl0sWzEsMSwieCJdLFswLDAsInkiXSxbMCw0LCJiIl0sWzAsMSwiZiIsMCx7InN0eWxlIjp7ImhlYWQiOnsibmFtZSI6ImVwaSJ9fX1dLFsyLDEsIlxccGlfYyIsMl0sWzMsMCwicF9hIiwxXSxbMywyLCJwX3tjXFx0aW1lcyBifSIsMV0sWzMsMSwiIiwxLHsic3R5bGUiOnsibmFtZSI6ImNvcm5lciJ9fV0sWzQsMCwia19hIiwwLHsiY3VydmUiOi0yfV0sWzIsNSwiXFxwaV9iIl0sWzQsNSwia19iIiwyLHsiY3VydmUiOjJ9XSxbNCwyLCJrX3tjIFxcdGltZXMgYn0iLDEseyJjdXJ2ZSI6MX1dXQ==
+        \begin{tikzcd}
+        	y &&& \\
+        	& x && a \\
+        	\\
+        	& {c \times b} && c \\
+        	b
+        	\arrow["{k_a}", curve={height=-12pt}, from=1-1, to=2-4]
+        	\arrow["{k_{c \times b}}"{description}, curve={height=6pt}, from=1-1, to=4-2]
+        	\arrow["{k_b}"', curve={height=12pt}, from=1-1, to=5-1]
+        	\arrow["{p_a}"{description}, from=2-2, to=2-4]
+        	\arrow["{p_{c\times b}}"{description}, from=2-2, to=4-2]
+        	\arrow["\lrcorner"{anchor=center, pos=0.125}, draw=none, from=2-2, to=4-4]
+        	\arrow["f", two heads, from=2-4, to=4-4]
+        	\arrow["{\pi_c}"', from=4-2, to=4-4]
+        	\arrow["{\pi_b}", from=4-2, to=5-1]
+        \end{tikzcd}
+    \end{center}
+
+    Agora, pela escolha de $k_{c \times b}$,
+
+    \begin{align*}
+        \pi_c \circ k_{c \times b} = f \circ k_a
+    \end{align*}
+
+    Logo, temos um cone sobre os vértices do pullback. Pela definição de pullback, existe um único
+    morfismo $k_x \colon y \to x$ que comuta com $p_a$ e $p_{c \times b}$. Temos, pois, o nosso
+    morfismo da definição de produto. Precisamos verificar que ele comuta com as projeções, e que é
+    único.
+\end{proof}
+
+\TODO{citação de topos epi são estáveis por pullback}
 
 \TODO{shaves in geometry and logic}
 
@@ -5338,282 +6347,7 @@ Isto nos dá permite provar o seguinte resultado:
     livre são as identidades, então $f$ é identidade.
 \end{proof}
 
-\begin{lemma}
-    Sejam $\A, \B$ categorias, e $F \colon \A \to \B$ um funtor que reflete identidades. Ademais,
-    seja $f \colon b_1 \to b_2$ uma flecha de $\B$ na imagem de $F$ que não tem decomposição não
-    trivial.
 
-    Então qualquer flecha $f'$ de $\A$ tal que $F(f') = f$ não tem decomposição não trivial.
-\end{lemma}
-
-\begin{proof}\mylabel{reflects_generators}
-    Com efeito, suponha que $f' \colon a_1 \to a_2$ tenha uma decomposição:
-
-    % https://q.uiver.app/#q=WzAsMyxbMCwwLCJhXzEiXSxbMiwwLCJhIl0sWzQsMCwiYV8yIl0sWzAsMSwiZyJdLFsxLDIsImgiXSxbMCwyLCJmJyIsMix7ImN1cnZlIjozfV1d
-    \[\begin{tikzcd}
-        {a_1} && a && {a_2}
-        \arrow["g", from=1-1, to=1-3]
-        \arrow["{f'}"', curve={height=18pt}, from=1-1, to=1-5]
-        \arrow["h", from=1-3, to=1-5]
-    \end{tikzcd}\]
-
-    Então, como $F$ é funtor, sabemos que $F(f') = f = F(g) \circ F(h)$. Logo, como $f$ não tem
-    decomposição não trivial, é necessário que $F(g)$ ou $F(h)$ sejam a uma identidade. Como $F$
-    reflete identidades, então $g$ ou $h$ são identidades.
-\end{proof}
-
-\begin{theorem}\mylabel{graph_encoding_iff_cat_encoding}
-    Sejam $A, B \in \Graph$, e $f \colon A \to B$ um encoding total de grafos. Então
-
-    \begin{equation*}
-        \Free f \colon \Free(A) \to \Free(B)
-    \end{equation*}
-    é uma fibração conservativa.
-
-    Por outro lado, se $F \colon \Free(C) \to \Free(B)$ é uma fibração conservativa, existe
-    um subgrafo $A \hookrightarrow C$ e um $f \colon A \to B$ encoding tal que o seguinte diagrama
-    comuta
-
-    \[\begin{tikzcd}
-        {\Free(A)} && {\Free(C)} \\
-        \\
-        && {\Free(B)}
-        \arrow["{\Free i}", hook, from=1-1, to=1-3]
-        \arrow["{\Free f}"', from=1-1, to=3-3]
-        \arrow["F", from=1-3, to=3-3]
-    \end{tikzcd}\]
-\end{theorem}
-
-\begin{proof}
-    ($\implies$) Seja $f \colon A \to B$ um encoding total. Primeiramente, provarenos que $\Free f$
-    é uma fibração.
-
-    Seja, então, $p \colon \Free (y_0) \to \Free \left( f (b) \right)$ um caminho em $\Free(B)$.
-    Sabemos que $p$ é uma palavra formada pela composição de arestas de $B$ da seguinte forma:
-
-    \begin{equation*}
-        y_0 \to y_1 \to y_2 \to \cdots \to y_{n-1} \to f(b)
-    \end{equation*}
-
-    Do fato de que $f$ é encoding, tira-se que existe $x_{n-1} \in A$ tal que existe aresta
-    $x_{n-1} \to b$ que é levada em $y_{n-1} \to f(b)$. Seguindo indutivamente, obtemos um caminho
-    em $A$
-
-    \begin{equation*}
-        p' \colon x_0 \to x_1 \to \cdots \to x_{n-1} \to b
-    \end{equation*}
-    que é mapeado por $\Free f$ para $p$.
-
-    Além disso, suponha que $p \colon a \to b$ em $\Free(A)$ seja tal que $\Free(f)(p)$ seja
-    isomorfismo. Então, como $\Free(B)$ é categoria livre, sabemos que $\Free(f)(p)$ é uma
-    identidade. Logo, pela própria construção de $\Free(f)$, $p$ também é identidade; ou seja,
-    também é isomorfismo. Logo, o funtor $\Free(f)$ é conservativo.
-
-    ($\Longleftarrow$) Seja $F \colon \Free(C) \to \Free(B)$ uma fibração. Além disso, seja
-    $a \to b$ uma aresta em $B$ ou, equivalentemente, um gerador em $\Free(B)$. Então, como $F$ é
-    sobrejetor, sabemos que existe $b' \in \Obj{C}$ tal que $b = F(b')$. Assim sendo, dado que $F$
-    é fibração, existe $a' \in \Obj{C}$ e flecha $a' \to b'$ que é mapeada por $F$ em $a \to b$.
-    Provaremos que $a' \to b'$ não é decomponível.
-
-    Seja $a' \to c \to b'$ uma decomposição de $a' \to b'$. Então, como $F$ é funtor,
-    $a \to F(c) \to b$ seria decomposição de $a \to b$. Logo, como $a \to b$ é gerador, então
-    $F(c) = a$ ou $F(c) = b$ e a seta correspondente é uma identidade. Sem perda de generalidade,
-    assuma que $F(c) = b$ e $F(c) \to b$ é identidade. Então, pelo
-    \myref[Lema]{conservative_reflects_id}, $c = b'$ e $c \to b'$ é identidade.
-
-    Sendo assim, $a' \to b'$ é um gerador em $\Free(C)$, ou, equivalentemente, uma aresta em $C$.
-
-    Logo, podemos definir o seguinte grafo $A$:
-
-    \begin{equation}
-        \Ver{A} \defeq \{a \in \Obj{\Free(C)} \colon
-            a = \dom \gamma \, \vee \, a = \cod \gamma, \gamma \in F^{-1} \left[ \gen \Free(B) \right]\}
-    \end{equation}
-    \begin{equation}
-        \Edg{A} \defeq F^{-1} \left[ \gen \Free(B) \right]
-    \end{equation}
-
-    Como $F^{-1} \left[ \gen \Free(B) \right] \subseteq \gen \Free(C)$, podemos criar um
-    monomorfismo $i \colon A \hookrightarrow C$ de grafos pela identificação de uma aresta em $C$
-    com um gerador de $\Free(C)$.
-
-    Logo, podemos tomar a imagem inversa dos geradores de $\Free(C)$, e isso vai formar um subgrafo
-    $i \colon A \hookrightarrow C$ e uma função $f \colon A \to B$ que faz o mesmo papel de $F$
-    restrita à imagem inversa dos geradores de $\Free(B)$. Provemos que $f$ é um encoding total.
-
-    Por outro lado, considere $e' \colon a' \to b'$ um gerador em $\Free(A)$. Então $F(e')$ também
-    é gerador. Com efeito, suponha que $e \defeq F(e')$ tenha uma decomposição não trivial
-
-    \begin{equation*}
-        a \to_{\alpha} c \to_{\beta} b
-    \end{equation*}
-
-    Então, como $F$ é fibração, $a$
-\end{proof}
-
-\begin{theorem}
-    Sejam $A, B, C, D \in \Obj{\Graph}$ grafos. Então vale a seguinte equivalência
-
-    \begin{alignat*}{3}
-        A \boxProduct B \encodes C \boxProduct D \quad
-            && \iff \quad
-            && \Free(A) \,\times\, \Free(B) \encodes
-                    \Free(C) \,\times\, \Free(D)
-    \end{alignat*}
-\end{theorem}
-
-\begin{proof}
-    ($\Longleftarrow$) A volta desse teorema é fácil. Seja
-
-    \begin{equation*}
-        F \colon \Free(A) \,\times\, \Free(B) \to \Free(C) \,\times\, \Free(D)
-    \end{equation*}
-    um encoding de categorias. Basta notar que, se $(a, b)$ é um
-    vértice de $A \boxProduct B$, e existe uma aresta
-
-    \begin{equation*}
-        \gamma \colon (c', d') \to (c, d) \defeq F(a, b)
-    \end{equation*}
-
-    Sem perda de generalidade, assuma $d' = d$. Então existe uma seta em
-    $\Free(C) \,\times\, \Free(D)$ na forma $(\tilde{\gamma}, \id{d})$, em que $\tilde\gamma$ é o
-    caminho de comprimento $1$ que leva $c'$ até $c$ em $C$ correspondente à aresta $\gamma$.
-
-    Agora, é claro que $(\tilde\gamma, \id{d})$ não tem decomposição não trivial. Além disso,
-    repare que, como os únicos isomorfismos de $\Free(A) \,\times\, \Free(B)$ e
-    $\Free(C) \,\times\, \Free(D)$ são as identidades, $F$ ser conservativo implica que reflete
-    identidades. Assim sendo, pelo \myref[Lema]{reflects_generators}, sabemos que qualquer
-    pré-imagem de $(\tilde\gamma, \id{d})$ não tem decomposição não trivial.
-
-    Em segundo lugar, pela definição de encoding de categorias, existe um objeto
-    $(a', b') \in \Free(A) \,\times\, \Free(B)$ e um morfismo
-
-    \begin{equation*}
-        (\alpha, \beta) \colon (a', b') \to (a, b)
-    \end{equation*}
-    (lembre que os morfismos de $\Free(A) \,\times\, \Free(B)$ são pares de morfismos de $\Free(A)$
-    e $\Free(B)$), tal que $F(\alpha, \beta) = (\tilde\gamma, \id{d})$. Agora, como
-    $(\alpha, \beta)$ não tem decomposição não trivial, isso significa que $\alpha$ é identidade ou
-    $\beta$ é uma identidade; caso contrário, poderíamos escrever
-
-    \begin{equation*}
-        (\alpha, \beta) = (\alpha, \id{b}) \circ (\id{a'}, \beta)
-    \end{equation*}
-
-    Agora, $\alpha$ não pode ser uma identidade, porque, caso fosse, $\tilde\gamma$ seria uma
-    identidade, o que não pode acontecer pela escolha de $\gamma$. Assim sendo, $b' = b$ e
-    $\beta = \id{b}$. Agora, $\alpha$ não tem decomposição não trivial, e não é uma identidade.
-    Logo, $\alpha$ é um gerador de $\Free(A)$. Assim sendo, existe uma aresta $\bar{\alpha}$
-    correspondente a $\alpha$ em $A$:
-
-    \begin{equation*}
-        \bar\alpha \colon a' \to a
-    \end{equation*}
-    que, pela definição de produto caixa, nos dá uma aresta $(a', b) \to (a, b)$.
-
-    ($\Longrightarrow$) Seja
-
-    \begin{equation*}
-        f \colon A \boxProduct B \to C \boxProduct D
-    \end{equation*}
-    um encoding.
-
-    O \myref[Teorema]{graph_encoding_iff_cat_encoding} nos diz, então, que o funtor parcial
-
-    \begin{equation*}
-        \Free f \colon \Free(A \boxProduct B) \to \Free(C \boxProduct D)
-    \end{equation*}
-    é um encoding de categorias.
-
-    Defina um funtor (provaremos que, de fato, é um funtor mais abaixo) parcialmente de
-    $\Free(A) \,\times\, \Free(B)$ a $\Free(C) \,\times\, \Free(D)$ da seguinte forma:
-
-    \begin{equation*}
-        F(a, b) = f(a, b), \hspace{5pt} \forall a \in \Ver{A}, \forall b \in \Ver{B}
-    \end{equation*}
-    pois os objetos de $\Free(A)$ são justamente os vértices de $A$, e da mesma forma com $B$.
-
-    Agora, para definir $F$ sobre as setas, tome, por exemplo,
-
-    \begin{equation*}
-        (\alpha, \beta) \in \Hom[\Free(A) \times \Free(B)]{(a, b)}{(a_0, b_0)}
-    \end{equation*}
-    e decomponha esses caminhos nos geradores:
-
-    \begin{align*}
-        \alpha &\colon a \to a_n \to \cdots \to a_1 \to a_0 \\
-        \beta  &\colon b \to b_m \to \cdots \to b_1 \to b_0
-    \end{align*}
-
-    Por fim, seguiremos o seguinte processo indutivamente para definir a que seta o par acima será
-    mapeado: definimos $(\gamma, \delta) \defeq F(\alpha, \beta)$ e começaremos tomando o caminho
-    $\beta$, do fim para o começo. Se $f$ estiver definido sobre a aresta
-
-    \begin{equation*}
-        (a_0, b_1) \to (a_0, b_0)
-    \end{equation*}
-    correspondente à aresta $b_1 \to b_0$ de $\beta$, tome a imagem dessa aresta
-
-    \begin{equation*}
-        (c', d') \to (c_0, d_0)
-    \end{equation*}
-
-    Se essa aresta corresponder a uma aresta em $D$, tomamos $d_1 \to d_0$ a aresta correspondente,
-    em que $d_0$ é a imagem de $b_0$ por $f$, e esse será o final do caminho $\delta$. Caso
-    contrário, tomamos a aresta $c_1 \to c_0$ correspondente em $C$ e esse será o final de
-    $\gamma$.
-
-    \TODO{Provar que é funtor}
-
-    Agora, sejam $a_0 \in \Ver{A}$ e $b_0 \in \Ver{B}$. Além disso, escreva
-    $(c_0, d_0) \defeq f(a_0, b_0)$. Esses serão os nossos pontos iniciais para a prova recursiva a
-    seguir. Seja, ademais, $\gamma \colon c \leadsto c_0$ um caminho em $C$ e
-    $\delta \colon d \leadsto d_0$ um caminho em $D$. Para provar que $F$ é funtor, temos de provar
-    que existem dois caminhos $\alpha \in \Hom[\Free(A)]{a}{a_0}$ e
-    $\beta \in \Hom[\Free(B)]{b}{b_0}$ tais que $F(\alpha, \beta) = (\gamma, \delta)$.
-
-    Com efeito, decomponha $\gamma$ e $\delta$:
-
-    \begin{align*}
-        \gamma &\colon c \to c_n \to c_{n-1} \to \cdots \to c_1 \to c_0 \\
-        \delta &\colon d \to d_m \to d_{m-1} \to \cdots \to d_1 \to d_0
-    \end{align*}
-
-    Agora, tome a aresta $d_1 \to d_0$. Sabemos que em $C \boxProduct D$, existe uma aresta
-
-    \begin{equation*}
-        (c_0, d_1) \to (c_0, d_0)
-    \end{equation*}
-    correspondente a ela. Sabemos, então, do fato de $f$ ser encoding, que existe uma aresta em
-    $A \boxProduct B$
-
-    \begin{equation*}
-        (a', b') \to (a_0, b_0)
-    \end{equation*}
-    que é levada em na aresta acima por $f$. Agora, essa aresta pode corresponder a uma aresta em
-    $A$ ou em $B$. Se existir aresta $b_1 \to b_0$ em $B$ tal que
-
-    \begin{equation*}
-        f\left( (a_0, b_1) \to (a_0, b_0) \right) = d_1 \to d_0
-    \end{equation*}
-    tomamos essa aresta $b_1 \to b_0$ para compor o final do nosso caminho $\beta$, e $a_0$, $b_1$,
-    $c_0$ e $d_1$ serão os nossos novos pontos iniciais. Caso contrário, então
-    $(a', b') \to (a_0, b_0)$ corresponde a uma aresta em $A$, isto é, uma aresta $a_1 \to a_0$ e
-    $b' = b_0$. Nesse caso, $\alpha$ terminará com $a_1 \to a_0$ e $a_1$, $b_0$, $c_0$ e $d_1$
-    serão os nossos novos pontos iniciais. Seguindo esse processo até o fim, obtemos caminhos
-    $\alpha \colon a \leadsto a_0$ e $\beta \colon b \leadsto b_0$. Resta provar que, de fato,
-
-    \begin{equation*}
-        F(\alpha, \beta) = (\gamma, \delta)
-    \end{equation*}
-
-    Escreva, para isso,
-
-    \begin{align*}
-        \alpha &\colon a \to a_k \to \cdots \to a_1 \to a_0 \\
-        \beta  &\colon b \to b_l \to \cdots \to b_1 \to b_0
-    \end{align*}
-\end{proof}
 
 
 \begin{theorem}
@@ -5621,9 +6355,13 @@ Isto nos dá permite provar o seguinte resultado:
     $F, F' \colon \mathcal{I} \to \C$ dois funtores, $\eta \colon F \Rightarrow F'$ uma
     transformação natural entre eles. Além disso, seja $i \in \Mor{\C}$. Então, se
     $\eta_a$ tem a PLU à direita com relação a $i$ para todo $a \in \Obj{\mathcal{I}}$, teremos que
-    existe um morfismo $k \colon \lim F \to \lim F'$ entre os produtos tal que $k$ tem a PLU à
+    existe um morfismo $k \colon \lim F \to \lim F'$ entre os limites tal que $k$ tem a PLU à
     direita com relação a $i$.
 \end{theorem}
+
+\TODO{colocar esse resultado na discussão, anotar que não sei exatamente o que fazer com ele,
+talvez relação com graph embedding}
+\TODO{chamar último capítulo de discussão}
 
 \begin{proof}
     Seja $i \colon x \to y$. Fixaremos um $a, b \in \Obj{\I}$ para ilustração, mas o argumento será
@@ -6007,6 +6745,10 @@ definição de encoding se comporta em outras categorias:
 
 \TODO{exemplo com comma category}
 \TODO{se a conta sair trivial, olhar lema do Yoneda}
+
+\TODO{pequena conclusão, explicar o que fiz, o que talvez pode ser feito com os resultados}
+\TODO{talvez dar exemplo nas comma categories na definição}
+\TODO{falar o que poderia ser feito a mais}
 
 \chapter*{TODOs}
     \PrintTODOs
