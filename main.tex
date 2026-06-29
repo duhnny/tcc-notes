@@ -82,7 +82,7 @@
 
 \tableofcontents
 
-\chapter{Introdução}
+\chapter{Introdução}\label{introduction}
 
 Uma estratégia que se tornou muito comum hoje em dia por conta de sua eficiência é a de
 paralelização (\autocite{parallel_computing}, \autocite{reevaluating}). Nela, um programa é
@@ -216,7 +216,7 @@ CPUs que realizam essas operações. Vamos formalizar isso.
 
 Agora, descreveremos o grafo temporal do fluxo de informações entre as CPUs:
 
-\begin{definition}\mylabel[grafo temporal]{temporal_graph}
+\begin{definition}\mylabel[grafo!temporal]{temporal_graph}
     Seja $G$ um grafo. O \textbf{grafo temporal} de $G$ é o grafo, denotado $\temp{G}$, é o grafo:
 
     \begin{equation*}
@@ -250,8 +250,6 @@ tempo.
     $a' \edg[\alpha'] b$ em $A$ tal que $f(\alpha') = \alpha$. Nesse caso, denotamos
     $f \colon A \encodes B$.
 \end{definition}
-
-\TODO{definir homomorfismo parcial}
 
 Com isso, podemos afirmar, o seguinte, pela argumentação acima:
 
@@ -330,7 +328,7 @@ trabalhando em um universo de tamanho adequado.
 
 Comecemos com a definição do que é uma categoria:
 
-\begin{definition}\mylabel{category}
+\begin{definition}\mylabel[categoria]{category}
     Uma \textbf{categoria} $\C$ é uma coleção de objetos, que denotamos $\Obj{\C}$ e flechas, que
     denotamos $\Mor{\C}$. A cada flecha $f \in \Mor{\C}$, correspondem dois objetos de $\C$:
 
@@ -354,9 +352,9 @@ Comecemos com a definição do que é uma categoria:
     \end{center}
     como um diagrama.
 
-    Ademais, uma categoria é munida de uma operação de \textbf{composição} $\circ$ da seguinte
-    forma: se $f \colon a \to b$ e $g \colon b \to c$ são flechas de $\C$, então
-    $g \circ f \in \Mor{\C}$ é uma flecha tal que
+    Ademais, uma categoria é munida de uma operação de \textbf{composição}\index{composição}
+    $\circ$ da seguinte forma: se $f \colon a \to b$ e $g \colon b \to c$ são flechas de $\C$,
+    então $g \circ f \in \Mor{\C}$ é uma flecha tal que
 
     \begin{equation*}
         \dom{g \circ f} = a \logicalAnd \cod{g \circ f} = c
@@ -368,16 +366,17 @@ Comecemos com a definição do que é uma categoria:
     flechas, é necessário que o contradomínio da primeira seja o domínio da segunta).
 
     Por fim, para cada objeto $a \in \Obj{\C}$, existe uma flecha $\id{a} \in \Mor{\C}$, chamada a
-    \textbf{identidade de $a$} tal que, para toda flecha $f \colon a \to b$, $f \circ \id{a} = f$,
-    e, para toda flecha $g \colon c \to a$, $\id{a} \circ g = g$.
+    \textbf{identidade de $a$}\index{identidade} tal que, para toda flecha $f \colon a \to b$,
+    $f \circ \id{a} = f$, e, para toda flecha $g \colon c \to a$, $\id{a} \circ g = g$.
 \end{definition}
 
 A definição acima é relativamente abstrata. Convém observar alguns exemplos de categorias para
 desenvolver a intuição sobre o tipo de estrutura com a qual estamos lidando.
 
 \begin{example}
-    Considere a categoria $\Set$, em que os objetos $x, y, \cdots \in \Obj{\Set}$ são conjuntos, e
-    onde as flechas $f, g, \cdots \in \Mor{\Set}$ são funções entre conjuntos.
+    Considere a categoria $\Set$\index{categoria!dos conjuntos}, em que os objetos
+    $x, y, \cdots \in \Obj{\Set}$ são conjuntos, e onde as flechas $f, g, \cdots \in \Mor{\Set}$
+    são funções entre conjuntos.
 
     Para cada conjunto $x$, defina a identidade em $x$ como a função que leva qualquer elemento de
     $x$ nele próprio, ou, em termos conjuntistas
@@ -394,9 +393,9 @@ desenvolver a intuição sobre o tipo de estrutura com a qual estamos lidando.
 \end{example}
 
 \begin{example}
-    Um conjunto parcialmente ordenado (\textit{partially ordered set}) é um par $(X, \leq_X)$ em
-    que $X$ é um conjunto e $\leq_X$ é uma relação de ordem em $X$, isto é, que obedece as
-    seguintes regras:
+    Um conjunto parcialmente ordenado\index{conjunto parcialmente ordenado}\index{poset}
+    (\textit{partially ordered set}) é um par $(X, \leq_X)$ em que $X$ é um conjunto e $\leq_X$ é
+    uma relação de ordem em $X$, isto é, que obedece as seguintes regras:
 
     \begin{enumerate}
         \item[reflexiva]      $x \leq_X x$, para todo $x \in X$;
@@ -430,11 +429,11 @@ desenvolver a intuição sobre o tipo de estrutura com a qual estamos lidando.
 \end{example}
 
 \begin{example}
-    Um \textbf{grupo} é uma tripla ordenada $(G, \cdot_G, e_G, i_G)$ em que $G$ é um conjunto,
-    $\cdot_G$ é uma operação binária associativa em $G$ e $e_G$ é a identidade em $G$ para essa
-    operação, isto é, $a \cdot_G e_G = e_G \cdot_G a = a$, para todo $a \in G$, e, por fim,
-    $i_G \colon G \to G$ é uma função que leva cada elemento de $G$ no seu inverso na operação de
-    $G$, isto é, tal que $a \cdot_G i_G(a) = i_G(a) \cdot_G a = e_G$ para todo $a \in G$.
+    Um \textbf{grupo}\index{grupo} é uma tripla ordenada $(G, \cdot_G, e_G, i_G)$ em que $G$ é um
+    conjunto, $\cdot_G$ é uma operação binária associativa em $G$ e $e_G$ é a identidade em $G$
+    para essa operação, isto é, $a \cdot_G e_G = e_G \cdot_G a = a$, para todo $a \in G$, e, por
+    fim, $i_G \colon G \to G$ é uma função que leva cada elemento de $G$ no seu inverso na operação
+    de $G$, isto é, tal que $a \cdot_G i_G(a) = i_G(a) \cdot_G a = e_G$ para todo $a \in G$.
 
     Grupos com homomorfismos de grupo, isto é, funções que preservam a identidade, a operação do
     grupo e os inversos formam uma categoria, que escrevemos $\Group$. Explicitamente, essas
@@ -463,7 +462,7 @@ Em geral, classes de estruturas com funções entre elas que preservam essas est
 categoria. Mas isso nos levanta uma pergunta: existem "funções" entre categorias que preservem a
 estrutura da categoria? E a resposta é sim, elas são chamadas de funtores:
 
-\begin{definition}\mylabel{functor}
+\begin{definition}\mylabel[funtor]{functor}
     Sejam $\A, \B$ duas categorias. Um \textbf{funtor} $F$ de $\A$ para $\B$, que denotamos, como
     morfismos, $F \colon \A \to \B$, é um mapa de objetos $\A$ para objetos de $\B$ e de flechas de
     $\A$ para flechas de $\B$ tal que:
@@ -646,7 +645,7 @@ eles. Isso é verdadeiro para qualquer categoria na imagem de $P$ como definido 
 em uma relação de ordem $\leq$, há no máximo um par $(x_1, x_2)$ e, além disso, se $(x_1, x_2) \in
 \leq$ e $(x_2, x_1) \in \leq$, então $x_1 = x_2$.
 
-\begin{example}\mylabel{discrete_cat}
+\begin{example}\mylabel[categoria!discreta]{discrete_cat}
     Definimos o seguinte funtor $\D \colon \Set \to \Cat$ da seguinte forma:
 
     \begin{align*}
@@ -654,9 +653,9 @@ em uma relação de ordem $\leq$, há no máximo um par $(x_1, x_2)$ e, além di
         \Mor{\D(X)} &\defeq \{\id{x} \colon x \in X\}
     \end{align*}
     ou seja, a categoria $\D(X)$ é a categoria cujos objetos são os elementos do conjunto $X$ e
-    cujos morfismos são somente as identidades dos objetos. De fato, isso nos dá uma categoria pela
-    \myref[Definição]{category} porque tem as identidades, e a composição só precisa valer para as
-    identidades, e o vale por definição.
+    cujos morfismos são somente as identidades dos objetos, dita a \textbf{categoria discreta}
+    sobre $X$. De fato, isso nos dá uma categoria pela \myref[Definição]{category} porque tem as
+    identidades, e a composição só precisa valer para as identidades, e o vale por definição.
 
     Para um morfismo em $\Set$ $f \colon X \to Y$, ou seja, uma função entre os conjuntos $X$ e
     $Y$, definimos o seguinte funtor:
@@ -677,7 +676,7 @@ categoria, e funtores são setas entre categorias, quais são as setas entre fun
 Bom, sabemos que as setas entre funtores têm de levar ao menos objetos de um em objetos do outro.
 Disto vem a seguinte definição, de \autocite{freeproduct}.
 
-\begin{definition}\mylabel{transformation}
+\begin{definition}\mylabel[transformação]{transformation}
     Sejam $\A, \B$ duas categorias, e sejam $F, F' \colon \A \to \B$ dois funtores entre elas. Uma
     \textbf{transformação} $\tau$ entre $F$ e $F'$, que denotamos $\tau \colon F \Rightarrow F'$, é
     uma família $(\tau_a)_{a \in \Obj{\A}}$ de morfismos em $\B$ indexada pelos objetos de $a$ tal
@@ -692,11 +691,11 @@ Perceba, no entanto, que isso não implica nada sobre os morfismos. Uma condiç�
 para manter a consistência desses morfismos através de transformações é a chamada \textit{condição
 de naturalidade}, enunciada a seguir:
 
-\begin{definition}\mylabel{natural_transformation}
+\begin{definition}\mylabel[transformação!natural]{natural_transformation}
     Sejam $\A, \B$ duas categorias, e $F, F' \colon \A \to \B$ dois funtores entre elas. Seja,
     ainda, $\eta \colon F \Rightarrow F'$ uma transformação entre esses dois funtores. Então
-    dizemos que $\eta$ tem a \textbf{condição de naturalidade} se, para todo morfismo
-    $f \colon x \to y$ em $\A$, o seguinte diagrama comuta:
+    dizemos que $\eta$ tem a \textbf{condição de naturalidade}\index{naturalidade} se, para todo
+    morfismo $f \colon x \to y$ em $\A$, o seguinte diagrama comuta:
 
     \begin{center}
         % https://q.uiver.app/#q=WzAsNCxbMCwwLCJGKHgpIl0sWzIsMCwiRih5KSJdLFswLDIsIkYnKHgpIl0sWzIsMiwiRicoeSkiXSxbMCwxLCJGKGYpIl0sWzAsMiwiXFxldGFfeCIsMl0sWzEsMywiXFxldGFfeSJdLFsyLDMsIkYnKGYpIiwyXV0=
@@ -718,7 +717,7 @@ de naturalidade}, enunciada a seguir:
 Ademais, as transformações naturais, assim como as setas nas categorias, se compõem. Isso se dá da
 seguinte forma:
 
-\begin{definition}\mylabel{vertical_composition}
+\begin{definition}[composição!vertical]\mylabel{vertical_composition}
     Sejam $\A, \B$ duas categorias, e $F, F', F'' \colon \A \to \B$ três funtores entre elas. Ainda
     mais, sejam $\eta \colon F \Rightarrow F'$ e $\eta' \colon F' \Rightarrow F''$ duas
     transformações naturais.
@@ -788,7 +787,7 @@ resultados sobre eles sem o conhecimento preciso do que são, como, por exemplo,
 A definição mais fundamental para nós é uma que permeia toda a Matemática: a de
 \textit{isomorfismo}. Vejamos como na área de Categorias, o isomorfismo é definido:
 
-\begin{definition}\mylabel{isomorphism}
+\begin{definition}\mylabel[isomorfismo]{isomorphism}
     Seja $\C$ uma categoria. Um morfismo $f \colon x \to y$ é dito um \textbf{isomorfismo} se, e
     somente se, existe um outro morfismo $g \colon y \to x$ em $\C$ tal que:
 
@@ -839,7 +838,7 @@ categorias já conhecidas:
     Assim sendo, os isomorfismos em $\Set$ são as funções bijetoras.
 \end{example}
 
-\begin{example}
+\begin{example}\mylabel[categoria!pequena]{cat}
     Em $\Cat$, os objetos são categorias, e os morfismos são funtores entre elas. Seja, então,
     $F \colon \A \to \B$ um isomorfismo. Então existe uma inversa $G$ para $F$.
 
@@ -957,8 +956,8 @@ Há um pequeno enfraquecimento da condição do isomorfismo que é apresentada a
         g \circ f = \id{x}.
     \end{equation*}
 
-    Nesse caso, dizemos que $f$ é uma \textbf{seção} de $g$, ou que $g$ é uma
-    \textbf{retração} de $f$.
+    Nesse caso, dizemos que $f$ é uma \textbf{seção}\index{seção} de $g$, ou que $g$ é uma
+    \textbf{retração}\index{retração} de $f$.
 \end{definition}
 
 Repare que neste caso só exigimos que a inversa seja de um lado. Caso tenhamos morfimos como acima,
@@ -1013,13 +1012,15 @@ O resultado acima não é importante apenas no caso de seções e retrações. N
 classes de morfismos justamente por essa propriedade:
 
 \begin{definition}\mylabel{monomorphism+epimorphism}
-    Seja $\C$ uma categoria. Um morfismo $m \colon x \to y$ de $\C$ é dito um \textbf{monomorfismo}
-    ou um \textbf{morfismo cancelável à esquerda} se, e somente se, para todo par de morfismos
+    Seja $\C$ uma categoria. Um morfismo $m \colon x \to y$ de $\C$ é dito um
+    \textbf{monomorfismo}\index{monomorfismo} ou um \textbf{morfismo cancelável à
+    esquerda}\index{cancelável} se, e somente se, para todo par de morfismos
     $\alpha, \alpha' w \to x$, se $m \circ \alpha = m \circ \alpha'$, então $\alpha = \alpha'$.
     Nesse caso, escrevemos $m \colon x \mono y$.
 
-    \textit{Dualmente}, um morfismo $e \colon x \to y$ é dito um \textbf{epimorfismo} ou um
-    \textbf{morfismo cancelável à direita} se, e somente se, para todo par de morfismos
+    \textit{Dualmente}, um morfismo $e \colon x \to y$ é dito um
+    \textbf{epimorfismo}\index{epimorfismo} ou um \textbf{morfismo cancelável à direita} se, e
+    somente se, para todo par de morfismos
     $\beta, \beta' \colon y \to z$, se $\beta \circ e = \beta' \circ e$, então $\beta = \beta'$.
     Escrevemos, então, $e \colon x \epi y$.
 \end{definition}
@@ -1066,9 +1067,9 @@ classes de morfismos justamente por essa propriedade:
 Além de morfimos, existem algumas classes de objetos especiais que nos serão úteis mais afrente.
 
 \begin{definition}\mylabel{initial+terminal}
-    Seja $\C$ uma categoria. Dizemos que um objeto $\initial \in \Obj{\C}$ é dito \textbf{inicial}
-    se, e somente se, para qualquer outro objeto $x \in \Obj{\C}$ existe um único morfismo
-    $f \colon \initial \to \C$:
+    Seja $\C$ uma categoria. Dizemos que um objeto $\initial \in \Obj{\C}$ é dito
+    \textbf{inicial}\index{objeto!inicial} se, e somente se, para qualquer outro objeto
+    $x \in \Obj{\C}$ existe um único morfismo $f \colon \initial \to \C$:
 
     \begin{center}
         % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXGluaXRpYWwiXSxbMiwwLCJcXGZvcmFsbCB4Il0sWzAsMSwiXFxleGlzdHMhIGYiXV0=
@@ -1078,8 +1079,9 @@ Além de morfimos, existem algumas classes de objetos especiais que nos serão �
         \end{tikzcd}
     \end{center}
 
-    \textit{Dualmente}, um objeto $\terminal \in \Obj{\C}$ é dito \textbf{terminal} se, e somente se,
-    para todo $x \in \Obj{\C}$ existe um único morfismo $f \colon x \to \terminal$:
+    \textit{Dualmente}, um objeto $\terminal \in \Obj{\C}$ é dito
+    \textbf{terminal}\index{objeto!terminal} se, e somente se, para todo $x \in \Obj{\C}$ existe um
+    único morfismo $f \colon x \to \terminal$:
 
     \begin{center}
         % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXGZvcmFsbCB4Il0sWzIsMCwiXFxmaW5hbCJdLFswLDEsIlxcZXhpc3RzISBmIl1d
@@ -1158,7 +1160,7 @@ provas na outra direção.
 
 Para chegar a isso, é importante considerar a seguinte construção abstrata:
 
-\begin{definition}\mylabel{opposite_category}
+\begin{definition}\mylabel[categoria!oposta]{opposite_category}
     Seja $\C$ uma categoria. A \textbf{categoria oposta} $\op{\C}$ é a categoria que se obtém a
     partir de $\C$ mantendo os objetos e formalmente invertendo as flechas. Isto é, as flechas e as
     composições são as mesmas, apenas se troca o codomínio com o domínio.
@@ -1249,7 +1251,7 @@ Esta não é a única construção útil que se pode fazer a partir de uma categ
 seguinte construção nos será útil para definir a categoria dos grafos no capítulo
 \ref{graph_theory}.
 
-\begin{definition}\mylabel{exponential_category}
+\begin{definition}\mylabel[categoria!de funtores]{exponential_category}
     Sejam $\A, \B$ duas categorias. Então a \textbf{categoria de funtores de $\A$ até $\B$}, que
     denotamos $\B^{\A}$ é a categoria cujos objetos são funtores de $\A$ até $\B$, e as flechas são
     as transformações naturais entre esses funtores. Para cada funtor $F$, a identidade é a família
@@ -1281,7 +1283,7 @@ se chama \textit{limite}. Passaremos a descrevê-la nesta seção.
 
 Primeiramente, convém formalizar a noção de \textit{diagrama} em uma categoria $\C$.
 
-\begin{definition}\mylabel{diagram}
+\begin{definition}\mylabel[diagrama]{diagram}
     Sejam $\I, \C$ duas categorias. Um \textbf{diagrama} (do tipo $\I$) em $\C$ é um funtor
     $D \colon \I \to \C$. Nesse contexto, a categoria $\I$ é chamada de índice do diagrama.
 \end{definition}
@@ -1330,7 +1332,7 @@ Dado um diagrama $D$, podemos definir a seguinte categoria:
         \end{tikzcd}
     \end{center}
 
-    Esses objetos dessa categoria são chamados de cones comutativos sobre $D$.
+    Esses objetos dessa categoria são chamados de cones comutativos\index{cone} sobre $D$.
 
     Os morfismos entre objetos dessa categoria são morfismos em $\C$, por exemplo
     $f \colon a \to a'$, que leva um cone $(a, (\psi_i)_{i \in \Obj{\I}})$ no cone
@@ -1348,8 +1350,9 @@ Dado um diagrama $D$, podemos definir a seguinte categoria:
         \end{tikzcd}
     \end{center}
 
-    Dualmente, a \textbf{categoria de cocones sobre $D$}, $\Cocone{D}$ é a categoria cujos objetos
-    são do tipo $(a, \psi_i)_{i \in \Obj{\I}}$ tais que os seguintes diagramas comutam sobre $D$:
+    Dualmente, a \textbf{categoria de cocones sobre $D$}\index{cocone}, $\Cocone{D}$ é a categoria
+    cujos objetos são do tipo $(a, \psi_i)_{i \in \Obj{\I}}$ tais que os seguintes diagramas
+    comutam sobre $D$:
 
     \begin{center}
         % https://q.uiver.app/#q=WzAsMyxbMCwwLCJEKGkpIl0sWzIsMCwiRChqKSJdLFsxLDIsImEiXSxbMCwxLCJEKGYpIl0sWzAsMiwiXFxwc2lfaSIsMl0sWzEsMiwiXFxwc2lfaiJdXQ==
@@ -1393,10 +1396,11 @@ comuta também no exterior, porque
 Bom, com isso em mente, podemos finalmente definir o que são limites e colimites.
 
 \begin{definition}\mylabel{limit+colimit}
-    Seja $\C$ uma categoria e $D \colon \I \to \C$ um diagrama sobre $\C$. Um \textbf{limite} de
-    $D$ é um objeto terminal da categoria $\Cone{D}$.
+    Seja $\C$ uma categoria e $D \colon \I \to \C$ um diagrama sobre $\C$. Um
+    \textbf{limite}\index{limite} de $D$ é um objeto terminal da categoria $\Cone{D}$.
 
-    Dualmente, um \textbf{colimite} de $D$ é um objeto inicial da categoria $\Cocone{D}$.
+    Dualmente, um \textbf{colimite}\index{colimite} de $D$ é um objeto inicial da categoria
+    $\Cocone{D}$.
 \end{definition}
 
 Como tanto o limite quanto o colimite são objetos terminal e inicial, respectivamente, sabemos que
@@ -1408,7 +1412,7 @@ diagrama $D$. Semelhantemente, $\colim D$ será o vértice do colimite de $D$.
 Bom, isso nos dá abertura para tratar de três estruturas muito importantes na Teoria de Categorias:
 o produto, o equalizador e o pullback, bem como os seus duais.
 
-\begin{definition}\mylabel{product}
+\begin{definition}\mylabel[produto!categórico]{product}
     Seja $\C$ uma categoria e $\I$ uma categoria discreta. Seja, ademais, $D \colon \I \to \C$ um
     diagrama de tipo $\I$ em $\C$. O \textbf{produto} da família de objetos de $\C$,
     $(x_i)_{i \in \Obj{\I}}$, é o limite do diagrama $D$, denotado como
@@ -1417,14 +1421,16 @@ o produto, o equalizador e o pullback, bem como os seus duais.
         \left( \prod_{i \in \Obj{\I}} x_i, (\pi_i)_{i \in \Obj{\I}} \right)
     \end{equation*}
 
-    À família de flechas de $(\pi_i)_{i \in \Obj{\I}}$, chamamos de \textbf{projeções}.
+    À família de flechas de $(\pi_i)_{i \in \Obj{\I}}$, chamamos de
+    \textbf{projeções}\index{canônica!projeção}.
 
     Dualmente, o \textbf{coproduto} é o colimite de $D$, denotado:
 
     \begin{equation*}
         \left( \coprod_{i \in \Obj{\I}} x_i, (\iota)_{i \in \Obj{\I}} \right)
     \end{equation*}
-    e chamamos a família $(\iota_i)_{i \in \Obj{\I}}$ de \textbf{injeções}.
+    e chamamos a família $(\iota_i)_{i \in \Obj{\I}}$ de
+    \textbf{injeções}\index{canônica!injeção}.
 \end{definition}
 
 É comúm nos referirmos ao objeto $\prod_i x_i$ como o produto por abuso de linugagem, mas esteja
@@ -1461,7 +1467,7 @@ E semelhantemente para o colimite de uma família. Vejamos um exemplo mais famil
     uma família $(x_i)_{i \in \Obj{\I}}$ de conjuntos. Suponha, também que se tenha um conjunto $y$
     e uma famlília de funções $(f_i)_{i \in \Obj{\I}}$ tal que cada $f_i \colon y \to x_i$.
 
-    Tome ainda o produto cartesiano
+    Tome ainda o produto cartesiano\index{produto!cartesiano}
 
     \begin{equation*}
         \prod_{i \in \Obj{\I}} x_i \defeq \left\{x \in \left( \bigcup_i x_i \right)^{\Obj{\I}}
@@ -1489,7 +1495,7 @@ E semelhantemente para o colimite de uma família. Vejamos um exemplo mais famil
     Sendo assim, o produto cartesiano como definido acima é, a menos de isomorfismo, que no caso
     dos conjuntos é bijeção, o produto categórico de $\Set$.
 
-    Por outro lado, considere a união disjunta de $(x_i)$:
+    Por outro lado, considere a união disjunta\index{união disjunta} de $(x_i)$:
 
     \begin{equation*}
         \bigsqcup_{i \in \Obj{\I}} x_i \defeq
@@ -1520,8 +1526,9 @@ Outro tipo de limite importante são os \textit{equalizadores} e \textit{coequal
 generalizam, para categorias, as noções de subconjunto e quociente, respectivamente.
 
 \begin{definition}\mylabel{equalizer}
-    Seja $\C$ uma categoria e $f, g \colon a \to b$ dois morfismos em $\C$. O \textit{equalizador}
-    dessas flechas é um objeto $x$ e uma flecha $m \colon x \to a$ tal que $f \circ m = g \circ m$.
+    Seja $\C$ uma categoria e $f, g \colon a \to b$ dois morfismos em $\C$. O
+    \textit{equalizador}\index{equalizador} dessas flechas é um objeto $x$ e uma flecha
+    $m \colon x \to a$ tal que $f \circ m = g \circ m$.
 
     Mais geralmente, o equalizador de uma família de flechas $(f_i)_{i \in I}$ em $\Hom[\C]{a}{b}$
     é um objeto $x \in \Obj{\C}$ e uma flecha $m \colon x \to a$ tais que
@@ -1548,7 +1555,8 @@ generalizam, para categorias, as noções de subconjunto e quociente, respectiva
     \end{center}
 
     Dualmente, para uma família $(f_i)_{i \in I}$ de morfismos em $\Hom[\C]{a}{b}$, um
-    \textbf{coequalizador} é um objeto $x$ e uma flecha $e \colon b \to x$ tal que:
+    \textbf{coequalizador}\index{coequalizador} é um objeto $x$ e uma flecha $e \colon b \to x$ tal
+    que:
 
     \begin{equation*}
         e \circ f_i = e \circ f_j
@@ -1600,8 +1608,9 @@ Por fim, a propriedade universal do produto nos dá a segunda parte da definiç�
 forma, coequalizadores são colimites.
 
 \begin{example}
-    Em $\Set$, equalizadores são subconjuntos, e coequalizadores são quocientes. Com efeito, sejam
-    $f, g \colon a \to b$ duas funções. Então o equalizador dessas flechas é o subconjunto:
+    Em $\Set$, equalizadores são subconjuntos\index{subconjunto}, e coequalizadores são
+    quocientes\index{quociente}. Com efeito, sejam $f, g \colon a \to b$ duas funções. Então o
+    equalizador dessas flechas é o subconjunto:
 
     \begin{equation*}
         x \defeq \{c \in a \colon f(c) = g(c)\}
@@ -1642,9 +1651,9 @@ nos grafos: os \textit{pullbacks} e \textit{pushouts}.
 
 \begin{definition}\mylabel{pullback}
     Seja $\C$ uma categoria, e $f \colon a \to c$ e $g \colon b \to c$ duas flechas em $\C$ com o
-    mesmo codomínio. Então o \textbf{pullback} dessas duas flechas é um objeto $a \times_c b$
-    dotado de duas flechas $f' \colon a \times_c b \to b$, e $g' \colon a \times_c b \to a$ tais
-    que o seguinte diagrama comuta:
+    mesmo codomínio. Então o \textbf{pullback}\index{pullback} dessas duas flechas é um objeto
+    $a \times_c b$ dotado de duas flechas $f' \colon a \times_c b \to b$, e
+    $g' \colon a \times_c b \to a$ tais que o seguinte diagrama comuta:
 
     \begin{center}
         % https://q.uiver.app/#q=WzAsNCxbMCwwLCJhIFxcdGltZXNfYyBiIl0sWzAsMiwiYiJdLFsyLDAsImEiXSxbMiwyLCJjIl0sWzIsMywiZiJdLFsxLDMsImciLDJdLFswLDIsImcnIl0sWzAsMSwiZiciLDJdLFswLDMsIiIsMSx7InN0eWxlIjp7Im5hbWUiOiJjb3JuZXIifX1dXQ==
@@ -1698,8 +1707,8 @@ nos grafos: os \textit{pullbacks} e \textit{pushouts}.
     Caso esse seja o caso, denotamos que um diagrama é pullback com a marcação no canto superior
     direito no primeiro diagrama acima.
 
-    Dualmente, dadas duas flechas $f \colon c \to a$ e $g \colon c \to b$, o \textbf{pushout} é o
-    completamento do diagrama
+    Dualmente, dadas duas flechas $f \colon c \to a$ e $g \colon c \to b$, o
+    \textbf{pushout}\index{pushout} é o completamento do diagrama
 
     \begin{center}
         % https://q.uiver.app/#q=WzAsNCxbMCwwLCJjIl0sWzIsMCwiYiJdLFswLDIsImEiXSxbMiwyLCJhIFxcdGltZXNeYyBiIl0sWzAsMiwiZiIsMl0sWzAsMSwiZyJdLFsyLDMsImcnIiwyXSxbMSwzLCJmJyJdLFszLDAsIiIsMSx7InN0eWxlIjp7Im5hbWUiOiJjb3JuZXIifX1dXQ==
@@ -1975,8 +1984,8 @@ as setas entre os produtos de grafos, por exemplo. O seguinte lema nos dá esse 
     e, portanto, existe um único $h \colon \colim D \to \colim D'$ como no enunciado.
 \end{proof}
 
-À flecha $h$ acima, em ambos os casos, chamamos de \textbf{flecha canônica} entre os limites ou
-colimites.
+À flecha $h$ acima, em ambos os casos, chamamos de \textbf{flecha canônica}\index{canônica!flecha}
+entre os limites ou colimites.
 
 O seguinte resultado sobre essas flechas nos será útil mais afrente:
 
@@ -2359,7 +2368,7 @@ provado.
 
 Agora, exploremos algumas boas propriedades dos pré-feixes.
 
-\begin{example}\mylabel[Pré-feixes]{presheaves}
+\begin{example}\mylabel[pré-feixes]{presheaves}
     Seja $\C$ uma categoria pequena qualquer. Considere, então, a categoria $\Set^{\op{\C}}$.
 
     (i) Os monomorfismos em $\Set^{\op{\C}}$ são famílias de funções injetoras. Com efeito, sejam
@@ -2374,9 +2383,10 @@ Agora, exploremos algumas boas propriedades dos pré-feixes.
     (ii) Da mesma forma, epimorfismos em $\Set^{\op{\C}}$ são famílias de epimorfismos em $\Set$,
     isto é, sobrejeções.
 
-    (iii) Como provado acima, limites e colimites são feitos ponto a ponto. Então, por exemplo,
-    dados dois funtores $F, G \colon \op{\C} \to \Set$, podemos obter o produto $F \times G$
-    fazendo o produto componente a componente de $F$ e $G$:
+    (iii) Como provado acima, limites e colimites são feitos ponto a ponto
+    \index{limite!ponto a ponto}. Então, por exemplo, dados dois funtores
+    $F, G \colon \op{\C} \to \Set$, podemos obter o produto $F \times G$ fazendo o produto
+    componente a componente de $F$ e $G$:
 
     \begin{equation*}
         (F \times G)(c) = F(c) \times G(c), \hspace{10pt} \forall c \in \Obj{\op{\C}}
@@ -2397,7 +2407,7 @@ com a Teoria de Categorias, que utilizaremos para aprofundar o nosso entendiment
 
 Tendo tudo isso em vista, comecemos com a definição do que é um grafo:
 
-\begin{definition}\mylabel[Categoria!dos grafos]{graph}
+\begin{definition}\mylabel[categoria!dos grafos]{graph}
     Considere a categoria formal $\Gamma$, com dois objetos e duas flechas paralelas seguinte:
 
     \begin{center}
@@ -2416,8 +2426,8 @@ Tendo tudo isso em vista, comecemos com a definição do que é um grafo:
     \end{equation*}
     ou seja, um \textbf{grafo} $G \in \Obj{\Graph}$ é um funtor $G \colon \op{\Gamma} \to \Set$.
 
-    Da mesma forma, um \textbf{homomorfismo de grafos} $h$ é uma transformação natural entre dois
-    desses funtores.
+    Da mesma forma, um \textbf{homomorfismo de grafos}\index{homomorfismo!de grafos} $h$ é uma
+    transformação natural entre dois desses funtores.
 
     \begin{center}
         % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXG9we1xcR2FtbWF9Il0sWzQsMCwiXFxTZXQiXSxbMCwxLCJHIiwwLHsiY3VydmUiOi00fV0sWzAsMSwiSCIsMix7ImN1cnZlIjo0fV0sWzIsMywiaCIsMix7InNob3J0ZW4iOnsic291cmNlIjoyMCwidGFyZ2V0IjoyMH19XV0=
@@ -2446,7 +2456,8 @@ duas funções paralelas
 de $G(E)$ para $G(V)$. Eis a forma como devemos interpretar isso: $G(V)$ será o conjunto de
 vértices do nosso grafo, e $G(E)$ o conjunto de arestas. Nesse contexto,
 $G(s) \colon G(E) \to G(V)$ e $G(t) \colon G(E) \to G(V)$ são as funções que associam a cada aresta
-uma origem (do inglês, \textit{source}) e um destino (do inglês, \textit{target}).
+uma origem\index{origem} (do inglês, \textit{source}) e um destino\index{destino} (do inglês,
+\textit{target}).
 
 Ao longo do texto, usaremos a seguinte notação para nos referirmos a esses objetos:
 
@@ -2549,13 +2560,13 @@ Pelos motivos acima, alguns preferem chamar estruturas desse tipo de "multidigra
     \end{tikzcd}\]
 
     No grafo à esquerda, a origem e o destino de ambas as arestas são o mesmo ponto. Nesse caso,
-    dizemos que a aresta em questão é um \textbf{loop}. No grafo da direita, por sua vez, podemos
-    ver que, para cada aresta, há uma aresta oposta ligando os mesmos dois vértices, e elas estão
-    em pares. É assim que representaremos grafos "sem direção", no sentido estabelecido acima. A
-    ideia é que, em um grafo sem direção, o que pode ir por uma aresta, também pode viajar no
-    sentido contrário, e isso também é o que temos quando usamos pares opostos de arestas. Por fim,
-    no grafo de baixo, temos um exemplo em que ambos $\Ver{G}$ e $\Edg{G}$ são infinitos. Isso é
-    para dizer que, segundo nossa definição, não há nenhuma restrição para o tamanho desses
+    dizemos que a aresta em questão é um \textbf{loop}\index{loop}. No grafo da direita, por sua
+    vez, podemos ver que, para cada aresta, há uma aresta oposta ligando os mesmos dois vértices, e
+    elas estão em pares. É assim que representaremos grafos "sem direção", no sentido estabelecido
+    acima. A ideia é que, em um grafo sem direção, o que pode ir por uma aresta, também pode viajar
+    no sentido contrário, e isso também é o que temos quando usamos pares opostos de arestas. Por
+    fim, no grafo de baixo, temos um exemplo em que ambos $\Ver{G}$ e $\Edg{G}$ são infinitos. Isso
+    é para dizer que, segundo nossa definição, não há nenhuma restrição para o tamanho desses
     conjuntos. E é claro que também existe a possibilidade de $\Ver{G}$ e $\Edg{G}$ terem tamanhos
     diferentes:
 
@@ -2669,7 +2680,60 @@ Uma última coisa nos é necessária para entender o conceito de encoding:
     isto é, se $H$ está contido em $G$.
 
     Nesse caso, escrevemos $H \inclusion G$ ou $i \colon H \inclusion G$, para denotar a inclusão
-    especificamente.
+    explicitamente.
+\end{definition}
+
+\begin{definition}
+    Sejam $A, B \in \Obj{\Graph}$ grafos. Um \textbf{homomorfismo
+    parcial}\index{homomorfismo!parcial} parcial de $A$ para $B$ é um par de flechas $(i, f)$ em
+    que $i \colon C \inclusion A$ é um subgrafo de $A$ e $f \colon A \to B$ é um homomorfismo de
+    $A$ para $B$.
+\end{definition}
+
+A ideia de um homomorfismo parcial é como de uma função definida somente em uma "parte" do grafo
+$G$.
+
+Um encoding, como pode ser visto na \myref[Definição]{encoding}, é um homomorfismo parcial. Fazemos
+isso para permitir encodings em grafos para os quais nem teríamos um homomorfismo, como por
+exemplo:
+
+\begin{center}
+    \begin{minipage}{.2\linewidth}
+        \begin{center}
+            % https://q.uiver.app/#q=WzAsMyxbMCwwLCJcXGJ1bGxldCJdLFsxLDAsIlxcYnVsbGV0Il0sWzIsMCwiXFxidWxsZXQiXSxbMCwxXSxbMSwyXV0=
+            \begin{tikzcd}
+            	\bullet & \bullet & \bullet
+            	\arrow[from=1-1, to=1-2]
+            	\arrow[from=1-2, to=1-3]
+            \end{tikzcd}
+        \end{center}
+    \end{minipage}
+    \begin{minipage}{.2\linewidth}
+        \begin{equation*}
+            \edg[f]
+        \end{equation*}
+    \end{minipage}
+    \begin{minipage}{.2\linewidth}
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXGJ1bGxldCJdLFsxLDAsIlxcYnVsbGV0Il0sWzAsMV1d
+        \begin{tikzcd}
+        	\bullet & \bullet
+        	\arrow[from=1-1, to=1-2]
+        \end{tikzcd}
+    \end{minipage}
+\end{center}
+
+Isso se dá, em parte, porque nossa motivação é a simulação, e, como visto no capítulo
+\ref{introduction}, não é necessário que todas as CPUs e todos os caminhos de comunicação sejam
+utilizados para que possamos simular uma topologia em outra.
+
+Durante o texto, abusaremos da linguagem e identificaremos, muitas vezes, um homomorfismo $f$ com a
+sua composição com a inclusão $f \circ i$ para simplificar a notação. Procuraremos, no entanto,
+deixar claro quando estamos lidando com homomorfismos parciais \textit{versus} quando estaremos
+lidando com homomorfismos definidos em todo o grafo $G$.
+
+\begin{definition}\mylabel[encoding!total]{total_encoding}
+    Um encoding $f \colon A \encodes B$ é dito \textbf{total}\index{encoding!total} se o subgrafo
+    sobre o qual o encoding está definido é $A$, ou seja, se está definido sobre todo o grafo $A$.
 \end{definition}
 
 \section{Grafos especiais}
@@ -2678,7 +2742,7 @@ Uma última coisa nos é necessária para entender o conceito de encoding:
 aparência. Alguns grafos, porém, serão examinados mais afundo ao longo do texto, então convém
 dá-los nomes:
 
-\begin{definition}\mylabel{complete_graph}
+\begin{definition}\mylabel[grafo!completo]{complete_graph}
     Seja $n \in \N$, $n \geq 1$. Então o \textbf{grafo completo de $n$ vértices}, escrito $K_n$, é
     o grafo tal que
 
@@ -2723,7 +2787,7 @@ Mais abaixo, na \myref[Definição]{cayley}, destrincharemos exatamente o que se
 Essa representação nos será muito útil, porque tanto os grafos completos $K_n$ como os cubos $Q_n$
 têm representação de Cayley, o que nos permite trabalhar com eles usando propriedades algébricas.
 
-\begin{definition}\mylabel{cayley}
+\begin{definition}\mylabel[grafo!de Cayley]{cayley}
     Seja $G$ um grupo e $S \subseteq G$ um subconjunto de $G$ qualquer (não necessáriamente um
     subgrupo). Então o \textbf{grafo de Cayley de $G$ com relação a $S$}, denotado por
     $\Cayley{G}{S}$, é o grafo definido da seguinte forma:
@@ -2818,7 +2882,7 @@ seguir:
 O último grafo que nos interessa nomear são os cubos $n$ dimensionais. Aproveitaremos a
 \myref[Definição]{cayley} acima para defini-los de forma sucinta:
 
-\begin{definition}\mylabel{cube}
+\begin{definition}\mylabel[grafo!cubo]{cube}
     Um \textbf{cubo $n$-dimensional} $Q_n$, onde $n \in \N$, $n \geq 1$, é o grafo definido como
 
     \begin{equation*}
@@ -2886,7 +2950,7 @@ Há diversas operações possíveis entre grafos na literatura. Trataremos de do
 ao longo do texto: o produto caixa e o produto tensorial. Além disso, para simplificar a notação
 posteriormente, definiremos o oposto de um grafo:
 
-\begin{definition}\mylabel{opposite_graph}
+\begin{definition}\mylabel[grafo!oposto]{opposite_graph}
     Seja $G \in \Obj{\Graph}$ um grafo. Definimos o \textbf{grafo oposto} $\op{G}$,
     semelhantemente à \myref[Definição]{opposite_category}, como o grafo com os mesmos vértices e
     arestas de $G$, mas com a direção das arestas invertida.
@@ -2901,7 +2965,7 @@ posteriormente, definiremos o oposto de um grafo:
 
 Isto posto, podemos definir as operações que nos servirão daqui para frente.
 
-\begin{definition}\mylabel{tensor_product}
+\begin{definition}\mylabel[produto!tensorial]{tensor_product}
     Seja $(A_i)_{i \in I}$ uma família de grafos. Definimos o \textbf{produto tensorial} dessa
     família de grafos, denotado por $\prod_{i \in I} A_i$ da seguinte forma:
 
@@ -2940,7 +3004,7 @@ Isto posto, podemos definir as operações que nos servirão daqui para frente.
 Outra operação que usaremos entre grafos é o \textit{produto caixa}, que passamos a definir a
 seguir. Porém, antes disso, para simplificar a notação, convém definir um \textit{grafo discreto}.
 
-\begin{definition}\mylabel{discrete_graph}
+\begin{definition}\mylabel[grafo!discreto]{discrete_graph}
     Seja $A \in \Obj{\Graph}$ um grafo. O \textbf{grafo discreto} de $A$, denotado $A_0$ é o grafo
     que só tem os vértices de $A$, sem as arestas, isto é:
 
@@ -2954,7 +3018,7 @@ seguir. Porém, antes disso, para simplificar a notação, convém definir um \t
 
 Podemos, então, definir o \textit{produto caixa}.
 
-\begin{definition}\mylabel{box_product}
+\begin{definition}\mylabel[produto!caixa!de grafos]{box_product}
     Sejam $A, B \in \Obj{\Graph}$ grafos. Então definimos o \textbf{produto caixa}
     $A \boxProduct B$ pelo seguinte pushout ponto a ponto:
 
@@ -3059,15 +3123,15 @@ nos gerará um custo.
 
 Para modelar uma situação como a acima, faremos as seguintes definições.
 
-\begin{definition}\mylabel{path}
+\begin{definition}\mylabel[caminho]{path}
     Seja $G$ um grafo. Um \textbf{caminho} $\gamma$ em $G$ é uma sequência finita
     $(\gamma_0, \gamma_1, \cdots, \gamma_n)$ de arestas de $G$ tais que
     $t(\gamma_i) = s(\gamma_{i+1})$ para todo $i$. Dizemos, nesse caso, que a origem de $\gamma$ é
     $s(\gamma_0)$ e o destino de $\gamma$ é $t(\gamma_n)$. Além disso, representamos
     $\gamma \colon s(\gamma_0) \leadsto t(\gamma_n)$.
 
-    O \textbf{comprimento} de $\gamma$, denotado $\len{\gamma}$, é o tamanho da sequência finita.
-    No caso, $\len{\gamma} = n+1$.
+    O \textbf{comprimento}\index{comprimento} de $\gamma$, denotado $\len{\gamma}$, é o tamanho da
+    sequência finita. No caso, $\len{\gamma} = n+1$.
 \end{definition}
 
 \begin{definition}
@@ -3079,7 +3143,7 @@ Para modelar uma situação como a acima, faremos as seguintes definições.
 Perceba que duas sequências finitas podem ser concatenadas. Definimos, pois, a seguinte operação
 para caminhos:
 
-\begin{definition}
+\begin{definition}\mylabel[concatenação]{concatination}
     Sejam $G$ um grafo e $\gamma_1 \colon a \leadsto b$ e $\gamma_2 \colon b \leadsto c$ dois
     caminhos em $G$. A \textbf{concatenação} de $\gamma_1$ com $\gamma_2$, denotada
     $\gamma_1 \cdot \gamma_2$, é a o caminho resultante da concatenação de $\gamma_1$ com
@@ -3089,7 +3153,7 @@ para caminhos:
 Como a concatenação de sequências é associativa, temos metade do que precisamos para uma categoria,
 só nos faltam as identidades. Podemos definir, então, o seguinte funtor:
 
-\begin{definition}
+\begin{definition}\mylabel[categoria!livre]{free}
     Definimos o funtor $\Free \colon \Graph \to \Cat$ da seguinte forma:
 
     Se $G \in \Obj{\Graph}$ é um grafo, então
@@ -3190,7 +3254,7 @@ Nesta seção, seguiremos alguns resultados simples de \autocite{digraphs}.
 
 Já vimos, anteriormente o que são os ciclos $C_n$. Disso podemos tirar a seguinte definição:
 
-\begin{definition}\mylabel{acyclic}
+\begin{definition}\mylabel[grafo!acíclico]{acyclic}
     Um grafo $G$ é dito \textbf{acíclico} se não existe monomorfismo $f \colon C_n \mono G$ para
     todo $n \in \N$, $n \geq 1$.
 \end{definition}
@@ -3233,14 +3297,16 @@ como computações na vida real, que devem ter um início, com as entradas, e um
 da computação. Convém formalizar essa noção.
 
 \begin{definition}\mylabel{degree}
-    Seja $G$ um grafo e $v \in \Ver{G}$ um de seus vértices. O \textbf{grau de entrada} de $v$,
-    denotado $\deg^-(v)$, é o número de arestas que terminam em $v$, isto é
+    Seja $G$ um grafo e $v \in \Ver{G}$ um de seus vértices. O \textbf{grau de
+    entrada}\index{grau!de entrada} de $v$, denotado $\deg^-(v)$, é o número de arestas que
+    terminam em $v$, isto é
 
     \begin{equation*}
         \deg^-(v) \defeq \card{\{\alpha \in \Edg{G} \colon t(\alpha) = v\}}
     \end{equation*}
 
-    Semelhantemente, o \textbf{grau de saída} de $v$ é o número de arestas que iniciam em $v$:
+    Semelhantemente, o \textbf{grau de saída}\index{grau!de saída} de $v$ é o número de arestas que
+    iniciam em $v$:
 
     \begin{equation*}
         \deg^+(v) \defeq \card{\{\alpha \in \Edg{G} \colon s(\alpha) = v\}}
@@ -3382,7 +3448,7 @@ Primeiramente, mostraremos um lema que nos ajudará a trabalhar cubos $Q_m$.
     Voltando o argumento, temos o outro lado do isomorfismo.
 \end{proof}
 
-\begin{corollary}\mylabel{q_n_iso_cayley}
+\begin{corollary}\mylabel[grafo!cubo]{q_n_iso_cayley}
     $Q_n \cong \Cayley{(\Z_2)^n}{\{(1, 0, 0, \cdots, 0), (0, 1, \cdots, 0), \cdots (0, 0, \cdots, 1)\}}$
 \end{corollary}
 
@@ -3393,7 +3459,7 @@ Primeiramente, mostraremos um lema que nos ajudará a trabalhar cubos $Q_m$.
 Repare que o corolário acima nos dá uma representação dos grafos $Q_n$. Além disso, repare que,
 para qualquer grupo $G$ com $n$ elementos, temos
 
-\begin{equation*}
+\begin{equation*}\index{grafo!completo}
     K_n \cong \Cayley{G}{*}
 \end{equation*}
 
@@ -3401,7 +3467,7 @@ Bom, tendo estabelecido que os grafos de Cayley são úteis na representação d
 estamos trabalhando, introduziremos um lema que nos permitirá encontrar encodings entre esse tipo
 de grafo.
 
-\begin{lemma}\mylabel{cayley_enc_cayley}
+\begin{lemma}\mylabel[grafo!de Cayley]{cayley_enc_cayley}
     Sejam $G, H$ grupos, $S \subseteq G$ e $T \subseteq H$ subconjuntos desses, e
     $f \colon G \to H$ um homomorfismo sobrejetor de grupos tal que $f(S) \supseteq T$. Então
 
@@ -3441,14 +3507,14 @@ de grafo.
 
 Este lema que acabamos de demonstrar nos dá simples condições para encontrar encodings. Não só
 isso, ele nos dá um algoritmo para encontrar tais encodings. Ele nos será útil mais afrente para
-encontrarmos o que apelidaremos de encoding de Hamming\index{Encoding!de Hamming}\footnote{esse é
+encontrarmos o que apelidaremos de encoding de Hamming\index{encoding!de Hamming}\footnote{esse é
 nome que Fellows dá para o encoding.}, por sua ligação com o código de Hamming.
 
 Bom, esses são todos os preliminares de que precisamos antes de atacar a questão posta acima. Além
 disso, precisamos somente de um resultado direto da definição de encoding, que será necessária para
 provar que esse encoding de Hamming é, de fato, o menor encoding possível:
 
-\begin{lemma}\mylabel{degree_geq}
+\begin{lemma}\mylabel[grau]{degree_geq}
     Se $f: G \encodes H$ é um encoding, então $\deg_{f^{-1}[H]}(x) \geq \deg_H(f(x))$.
 \end{lemma}
 
@@ -3838,7 +3904,8 @@ direta de processamentos feitos para uma arquitetura arranjada no padrão de $K_
 arranjada no cubo.
 
 Agora, e se, em vez de exigir que uma infomação pudesse ser passada de um processador para outro em
-uma só etapa, admitíssemos um \textit{custo de retransmissão} de até $r$ etapas?
+uma só etapa, admitíssemos um \textit{custo de retransmissão}\index{custo de retransmissão} de até
+$r$ etapas?
 
 Veja o exemplo a seguir:
 
@@ -4288,7 +4355,7 @@ $B$.
 
 Agora, o seguinte lema pode ser provado sobre esses grafos temporais:
 
-\begin{lemma}
+\begin{lemma}\index{grafo!temporal}
     Se $A, B$ são dois grafos tais que $A \encodes B$, então $\temp{A} \encodes \temp{B}$
 \end{lemma}
 
@@ -4311,7 +4378,7 @@ O que nos dá o seguinte corolário:
 
 Assim sendo, algo que pode ser computado através de um diagrama de computação $D$ em uma rede de
 CPUs disposta em um grafo $B$, pode ser computado também em $A$, se $A \encodes B$. Isso significa
-que podemos "simular", nesse sentido, a primeira rede de CPUs na segunda.
+que podemos "simular"\index{simulação}, nesse sentido, a primeira rede de CPUs na segunda.
 
 Nesta seção, compararemos o que podemos fazer quanto ao problema da simulação de grafos completos
 em cubos usando os resultados que obtivemos para os encodings com os resultados que se podem obter
@@ -4319,7 +4386,7 @@ pela estratégia mais conhecida, chamada de \textit{graph embedding}, que defini
 seguir\footnote{A definição que usaremos é uma generalização de \autocite{embedding} para os
 multi-digrafos que estamos usando.}:
 
-\begin{definition}\mylabel{embedding}
+\begin{definition}\mylabel[embedding]{embedding}
     Sejam $G, H$ grafos. Um \textbf{embedding} de $H$ em $G$ é um monomorfismo
     $F \colon \Free(H) \mono \Free(G)$ em $\Cat$.
 \end{definition}
@@ -4334,7 +4401,7 @@ Isso motiva a seguinte definição:
 
 \begin{definition}
     Sejam $G, H$ grafos e $F \colon \Free(H) \to \Free(G)$ um embedding. Seu \textbf{custo de
-    expansão}, denotado $\cost{F}$, é definido da seguinte forma:
+    expansão}\index{custo de expansão}, denotado $\cost{F}$, é definido da seguinte forma:
 
     \begin{equation*}
         \cost{F} \defeq \max_{\alpha \in \Edg{H}}
@@ -4665,9 +4732,10 @@ termina em $v$}, e isso faz toda a diferença. Observe o exemplo a seguir:
 Dado o exemplo acima, é claro que não basta somente que $f$ seja um epimorfismo para que tenha as
 propriedades que pedimos. Que outra noção poderia se enquadrar?
 
-Repare que funções contínuas chamadas de \textit{espaço de recobrimento} têm uma proprieadade
-parecida com o que desejamos para $f$: elas levantam caminhos. Passamos a descrever essa semelhança
-a seguir. A principal referência para o que segue é \autocite{algebraic_topology}.
+Repare que funções contínuas chamadas de \textit{espaço de recobrimento}\index{espaço de
+recobrimento} têm uma proprieadade parecida com o que desejamos para $f$: elas levantam caminhos.
+Passamos a descrever essa semelhança a seguir. A principal referência para o que segue é
+\autocite{algebraic_topology}.
 
 \begin{definition}
     Sejam $(X, \tau)$ e $(\tilde{X}, \tilde{\tau})$ dois espaços topológicos. Uma função contínua
@@ -4703,7 +4771,7 @@ Chamamos a esse $\tilde\gamma$ que completa o diagrama
     	\arrow["\gamma"', from=3-1, to=3-3]
     \end{tikzcd}
 \end{center}
-de um \textbf{levantamento} de $\gamma$.
+de um \textbf{levantamento}\index{levantamento} de $\gamma$.
 
 Ora, essa propriedade é exatamente o que queremos para um encoding: em vez de um caminho, queremos
 que um encoding levante arestas. A diferença é que não precisamos que esse levantamento seja único,
@@ -4733,7 +4801,7 @@ e a definição para grafos.
 Isto posto, comecemos com a definição do que é uma fibração de Grothendieck
 (\autocite{fibrations}).
 
-\begin{definition}\mylabel{cartesian_morphism}
+\begin{definition}\mylabel[morfismo!cartesiano]{cartesian_morphism}
     Sejam $\A, \B$ categorias e $F \colon \A \to \B$ um funtor entre elas. Um morfismo
     $f \colon x \to y$ é dito \textbf{cartesiano} se, e somente se, para todo morfismo
     $g \colon z \to y$ em $A$ e todo morfismo $w \colon F(z) \to F(x)$ tal que o seguinte diagrama
@@ -4788,7 +4856,7 @@ Isto posto, comecemos com a definição do que é uma fibração de Grothendieck
     com $F(w') = w$.
 \end{definition}
 
-\begin{definition}\mylabel{grothendieck_fibration}
+\begin{definition}\mylabel[fibração de Grothendieck]{grothendieck_fibration}
     Sejam $\A, \B$ categorias e $F \colon \A \to \B$ um funtor entre elas. Nós dizemos que $F$ é
     uma \textbf{fibração de Grothendieck} se, para todo $a \in \Obj{\A}$, e todo morfismo
     $f \colon b \to F(a)$ em $\B$, existe um levantamento $f' \colon a' \to b$ morfismo em $\A$
@@ -5059,8 +5127,8 @@ sejam a identidade não sejam levadas na identidade.
 
 \begin{definition}
     Sejam $\A, \B$ categorias e $F \colon \A \to \B$ um funtor entre elas. Dizemos que $F$
-    \textbf{reflete identidades} se, e somente se, sempre que $f \in \Mor{\A}$ é tal que $F(f)$ é
-    identidade, então $f$ é identidade.
+    \textbf{reflete identidades}\index{identidade!reflete} se, e somente se, sempre que
+    $f \in \Mor{\A}$ é tal que $F(f)$ é identidade, então $f$ é identidade.
 \end{definition}
 
 % Agora, uma noção que, a princípio, teria potencial de fazer a ponte
@@ -5245,8 +5313,8 @@ Agora estamos prontos para provar a equivalência dessas duas definições:
 Há uma definição de produto caixa para categorias, que definimos a seguir:
 
 \begin{definition}\mylabel{cat_box_product}
-    Sejam $\A, \B$ categorias. Definimos o \textbf{produto caixa de categorias} $\A \boxProduct \B$
-    com o seguinte pushout:
+    Sejam $\A, \B$ categorias. Definimos o \textbf{produto caixa de
+    categorias}\index{produto!caixa!de categorias} $\A \boxProduct \B$ com o seguinte pushout:
 
     \begin{center}
         % https://q.uiver.app/#q=WzAsNCxbMCwwLCJcXEFfMCBcXHRpbWVzIFxcQl8wIl0sWzAsMiwiXFxBXzAgXFx0aW1lcyBcXEIiXSxbMiwwLCJcXEEgXFx0aW1lcyBcXEJfMCJdLFsyLDIsIlxcQSBcXGJveFByb2R1Y3QgXFxCIl0sWzAsMiwiXFxpb3RhX0EiLDAseyJzdHlsZSI6eyJ0YWlsIjp7Im5hbWUiOiJob29rIiwic2lkZSI6InRvcCJ9fX1dLFswLDEsIlxcaW90YV9CIiwyLHsic3R5bGUiOnsidGFpbCI6eyJuYW1lIjoiaG9vayIsInNpZGUiOiJib3R0b20ifX19XSxbMSwzXSxbMiwzXSxbMywwLCIiLDEseyJzdHlsZSI6eyJuYW1lIjoiY29ybmVyIn19XV0=
@@ -5411,7 +5479,7 @@ A definição abaixo foi adaptada do estudo das \textit{categorias modelo}, em q
 aprofundar, por exemplo, a partir de \autocite{quasicats} ou \autocite{model}. Ela captura
 exatamente, e generaliza, a noção que vínhamos usando.
 
-\begin{definition}\mylabel{lifting_property}
+\begin{definition}\mylabel[propriedade de levantamento]{lifting_property}
     Seja $\C$ uma categoria, e $i, k \in \Mor{\C}$ dois morfismos de $\C$ quaisquer. Dizemos que
     $i$ tem a \textbf{propriedade de levantamento à esquerda} com relação a $k$ (ou,
     equivalentemente, que $k$ tem a \textbf{propriedade de levantamento à direia} com relação a
@@ -5447,8 +5515,8 @@ exatamente, e generaliza, a noção que vínhamos usando.
     \end{center}
 
     Nas mesmas circunstâncias, dizemos que $i$ tem a \textbf{propriedade de levantamento único à
-    esquerda (direita)}, ou, de forma mais concisa, PLU, se $h$ é o único morfismo que faz tudo
-    comutar.
+    esquerda (direita)}\index{propriedade de levantamento!único}, ou, de forma mais concisa, PLU,
+    se $h$ é o único morfismo que faz tudo comutar.
 \end{definition}
 
 Vejamos o que a definição acima significa.
