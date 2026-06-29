@@ -1,0 +1,38 @@
+\ExplSyntaxOn
+
+\prop_new:N \g_db_todo_prop
+
+\NewDocumentCommand{\TODO}{m}{
+    \ClassWarning{TODO}{#1}
+    \fcolorbox{red}{white}{\hypertarget{TODO_ \msg_line_number:}{\color{red}{#1}}}
+    \prop_gput:Nen \g_db_todo_prop {\msg_line_number:} {#1}
+}
+
+\cs_new:Npn \printItem:nn #1#2 {\item[\hyperlink{TODO_ #1}{\textbf{#1 .}}] #2}
+
+\NewDocumentCommand{\PrintTODOs} {} {
+    \prop_if_empty:NTF \g_db_todo_prop {} {
+        \chapter*{TODOs}
+        \textbf{Total:~\prop_count:N \g_db_todo_prop}
+        \begin{itemize}
+                \prop_map_function:NN \g_db_todo_prop \printItem:nn
+        \end{itemize}
+    }
+}
+
+\ExplSyntaxOff
+
+\NewDocumentCommand{\mylabel}{om}{%
+    \IfNoValueTF{#1}{%
+        \label{#2}\hypertarget{#2}%
+    }{%
+        \label{#2}\index{#1}\hypertarget{#2}%
+    }%
+}
+\NewDocumentCommand{\myref}{om}{%
+    \IfNoValueTF{#1}{%
+        \hyperlink{#2}{\textbf{\ref{#2}}}%
+    }{%
+        \hyperlink{#2}{\textbf{#1 \ref{#2}}}%%
+    }%
+}%

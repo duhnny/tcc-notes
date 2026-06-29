@@ -34,6 +34,10 @@
 }
 
 % general conventions
+\let\oldImplies=\implies
+\RenewDocumentCommand{\implies}{!o}{%
+	\IfNoValueTF{#1}{\oldImplies}{\xRightarrow{#1}}%
+}%
 \newcommand{\logicalAnd}{\hspace{5pt}\text{\&\&}\hspace{5pt}}
 \newcommand{\logicalOr}{\hspace{5pt}\text{||}\hspace{5pt}}
 \newcommand{\N}{\mathbb{N}}
@@ -105,3 +109,5 @@
 \newcommand{\cost}[1]{\operatorname{cost}\left( #1 \right)}
 \newcommand{\len}[1]{\operatorname{len}\left( #1 \right)}
 \newcommand{\eval}[1]{\operatorname{eval}_{#1}}
+\newcommand{\toPath}[1]{\tilde{#1}}
+\newcommand{\toEdg}[1]{#1^*}
